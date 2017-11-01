@@ -58,7 +58,8 @@ def check_max_i(sta, max_i):
     elif y_d2 > sy-1: max_i[1] = sy-f_size-1
     return max_i
 
-
+# TODO: This needs to be parametrized, or somehow tied to how large stixels are
+# f_size=5 will not be appropriate for 2x2 stixels
 def stim_weighted(sta, max_i, stimulus):
     # Turns the checkerflicker stimulus into more Gaussian-like
     f_size = 5
