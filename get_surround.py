@@ -153,14 +153,23 @@ for i in range(files.shape[1]):
 
     Y, X = np.meshgrid(np.arange(fit_frame.shape[1]), np.arange(fit_frame.shape[0]))
     Z = f(X, Y)
-    Zm = np.log((Z-pars[0])/pars[1])
+    # Correcting for Mahalonobis dist.
+    # Using a second variable Zm2 to not break how it currently works and
+    # easily revert
+    Zm2 = np.log((Z-pars[0])/pars[1])
+    Zm = np.sqrt(Zm2*-2)
+    Zm[Zm==np.inf] = np.nan
+    # To workaround negative values from before, remove minus from Zm comparisons to fix this
+    Zm = -Zm
     Zmr = np.ceil(Zm)
+    Zm = Zm2
 
     ax = plt.subplot(2, 2, 2)
     if np.max(fit_frame) != np.max(np.abs(fit_frame)):
         fit_frame = -fit_frame
     ax.imshow(fit_frame, cmap='BuGn')
-    ax.contour(f(*np.indices(fit_frame.shape)), 4, cmap=plt.cm.Blues)
+    ax.contour(f(*np.indices(fit_frame.shape)), 4, cmap=plt.cm.Reds)
+#    ax.contour(X, Y, -Zm)
 
     from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
 
