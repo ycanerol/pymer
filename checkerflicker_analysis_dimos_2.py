@@ -88,7 +88,7 @@ for filename in files:
         first_run_flag = False
 
     spike_path = main_dir+'rasters/'+str(stimulus_order)+'_SP_C'+filename+'.txt'
-    save_path = main_dir+'analyzed/'+str(stimulus_order)+'_SP_C'+filename
+    save_path = main_dir+'analyzed/'+str(stimulus_order)+'_SP_C'+'{:0>5}'.format(filename)
 
     spike_file = open(spike_path)
     spike_times = np.array([float(line) for line in spike_file])
