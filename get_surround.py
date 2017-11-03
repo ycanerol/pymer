@@ -134,7 +134,7 @@ for i in range(files.shape[1]):
 #    plt.show()
 #    plt.close()
 
-     # %% Fit 2D Gaussian
+# %% Fit 2D Gaussian
 #    fit_frame = sta[:, :, max_i[2]]
 #    f_size = 20
 #
@@ -151,9 +151,21 @@ for i in range(files.shape[1]):
     Zm = np.log((Z-pars[0])/pars[1])
     Zmr = np.ceil(Zm)
 
-    plt.subplot(2,2,2)
-    plt.imshow(fit_frame)
-    plt.contour(f(*np.indices(fit_frame.shape)), 4, cmap=plt.cm.Blues)
+    ax = plt.subplot(2, 2, 2)
+    if np.max(fit_frame) != np.max(np.abs(fit_frame)):
+        fit_frame = -fit_frame
+    ax.imshow(fit_frame, cmap='BuGn')
+    ax.contour(f(*np.indices(fit_frame.shape)), 4, cmap=plt.cm.Blues)
+
+    from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
+
+    scalebar = AnchoredSizeBar(ax.transData,
+                               3, '180 µm', 'lower left',
+                               pad=1,
+                               color='grey',
+                               frameon=False,
+                               size_vertical=.3)
+    ax.add_artist(scalebar)
 #    plt.show()
 # %%
 #    plt.figure(figsize=(12, 12))
