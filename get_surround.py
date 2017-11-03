@@ -25,12 +25,11 @@ def show_sta(sta, max_i, f_size=10):
     plt.show()
 
 
-def readexps(test=False,
-             directory='/home/ycan/Documents/'
-                       'Yunus_rotation_2017_06/data/Experiments/Mouse/'):
+def readexps(directory, test=False):
     # TODO: stimulus_order needs to be parametrized/automated properly
     stimulus_order = 5
     file_paths = glob.glob(directory+'*/analyzed/{}*.npz'.format(stimulus_order))
+    file_paths = sorted(file_paths)
     exp_names = [i.split('/')[-3] for i in file_paths]
     clusters = [i.split('/')[-1].split('C')[-1].split('.')[0] for i in file_paths]
 
@@ -78,7 +77,9 @@ def cut_around_center(sta_original, max_i_o, f_size):
         max_i = max_i_o
     return sta, max_i
 
-files = readexps(test=False, directory='/home/ycan/Documents/data/2017-08-02')
+
+files = readexps(directory='/home/ycan/Documents/data/2017-08-02', test=False)
+#files = np.reshape(files[:, 25], (3,1))
 
 for i in range(files.shape[1]):
 
@@ -162,10 +163,12 @@ for i in range(files.shape[1]):
     surround_mask = np.logical_not(np.logical_and(Zm < -3, Zm > -9))
     surround_mask_3d = np.broadcast_arrays(sta, surround_mask[..., None])[1]
 
-    plt.subplot(2,3,4)
+    #%%
+
+    plt.subplot(2, 3, 4)
     plt.imshow(center_mask)
     plt.title('Center (<3$\sigma$)')
-    plt.subplot(2,3,5)
+    plt.subplot(2, 3, 5)
     plt.imshow(surround_mask)
     plt.title('Surround (Between 3$\sigma$ and 9$\sigma$)')
 #    plt.show()
@@ -187,7 +190,8 @@ for i in range(files.shape[1]):
              size=9, transform=ax.transAxes)
     plt.axhline(0, linestyle='dashed', linewidth=1)
     plt.legend()
-#    plt.show()
-    plt.savefig('/home/ycan/Documents/notes/2017-11-01/'
-                'plots/{}-{:0>5}.svg'.format(exp_date, cluster),
-                format='svg', dpi=300)
+    plt.show()
+#    plt.savefig('/home/ycan/Documents/notes/2017-11-01/'
+#                'plots/{}-{:0>5}.svg'.format(exp_date, cluster),
+#                format='svg', dpi=300)
+#    plt.close()
