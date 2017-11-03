@@ -14,7 +14,7 @@ ax = fig.add_subplot(111, projection='3d')
 
 stride=4
 
-plotthis = Zm
+plotthis = sta_center[:, :, max_i[2]]
 
 #ax.contour(X, Y, plotthis, stride=stride)
 ax.plot_surface(X, Y, plotthis, alpha=.3, color='red')
@@ -23,5 +23,6 @@ cset = ax.contour(X, Y, plotthis, zdir='z', offset=-40, cmap=cm.gnuplot, stride=
 #cset = ax.contour(X, Y, plotthis, zdir='x', offset=0, cmap=cm.gnuplot)
 #cset = ax.contour(X, Y, plotthis, zdir='y', offset=f_size*2, cmap=cm.gnuplot)
 
-
+ax.azim = 200
+ax.elev = 0
 plt.show()
