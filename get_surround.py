@@ -94,6 +94,9 @@ for i in range(files.shape[1]):
     sta_original = data['sta_unscaled']
     max_i_original = data['max_i']
 
+    if data['total_spikes'] < 350:
+        continue
+
     f_size = 10
 
     sta, max_i = cut_around_center(sta_original, max_i_original, f_size)
