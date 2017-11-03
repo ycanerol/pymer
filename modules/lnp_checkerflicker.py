@@ -38,10 +38,9 @@ def sta(spikes, stimulus, filter_length, total_frames):
     # Unscaled might be needed for STC
 
 
-def check_max_i(sta, max_i):
+def check_max_i(sta, max_i, f_size=5):
     # Checks if max_i is too close to the borders
     # Resets is to the closest possible if so
-    f_size = 5
 
     sx = sta.shape[0]
     sy = sta.shape[1]

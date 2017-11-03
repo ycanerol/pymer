@@ -67,11 +67,14 @@ def ringmask(data, center_px, r):
 
 
 def cut_around_center(sta_original, max_i_o, f_size):
+    from lnp_checkerflicker import check_max_i
     if f_size is not 0:
+        max_i_o = check_max_i(sta_original, max_i_o, f_size=f_size)
         sta = sta_original[max_i_o[0]-f_size:max_i_o[0]+f_size+1,
                            max_i_o[1]-f_size:max_i_o[1]+f_size+1,
                            :]
         max_i = np.append([f_size]*2, max_i_o[2])
+
     else:
         sta = sta_original
         max_i = max_i_o
