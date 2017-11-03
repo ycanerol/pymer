@@ -78,8 +78,6 @@ def cut_around_center(sta_original, max_i_o, f_size):
         max_i = max_i_o
     return sta, max_i
 
-
-counter = 0
 files = readexps(test=False, directory='/home/ycan/Documents/data/2017-08-02')
 
 for i in range(files.shape[1]):
@@ -179,16 +177,17 @@ for i in range(files.shape[1]):
     sta_surround_temporal = np.mean(sta_surround, axis=(0, 1))
 
 #    f = plt.figure()
-    ax = plt.subplot(2,3,6)
+    ax = plt.subplot(2, 3, 6)
 #    plt.plot(sta[max_i[0], max_i[1], :], label='Center pixel')
     plt.plot(sta_center_temporal, label='Center')
     plt.plot(sta_surround_temporal, label='Surround')
     plt.text(0.5, 0.2,
-             'Correlation: {:5.3f}'.format(np.corrcoef(sta_center_temporal, sta_surround_temporal)[0][1]),
-             size=9, transform= ax.transAxes)
-    plt.axhline(0, linestyle='dashed', linewidth = 1)
+             'Correlation: {:5.3f}'.format(np.corrcoef(sta_center_temporal,
+                                                       sta_surround_temporal)[0][1]),
+             size=9, transform=ax.transAxes)
+    plt.axhline(0, linestyle='dashed', linewidth=1)
     plt.legend()
 #    plt.show()
-    plt.savefig('/home/ycan/Documents/notes/2017-11-01/plots/{}-{:0>5}.svg'.format(exp_date, cluster),
+    plt.savefig('/home/ycan/Documents/notes/2017-11-01/'
+                'plots/{}-{:0>5}.svg'.format(exp_date, cluster),
                 format='svg', dpi=300)
-

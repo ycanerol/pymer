@@ -16,13 +16,13 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-main_dir = '/home/ycan/Documents/data/2017-02-10/analyzed/'
+main_dir = '/home/ycan/Documents/data/2017-08-02/analyzed/'
 
 exp_name = main_dir.split('/')[-3]+'_'+main_dir.split('/')[-2]
 
 allfiles = os.listdir(main_dir)
 
-stimulus_order='10'
+stimulus_order='5'
 
 files_f = []  # Full field flicker
 files_c = []  # Checkerflicker
@@ -35,7 +35,7 @@ for i in allfiles:
             files_c.append(i.split('C')[-1].split('.')[0])
 
 #files = [i for i in files_c if i in files_f]
-files_c = files_c[3:]
+#files_c = files_c[3:]
 
 for i in files_c:
 #    # Changed this part because of stimulus order difference
@@ -132,6 +132,6 @@ for i in files_c:
                vmax=np.max(c['sta_unscaled']))
     plt.title('Brightest pixel: {}'.format(c['max_i']))
     plt.tight_layout(pad=5, h_pad=1, w_pad=1.8)
-    plt.show()
-#    plt.savefig(savepath, dpi=200, bbox_inches='tight')
-#    plt.close()
+#    plt.show()
+    plt.savefig(savepath, dpi=200, bbox_inches='tight')
+    plt.close()
