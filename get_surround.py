@@ -67,7 +67,12 @@ def ringmask(data, center_px, r):
 
 
 def cut_around_center(sta_original, max_i_o, f_size):
-    from lnp_checkerflicker import check_max_i
+    try:
+        from lnp_checkerflicker import check_max_i
+    except ImportError:
+        import sys
+        sys.path.append('/home/ycan/Documents/scripts/modules')
+        from lnp_checkerflicker import check_max_i
     if f_size is not 0:
         max_i_o = check_max_i(sta_original, max_i_o, f_size=f_size)
         sta = sta_original[max_i_o[0]-f_size:max_i_o[0]+f_size+1,
@@ -208,8 +213,8 @@ for i in range(files.shape[1]):
              size=9, transform=ax.transAxes)
     plt.axhline(0, linestyle='dashed', linewidth=1)
     plt.legend()
-    plt.show()
-#    plt.savefig('/home/ycan/Documents/notes/2017-11-01/'
-#                'plots/{}-{:0>5}.svg'.format(exp_date, cluster),
-#                format='svg', dpi=300)
-#    plt.close()
+#    plt.show()
+    plt.savefig('/home/ycan/Documents/notes/2017-11-01/'
+                'plots/{}-{:0>5}.svg'.format(exp_date, cluster),
+                format='svg', dpi=300)
+    plt.close()
