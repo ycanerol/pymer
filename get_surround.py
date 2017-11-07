@@ -86,7 +86,7 @@ def cut_around_center(sta_original, max_i_o, f_size):
     return sta, max_i
 
 
-files = readexps(directory='/home/ycan/Documents/data/2017-08-02', test=False)
+files = readexps(directory='/home/ycan/Documents/data/2017-08-02', test=True)
 #files = np.reshape(files[:, 25], (3,1))
 
 for i in range(files.shape[1]):
@@ -134,11 +134,6 @@ for i in range(files.shape[1]):
             plt.plot(np.mean(masked[0], axis=(0, 1)), label=str(i))
     plt.legend()
 
-#    plt.savefig('/home/ycan/Documents/notes/week2/plots/{}-{:0>5}.svg'.format(exp_date, cluster),
-#                format='svg', dpi=300)
-#    plt.show()
-#    plt.close()
-
 # %% Fit 2D Gaussian
 #    fit_frame = sta[:, :, max_i[2]]
 #    f_size = 20
@@ -157,8 +152,8 @@ for i in range(files.shape[1]):
     # Using a second variable Zm2 to not break how it currently works and
     # easily revert
     Zm2 = np.log((Z-pars[0])/pars[1])
+    Zm2[np.isinf(Zm2)] = np.nan
     Zm = np.sqrt(Zm2*-2)
-    Zm[Zm==np.inf] = np.nan
     # To workaround negative values from before, remove minus from Zm comparisons to fix this
     Zm = -Zm
     Zmr = np.ceil(Zm)
@@ -195,7 +190,7 @@ for i in range(files.shape[1]):
     surround_mask = np.logical_not(np.logical_and(Zm < -3, Zm > -9))
     surround_mask_3d = np.broadcast_arrays(sta, surround_mask[..., None])[1]
 
-    #%%
+    # %%
 
     plt.subplot(2, 3, 4)
     plt.imshow(center_mask)
@@ -222,8 +217,11 @@ for i in range(files.shape[1]):
              size=9, transform=ax.transAxes)
     plt.axhline(0, linestyle='dashed', linewidth=1)
     plt.legend()
-#    plt.show()
-    plt.savefig('/home/ycan/Documents/notes/2017-11-01/'
-                'plots/{}-{:0>5}.svg'.format(exp_date, cluster),
-                format='svg', dpi=300)
+    # Quickly turn plotting on or off
+    if True:
+        plt.show()
+    else:
+        plt.savefig('/home/ycan/Documents/notes/2017-11-01/'
+                    'plots/{}-{:0>5}.svg'.format(exp_date, cluster),
+                    format='svg', dpi=300)
     plt.close()
