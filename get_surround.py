@@ -86,7 +86,7 @@ def cut_around_center(sta_original, max_i_o, f_size):
     return sta, max_i
 
 
-files = readexps(directory='/home/ycan/Documents/data/2017-08-02', test=True)
+files = readexps(directory='/home/ycan/Documents/data/2017-08-02', test=False)
 #files = np.reshape(files[:, 25], (3,1))
 
 for i in range(files.shape[1]):
@@ -155,9 +155,8 @@ for i in range(files.shape[1]):
     Zm2[np.isinf(Zm2)] = np.nan
     Zm = np.sqrt(Zm2*-2)
     # To workaround negative values from before, remove minus from Zm comparisons to fix this
-    Zm = -Zm
-    Zmr = np.ceil(Zm)
-    Zm = Zm2
+#    Zm = -Zm
+#    Zmr = np.ceil(Zm)
 
     ax = plt.subplot(2, 2, 2)
     if np.max(fit_frame) != np.max(np.abs(fit_frame)):
@@ -185,19 +184,23 @@ for i in range(files.shape[1]):
 #        plt.axis('off')
 #    plt.show()
 
-    center_mask = np.logical_not(Zm > -3)
+    # Boundaries between center and surround and limit of surround
+    inner_b = 2
+    outer_b = 4
+
+    center_mask = np.logical_not(Zm < inner_b)
     center_mask_3d = np.broadcast_arrays(sta, center_mask[..., None])[1]
-    surround_mask = np.logical_not(np.logical_and(Zm < -3, Zm > -9))
+    surround_mask = np.logical_not(np.logical_and(Zm > inner_b, Zm < outer_b))
     surround_mask_3d = np.broadcast_arrays(sta, surround_mask[..., None])[1]
 
     # %%
 
     plt.subplot(2, 3, 4)
     plt.imshow(center_mask)
-    plt.title('Center (<3$\sigma$)')
+    plt.title('Center (<{}$\sigma$)'.format(inner_b))
     plt.subplot(2, 3, 5)
     plt.imshow(surround_mask)
-    plt.title('Surround (Between 3$\sigma$ and 9$\sigma$)')
+    plt.title('Surround (Between {}$\sigma$ and {}$\sigma$)'.format(inner_b, outer_b))
 #    plt.show()
 
     sta_center = np.ma.array(sta, mask=center_mask_3d)
@@ -222,6 +225,6 @@ for i in range(files.shape[1]):
         plt.show()
     else:
         plt.savefig('/home/ycan/Documents/notes/2017-11-01/'
-                    'plots/{}-{:0>5}.svg'.format(exp_date, cluster),
+                    'plots_mahalonobisd_corrected/{}-{:0>5}.svg'.format(exp_date, cluster),
                     format='svg', dpi=300)
     plt.close()
