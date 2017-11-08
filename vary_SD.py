@@ -8,38 +8,24 @@ Created on Tue Nov  7 10:36:16 2017
 import numpy as np
 import matplotlib.pyplot as plt
 
-<<<<<<< Updated upstream
-slims = np.arange(0, 10, step=1)
-=======
 plt.style.use('ggplot')
->>>>>>> Stashed changes
 
 slims = np.arange(0, 10, step=.4)
 filters = np.zeros((len(slims),20))
 
 for i in range(1, len(slims)):
     # Define upper and lower bounds
-<<<<<<< Updated upstream
-    upper = item
-    lower = slims[i-2]
-    mask = np.logical_not(np.logical_and(-Zm >= lower, -Zm <= upper))
-=======
     upper = slims[i]
     lower = slims[i-1]
     mask = np.logical_not(np.logical_and(Zm >= lower, Zm <= upper))
->>>>>>> Stashed changes
     mask3d = np.broadcast_arrays(sta, mask[..., None])[1]
     component = np.mean(np.ma.array(sta, mask=mask3d), axis=(0, 1))
     filters[i-1] = component
     offset = -i/20
     plt.plot(component + offset,
              label=str(upper))
-<<<<<<< Updated upstream
-    plt.text(-3, -i/20, '{:2.2f}-{:2.2f}'.format(lower, upper))
-=======
     plt.axhline(offset, alpha=.4, color='k', linestyle='dashed')
     plt.text(-3, offset, '{:2.2f}-{:2.2f}'.format(lower, upper), size=8)
->>>>>>> Stashed changes
 #plt.legend()
 plt.axis('off')
 plt.show()
