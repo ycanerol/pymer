@@ -86,7 +86,7 @@ def cut_around_center(sta_original, max_i_o, f_size):
     return sta, max_i
 
 
-files = readexps(directory='/home/ycan/Documents/data/2017-08-02', test=False)
+files = readexps(directory='/home/ycan/Documents/data/2017-08-02', test=True)
 #files = np.reshape(files[:, 25], (3,1))
 
 for i in range(files.shape[1]):

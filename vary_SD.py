@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 plt.style.use('ggplot')
 
-slims = np.arange(0, 10, step=.4)
+slims = np.arange(0, 10, step=.6)
 filters = np.zeros((len(slims),20))
 
 for i in range(1, len(slims)):
