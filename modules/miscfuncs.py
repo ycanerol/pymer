@@ -12,6 +12,27 @@ import matplotlib.pyplot as plt
 import glob
 
 
+def svd(sta):
+    # Perform singular value decomposition on STA
+    # As described by Gauthier et al. 2009
+
+    # Put temporal component of each pixel in one row
+    M = sta.reshape((sta.shape[0]*sta.shape[1], sta.shape[2]))
+    # Get U (spatial) and V (temporal) from SVD which returns UDV*
+    u, _, v = np.linalg.svd(M)
+    # First column of U contains the primary spatial component
+    # Second component also gives interesting results sometimes so we look at
+    # that as well.
+    sp1 = u[:, 0].reshape((sta.shape[0], sta.shape[1]))
+    sp2 = u[:, 1].reshape((sta.shape[0], sta.shape[1]))
+    # V contains the matching temporal components in its rows (b/c it's
+    # transposed).
+    t1 = v[0, :]
+    t2 = v[1, :]
+
+    return sp1, sp2, t1, t2, u, v
+
+
 def show_sta(sta, max_i, f_size=10):
     plt.plot(figsize=(12, 12), dpi=200)
     sta_min = np.min(sta)
