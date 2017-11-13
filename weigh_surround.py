@@ -20,9 +20,14 @@ for i in range(sta.shape[2]-1):
 
 weighted_surround = np.mean(sta*weights3d, axis=(0, 1))
 
-plt.plot(weighted_surround, label='weighted surround')
-plt.plot(sta_center_temporal, label='center')
-plt.plot(sta_surround_temporal, label='surround')
+#Normalized according to their abs max values
+sta_ctn = sta_center_temporal/np.max(np.abs(sta_center_temporal))
+sta_stn = sta_surround_temporal/np.max(np.abs(sta_surround_temporal))
+sta_wsn = weighted_surround/np.max(np.abs(weighted_surround))
+
+plt.plot(sta_wsn, label='weighted surround')
+plt.plot(sta_ctn, label='center')
+plt.plot(sta_stn, label='surround')
 plt.legend()
 plt.show()
 plt.imshow(weights3d[:,:,1])
