@@ -8,8 +8,11 @@ Created on Wed Nov  8 16:05:21 2017
 
 # Subtract the center, fit another gaussian for surround.
 Zm_flat = Zm
+# Convert NaNs into maximum value of the array
 Zm_flat[np.isnan(Zm_flat)] = np.nanmax(Zm_flat)
 surround = fit_frame-Zm_flat
+
+surround = fit_frame - Z
 pars_sur = gfit.gaussfit(surround)
 
 f_sur = gfit.twodgaussian(pars_sur)
