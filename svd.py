@@ -49,11 +49,9 @@ ff_filtered = ndi.filters.gaussian_filter(fit_frame,
 plotthese = [fit_frame, sp1, sp2, ff_filtered, sp1_filtered, sp2_filtered]
 
 plt.figure(dpi=130)
+plt.suptitle('frame size: '+str(f_size))
 rows = 3
 columns = 3
-plt.subplot(rows, 1, 1)
-plt.axis('off')
-plt.ylabel('Non filtered')
 
 for i in range(6):
     ax=plt.subplot(rows, columns, i+1)
@@ -64,15 +62,14 @@ for i in range(6):
         if isinstance(child, matplotlib.spines.Spine):
             child.set_color('C{}'.format(i%3))
             child.set_linewidth(2)
-#    if i==0: plt.title('center px')
-#    elif i==1: plt.title('SVD spatial 1')
-#    elif i==2: plt.title('SVD spatial 2')
-
+    if i==0: plt.title('center px')
+    elif i==1: plt.title('SVD spatial 1')
+    elif i==2: plt.title('SVD spatial 2')
+    if i==0: plt.ylabel('Non-filtered')
     if i==3: plt.ylabel('Gaussian filtered')
 
 plt.subplot(rows, 1, 3)
 plt.plot(sta[max_i[0], max_i[1], :], label='center px')
 plt.plot(t1, label='Temporal 1')
 plt.plot(t2, label='Temporal 2')
-plt.legend(fontsize='xx-small')
 plt.show()
