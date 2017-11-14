@@ -14,12 +14,13 @@ The assumption here is that space and time are independent components.
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
+import scipy.ndimage as ndi
 
 try:
     import miscfuncs as mf
 except ImportError:
     import sys
-    sys.path.append('home/ycan/Documents/scripts/modules/')
+    sys.path.append('/home/ycan/Documents/scripts/modules/')
     import miscfuncs as mf
 
 data = np.load('/home/ycan/Documents/data/2017-08-02/analyzed/5_SP_C10602.npz')
@@ -27,9 +28,10 @@ data = np.load('/home/ycan/Documents/data/2017-08-02/analyzed/5_SP_C10602.npz')
 sta = data['sta_unscaled']
 max_i = data['max_i']
 
-sta, max_i = mf.cut_around_center(sta, max_i, f_size=0)
+f_size = 24
 
-# %%
+sta, max_i = mf.cut_around_center(sta, max_i, f_size=f_size)
+
 fit_frame = sta[:, :,  max_i[2]]
 
 # %%

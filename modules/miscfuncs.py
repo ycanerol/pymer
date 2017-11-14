@@ -90,14 +90,9 @@ def ringmask(data, center_px, r):
 
 
 def cut_around_center(sta_original, max_i_o, f_size):
-    try:
-        from lnp_checkerflicker import check_max_i
-    except ImportError:
-        import sys
-        sys.path.append('/home/ycan/Documents/scripts/modules')
-        from lnp_checkerflicker import check_max_i
+    if f_size+2 > (sta_original.shape[0])/2 or f_size+2 > (sta_original.shape[1])/2:
+        raise ValueError('Frame size is larger than STA dimensions')
     if f_size is not 0:
-        max_i_o = check_max_i(sta_original, max_i_o, f_size=f_size)
         sta = sta_original[max_i_o[0]-f_size:max_i_o[0]+f_size+1,
                            max_i_o[1]-f_size:max_i_o[1]+f_size+1,
                            :]
