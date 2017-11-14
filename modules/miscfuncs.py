@@ -30,6 +30,14 @@ def svd(sta):
     t1 = v[0, :]
     t2 = v[1, :]
 
+    # Flip so that the spatial component is positive
+    if np.max(np.abs(sp1)) != np.max(sp1):
+        sp1 = -sp1
+        t1 = -t1
+    if np.max(np.abs(sp2)) != np.max(sp2):
+        sp2 = -sp2
+        t2 = -t2
+
     return sp1, sp2, t1, t2, u, v
 
 
