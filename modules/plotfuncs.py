@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import os
 
 
-def set_spines(ax, which='trlb'):
+def spineless(ax, which='trlb'):
     """
     Set the spine visibility quickly in matplotlib.
 
@@ -21,7 +21,7 @@ def set_spines(ax, which='trlb'):
     Example usage:
     ax=plt.subplot(111)
     ax.plot(np.random.randint(5, 10, size=10))
-    set_spines(ax, which='trlb')
+    spineless(ax, which='trlb')
     plt.show()
     """
     if which.find('t') is not -1: ax.spines['top'].set_visible(False)

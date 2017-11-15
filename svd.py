@@ -80,7 +80,7 @@ def plotsvd(file, f_size=10, filter_size=1):
     plt.plot(sta[max_i[0], max_i[1], :], label='center px')
     plt.plot(t1, label='Temporal 1')
     plt.plot(t2, label='Temporal 2')
-    plf.set_spines(ax, 'trlb')  # Turn off spines using custom function
+    plf.spineless(ax, 'trlb')  # Turn off spines using custom function
     return fig
 
 
