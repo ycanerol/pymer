@@ -58,12 +58,12 @@ def plotsvd(file, f_size=10, filter_size=1):
     plt.suptitle('{}\n frame size: {}'.format(filename, f_size))
     rows = 3
     columns = 3
-    vmax = np.max(fit_frame)
-    vmin = np.min(fit_frame)
+    vmax = np.max(np.abs(sp1))
+    vmin = -vmax
 
     for i in range(6):
         ax = plt.subplot(rows, columns, i+1)
-        im = plt.imshow(plotthese[i], vmin=vmin, vmax=vmax, cmap='viridis')
+        im = plt.imshow(plotthese[i], vmin=vmin, vmax=vmax, cmap=plf.RFcolormap())
         plt.xticks([])
         plt.yticks([])
         for child in ax.get_children():
@@ -90,9 +90,10 @@ file = '/home/ycan/Documents/data/2017-08-02/analyzed/5_SP_C10602.npz'
 for i in fsizes:
     filename = os.path.split(file)[-1].split('.')[0]
     plotsvd(file, f_size=i, filter_size=1)
-#    plt.show()
-
-    plt.savefig('/home/ycan/Documents/notes/'
-                '2017-11-15/svdplots/{}_{}.svg'.format(filename, i),
-                dpi=200,
-                bbox_inches = 'tight')
+    if False:
+        plt.show()
+    else:
+        plt.savefig('/home/ycan/Documents/notes/'
+                    '2017-11-15/svdplots/{}_{}.svd'.format(filename, i),
+                    dpi=200,
+                    bbox_inches='tight')
