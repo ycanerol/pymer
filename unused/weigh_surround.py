@@ -29,6 +29,11 @@ plt.plot(sta_wsn, label='weighted surround')
 plt.plot(sta_ctn, label='center')
 plt.plot(sta_stn, label='surround')
 plt.legend()
-plt.show()
-plt.imshow(weights3d[:,:,1])
-plt.show()
+plt.title('{}-{:0>5}.svg'.format(exp_date, cluster))
+plt.savefig('/home/ycan/Documents/notes/2017-11-15/'
+            'weightedsurround/{}-{:0>5}.svg'.format(exp_date, cluster),
+            format='svg', dpi=300)
+
+#plt.show()
+#plt.imshow(weights3d[:,:,1])
+#plt.show()
