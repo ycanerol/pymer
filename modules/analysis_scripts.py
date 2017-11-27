@@ -48,7 +48,7 @@ def read_ods(ods_fpath, cutoff=4):
     """
     import pyexcel_ods as pyxo
     clusters = pyxo.get_data(ods_fpath,
-                             start_row=5, row_limit=200,
+                             start_row=5, row_limit=400,
                              start_column=0, column_limit=6)
     metadata = pyxo.get_data(ods_fpath,
                              start_row=0, row_limit=2,
