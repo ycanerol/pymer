@@ -56,7 +56,8 @@ def read_ods(ods_fpath, cutoff=4):
     clusters = np.array(clusters['Sheet1'])
     # Get rid of unneeded columns using numpy advanced indexing
     clusters = clusters[:, [0, 4, 5]]
-    # Fill the gaps and convert to int
+    # The channels with multiple clusters have an empty line after the first
+    # line. Fill the empty lines using the first line of each channel.
     for i in range(len(clusters[:, 0])):
         if clusters[i, 0] != '':
             nr = clusters[i, 0]
