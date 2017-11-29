@@ -200,3 +200,18 @@ def getframetimes(filepath, threshold=75, sampling_rate=10000, plotting=False,
     frametimings_off = time[offsets]
 
     return frametimings_on, frametimings_off
+
+
+def read_raster(rasterspath, stimnr, channel, cluster, defaultpath=True):
+    """
+    Return the spike times from the specified raster file.
+    """
+    r = str(rasterspath)
+    s = str(stimnr)
+    c = str(channel)
+    fullpath = r + s + '_SP_C' + c + '{:0>2}'.format(cluster) + '.txt'
+    spike_file = open(fullpath)
+    spike_times = np.array([float(line) for line in spike_file])
+    spike_file.close()
+
+    return spike_times
