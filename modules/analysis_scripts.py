@@ -48,14 +48,24 @@ def read_ods(ods_fpath, cutoff=4):
     """
     import pyexcel_ods as pyxo
     clusters = pyxo.get_data(ods_fpath,
-                             start_row=5, row_limit=400,
+                             start_row=4, row_limit=400,
                              start_column=0, column_limit=6)
     metadata = pyxo.get_data(ods_fpath,
                              start_row=0, row_limit=2,
                              start_column=0, column_limit=25)
     clusters = np.array(clusters['Sheet1'])
     # Get rid of unneeded columns using numpy advanced indexing
-    clusters = clusters[:, [0, 4, 5]]
+    try:
+        clusters = clusters[:, [0, 4, 5]]
+    except IndexError:
+        # This happens when np.array() cannot convert clusters into an np.array
+        # containing strings; instead it returns an object array which cannot
+        # be indexed this way.
+        # If you're getting this error, check that there wasn't any ratings
+        # columns that are left blank.
+        raise ValueError('.ods file is missing information! Check that '
+                         'all clusters have a rating!')
+        return None, None
     # The channels with multiple clusters have an empty line after the first
     # line. Fill the empty lines using the first line of each channel.
     for i in range(len(clusters[:, 0])):
