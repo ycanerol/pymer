@@ -212,11 +212,21 @@ def getframetimes(filepath, threshold=75, sampling_rate=10000, plotting=False,
     return frametimings_on, frametimings_off
 
 
-def read_raster(rasterspath, stimnr, channel, cluster, defaultpath=True):
+def read_raster(experiment_dir, stimnr, channel, cluster, defaultpath=True,
+                alternatepath=''):
     """
     Return the spike times from the specified raster file.
+
+    Use defaultpath=False if the raster directory is not
+    experiment_dir + '/results/rasters/'. In this case alternatepath will be
+    appended to experiment_dir.
     """
-    r = str(rasterspath)
+    import os
+
+    if defaultpath:
+        r = os.path.join(experiment_dir, 'results/rasters/')
+    else:
+        r = os.path.join(experiment_dir, alternatepath)
     s = str(stimnr)
     c = str(channel)
     fullpath = r + s + '_SP_C' + c + '{:0>2}'.format(cluster) + '.txt'
