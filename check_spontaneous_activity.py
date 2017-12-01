@@ -13,7 +13,7 @@ import glob
 import analysis_scripts as asc
 import plotfuncs as plf
 
-experiment_dir = '/home/ycan/Documents/data/Erol_20171116_252MEA_sr_le_sp'
+experiment_dir = '/home/ycan/Documents/data/Erol_20171122_252MEA_fr_re_fp'
 
 spont_stimuli = [1, 2]
 
@@ -27,7 +27,7 @@ stim_fnames = sum(stim_fnames, [])  # Hacky solution to convert list of lists
 stim_names = [s.split('.mcd')[0] for s in stim_fnames]
 stim_nrs = [s.split('_')[0] for s in stim_names]
 
-clusters, _ = asc.read_ods(experiment_dir+'/spike_sorting.ods', cutoff=4)
+clusters, _ = asc.read_ods(experiment_dir, cutoff=3)
 
 total_spikes = np.empty([len(stim_fnames), len(clusters[:, 0])])
 
