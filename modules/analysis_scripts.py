@@ -159,12 +159,11 @@ def getframetimes(experiment_dir, stimnr, defaultpath=True, threshold=75,
     Returns:
     -------
         frametimings_on:
-            List of times in miliseconds where a pulse started, corresponding
+            List of times in seconds where a pulse started, corresponding
             to a frame update. Corrected for the monitor delay by time_offset.
         frametimings_off:
-            List of times in miliseconds where a pulse ended. Not to be used
+            List of times in seconds where a pulse ended. Not to be used
             frequently, only if a particular stimulus requires it.
-
 
     """
     import struct
@@ -231,8 +230,10 @@ def getframetimes(experiment_dir, stimnr, defaultpath=True, threshold=75,
         plt.show()
         plt.close()
 
-    frametimings_on = time[onsets]
-    frametimings_off = time[offsets]
+    # Get the times where on-offsets happen and convert from miliseconds
+    # to seconds
+    frametimings_on = time[onsets]/1000
+    frametimings_off = time[offsets]/1000
 
     return frametimings_on, frametimings_off
 
