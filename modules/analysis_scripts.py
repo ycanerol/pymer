@@ -10,20 +10,23 @@ Collection of analysis functions
 import numpy as np
 
 
-def read_ods(ods_fpath, cutoff=4):
+def read_ods(experiment_dir, cutoff=4, defaultpath=True):
     """
     Read metadata and cluster information from .ods file (manually
     created during spike sorting), return good clusters.
 
     Parameters:
     -----------
-        ods_fpath:
-            Full path of the .ods file to be used
-
+        experiment_dir:
+            Experiment directory that contains the .ods file. The function
+            looks for /spike_sorting.ods under this directory.
         cutoff:
             Worst rating that is wanted for the analysis. Default
             is 4. The source of this value is manual rating of each
             cluster.
+        defaultpath:
+            Whether to add '/spike_sorting.ods' to find the file. If False,
+            the full path to .ods should be supplied in experiment_dir.
 
     Returns:
     --------
@@ -46,11 +49,17 @@ def read_ods(ods_fpath, cutoff=4):
 
     First version: 2017-11-21 by Yunus
     """
+
+    if defaultpath:
+        filepath = experiment_dir + '/spike_sorting.ods'
+    else:
+        filepath = experiment_dir
+
     import pyexcel_ods as pyxo
-    clusters = pyxo.get_data(ods_fpath,
+    clusters = pyxo.get_data(filepath,
                              start_row=4, row_limit=400,
                              start_column=0, column_limit=6)
-    metadata = pyxo.get_data(ods_fpath,
+    metadata = pyxo.get_data(filepath,
                              start_row=0, row_limit=2,
                              start_column=0, column_limit=25)
     clusters = np.array(clusters['Sheet1'])
@@ -125,7 +134,8 @@ def getframetimes(experiment_dir, stimnr, defaultpath=True, threshold=75,
         defaultpath:
             Whether to use experiment_dir+'RawChannels/'+stim_nr+'_253.bin'
             to access the frametimings binary file. Default is True. If False
-            full path should be passed with experiment_dir.
+            full path should be passed with experiment_dir; stim_nr is not
+            important in this case, just pass empty.
         threshold:
             The threshold in milivolts for the trigger signal. Default is
             75 mV.
@@ -161,9 +171,10 @@ def getframetimes(experiment_dir, stimnr, defaultpath=True, threshold=75,
     import os
 
     if defaultpath:
-        filepath = os.path.join(experiment_dir, 'RawChannels', str(stimnr)+'_253.bin')
+        filepath = os.path.join(experiment_dir, 'RawChannels',
+                                str(stimnr)+'_253.bin')
     else:
-        filepath =experiment_dir
+        filepath = experiment_dir
 
     with open(filepath, mode='rb') as file:  # b is important -> binary
         fileContent = file.read()
