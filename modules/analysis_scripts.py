@@ -90,7 +90,8 @@ def read_ods(ods_fpath, cutoff=4):
     return clusters, metadata_dict
 
 
-def getframetimes(filepath, threshold=75, sampling_rate=10000, plotting=False,
+def getframetimes(experiment_dir, stimnr, defaultpath=True, threshold=75,
+                  sampling_rate=10000, plotting=False,
                   time_offset=25, zeroADvalue=32768,
                   microvoltsperADunit=25625/2048):
     """
@@ -116,8 +117,15 @@ def getframetimes(filepath, threshold=75, sampling_rate=10000, plotting=False,
 
     Parameters:
     ----------
-        filepath:
+        experiment_dir:
             Path to the binary file. '.../<stimulus_nr>_253.bin'
+        stimnr:
+            Number of the stimulus, to find /<stimulus_nr>_253.bin for the
+            stimulus of interest.
+        defaultpath:
+            Whether to use experiment_dir+'RawChannels/'+stim_nr+'_253.bin'
+            to access the frametimings binary file. Default is True. If False
+            full path should be passed with experiment_dir.
         threshold:
             The threshold in milivolts for the trigger signal. Default is
             75 mV.
@@ -150,6 +158,12 @@ def getframetimes(filepath, threshold=75, sampling_rate=10000, plotting=False,
 
     """
     import struct
+    import os
+
+    if defaultpath:
+        filepath = os.path.join(experiment_dir, 'RawChannels', str(stimnr)+'_253.bin')
+    else:
+        filepath =experiment_dir
 
     with open(filepath, mode='rb') as file:  # b is important -> binary
         fileContent = file.read()
