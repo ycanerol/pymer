@@ -100,7 +100,7 @@ def read_ods(experiment_dir, cutoff=4, defaultpath=True):
 
 
 def getframetimes(experiment_dir, stimnr, defaultpath=True, threshold=75,
-                  sampling_rate=10000, plotting=False,
+                  sampling_rate=10000, plotting=False, returnoffsets=False,
                   time_offset=25, zeroADvalue=32768,
                   microvoltsperADunit=25625/2048):
     """
@@ -145,6 +145,9 @@ def getframetimes(experiment_dir, stimnr, defaultpath=True, threshold=75,
             Whether to plot the whole trace and signal on-offsets. Slow for
             long recordings and frequent pulses (e.g. checkerflicker). Default
             is False.
+        returnoffsets:
+            Whether to return the offset times as well as onset times. If True,
+            two arrays are returned.
         time_offset:
             The delay between the pulse generation and the disply actually
             updating. Default is 25 ms.
@@ -162,8 +165,9 @@ def getframetimes(experiment_dir, stimnr, defaultpath=True, threshold=75,
             List of times in seconds where a pulse started, corresponding
             to a frame update. Corrected for the monitor delay by time_offset.
         frametimings_off:
-            List of times in seconds where a pulse ended. Not to be used
-            frequently, only if a particular stimulus requires it.
+            List of times in seconds where a pulse ended. Only returned if
+            returnoffsets is True. Not to be used frequently, only if a
+            particular stimulus requires it.
 
     """
     import struct
@@ -235,7 +239,10 @@ def getframetimes(experiment_dir, stimnr, defaultpath=True, threshold=75,
     frametimings_on = time[onsets]/1000
     frametimings_off = time[offsets]/1000
 
-    return frametimings_on, frametimings_off
+    if returnoffsets:
+        return frametimings_on, frametimings_off
+    else:
+        return frametimings_on
 
 
 def read_raster(experiment_dir, stimnr, channel, cluster, defaultpath=True,
