@@ -34,11 +34,10 @@ finally:
 stim_names = stimulusname.split('.mcd')[0]
 stim_nrs = stimulusname.split('_')[0]
 
-clusters, _ = asc.read_ods(experiment_dir+'/spike_sorting.ods', cutoff=4)
+clusters, metadata = asc.read_ods(experiment_dir, cutoff=4)
 
-frametimings, _ = asc.getframetimes(experiment_dir +
-                                    '/RawChannels/{}_253.bin'.format(onoffstimulus_order))
-frametimings = frametimings /1000
+frametimings = asc.getframetimes(experiment_dir, 3)
+# %%
 all_spikes = []
 for i in range(len(clusters[:, 0])):
     spikes = asc.read_raster(experiment_dir, onoffstimulus_order,
