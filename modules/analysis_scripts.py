@@ -267,3 +267,86 @@ def read_raster(experiment_dir, stimnr, channel, cluster, defaultpath=True):
     spike_file.close()
 
     return spike_times
+
+
+def read_parameters(exp_dir, stimulusnr, defaultpath=True):
+    """
+    Reads the parameters from stimulus files
+
+    Parameters:
+    -----------
+    exp_dir:
+        Main directory for the experiment. The function will look for 'stimuli'
+        folder under this directory.
+    stimulusnr:
+        The order of the stimulus. The function will open the files with the
+        file name '<stimulusnr>_*' under the stimulus directory.
+    defaultpath:
+         Whether to use experiment_dir+'/stimuli/' to access the stimuli
+         parameters. Default is True. If False full path to stimulus folder
+         should be passed with experiment_dir.
+
+    Returns:
+    -------
+    parameters:
+        Dictionary containing all of the parameters. Parameters are
+        are variable for different stimuli; but for each type, at least file
+        name and stimulus type are returned.
+
+    For spontaneous activity recordings, an empty text file is expected in the
+    stimuli folder. In this case the stimulus type is returned as spontaneous
+    activity.
+
+    """
+    import glob
+    import os
+
+    if defaultpath:
+        stimdir = os.path.join(exp_dir, 'stimuli')
+    else:
+        stimdir = exp_dir
+
+    paramfile = glob.glob(os.path.join(stimdir, '{}_*'.format(stimulusnr)))
+    if len(paramfile) == 1:
+        paramfile = paramfile[0]
+    elif len(paramfile) == 0:
+        raise IOError('No parameter file that starts with {} exists under'
+                      ' the directory: {}'.format(stimulusnr, stimdir))
+    else:
+        print(paramfile)
+
+        raise ValueError('Multiple files were found starting'
+                         ' with {}'.format(stimulusnr))
+
+    f = open(paramfile)
+    lines = [line.strip('\n') for line in f]
+    f.close()
+
+    parameters = {}
+
+    parameters['filename'] = os.path.split(paramfile)[-1]
+    if len(lines) == 0:
+        parameters['stimulus_type'] = 'spontaneous_activity'
+
+    for line in lines:
+        if len(line) == 0:
+            continue
+        try:
+            key, value = line.split('=')
+            key = key.strip(' ')
+            value = value.strip(' ')
+            try:
+                value = float(value)
+                if value % 1 == 0:
+                    value = int(value)
+            except ValueError:
+                if value == ' true' or value == 'true':
+                    value = True
+                elif value == ' false' or value == 'false':
+                    value = False
+
+            parameters[key] = value
+        except ValueError:
+            parameters['stimulus_type'] = line
+
+    return parameters
