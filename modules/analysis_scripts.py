@@ -350,3 +350,43 @@ def read_parameters(exp_dir, stimulusnr, defaultpath=True):
             parameters['stimulus_type'] = line
 
     return parameters
+
+
+def binspikes(spiketimes, frametimings):
+    """
+    Bins spikes according to frametimings, discards spikes before and after
+    stimulus presentation
+
+    Parameters:
+    ----------
+        spiketimes:
+            Array containing times of when spikes happen, as output of
+            read_rasters()
+        frametimings:
+            Array containing frametimings as output of getframetimes()
+    Returns:
+    -------
+        spikes:
+            Binned array of spikes according to frametimings.
+
+    Notes:
+    -----
+        Binning according to frametimings results in high count in first and
+        last bins since recording is started earlier than stimulus presentation
+        and stopped after presentation ends. Therefore the spikes that happen
+        before or after stimulus presentation are discarded in the output.
+    """
+    spikes = np.bincount(np.digitize(spiketimes, frametimings))
+    spikes[0] = 0
+    spikes = spikes[:-1]
+
+    # HINT: This might cause problems! Not sure this is the correct way to
+    # fix this problem, might cause misalignment of frametimes and spikes
+    #
+    # If there hasn't been any spikes at the end of the recording, the length
+    # of the spikes array will be shorter than the frametimings and this
+    # results in not having data at the end of the recording.
+    while spikes.shape[0] < frametimings.shape[0]:
+        spikes = np.append(spikes, 0)
+
+    return spikes
