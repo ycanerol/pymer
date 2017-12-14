@@ -30,6 +30,7 @@ stim_nrs = [s.split('_')[0] for s in stim_names]
 clusters, _ = asc.read_ods(experiment_dir, cutoff=3)
 
 total_spikes = np.empty([len(stim_fnames), len(clusters[:, 0])])
+total_time = 0
 
 for i in range(len(stim_fnames)):
     all_spikes = []
@@ -39,6 +40,12 @@ for i in range(len(stim_fnames)):
                                  clusters[j, 0], clusters[j, 1])
         all_spikes.append(spikes)
         total_spikes[i, j] = len(spikes)
+        try:
+            lastspike = spikes.max()
+        except ValueError:
+            lastspike = 0
+        if lastspike > total_time:
+            total_time = lastspike
         interspike_int.append(np.ediff1d(spikes))
     plt.eventplot(all_spikes)
     plt.ylabel('Cluster')
@@ -53,9 +60,9 @@ for i in range(len(stim_fnames)):
         plt.xlabel('Time between spikes[s]')
         plt.show()
 #%%
-plt.plot(total_spikes.T)
+plt.plot(total_spikes.T/total_time)
 plt.legend(stim_names)
-plt.title('Firing rate for each cell')
+plt.title('Mean firing rate for each cell')
 plt.xlabel('Cluster')
-plt.ylabel('Number of spikes')
+plt.ylabel('Firing rate [spike/s]')
 plt.show()
