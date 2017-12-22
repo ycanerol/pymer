@@ -66,6 +66,7 @@ def RFcolormap(colors=None):
     cm = matplotlib.colors.ListedColormap(colors)
     return cm
 
+
 def numsubplots(n, recursive=False):
     """
     Define the best arrangement of subplots for a
@@ -80,7 +81,7 @@ def numsubplots(n, recursive=False):
     Returns:
         p:
             A list containing the ideal arrangement
-            of subplots.
+            of subplots in the format of [nrows, ncolumns].
         n:
             Current number of subplots. Returned only
             when recursively calling the function.
@@ -89,6 +90,10 @@ def numsubplots(n, recursive=False):
     from mathworks.com/matlabcentral/fileexchange/
     26310-numsubplots-neatly-arrange-subplots
     Original by Rob Campbell, Jan 2010
+
+    Requires prime factorization and checking primality
+    which is not provided by Python by default; therefore
+    a custom package (primefac) is required.
 
     """
     import primefac
