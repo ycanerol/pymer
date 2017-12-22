@@ -119,7 +119,7 @@ def numsubplots(n, recursive=False):
             del p[1]
         p = sorted(p)
 
-    while p[0]/p[1] > 2.5:
+    while p[1]/p[0] > 2.5:
         N = n+1
         p, n = numsubplots(N, recursive=True)
 
