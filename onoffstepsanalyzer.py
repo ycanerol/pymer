@@ -54,7 +54,7 @@ def onoffanalyzer(experiment_dir, stim_order, stim_duration,
     wdir = os.getcwd()
     try:
         os.chdir(experiment_dir)
-        stimulusname = glob.glob('%s_*.mcd' % stim_order)[0]
+        stimulusname = np.sort(glob.glob('%s_*.mcd' % stim_order))[0]
     finally:
         os.chdir(wdir)
 
