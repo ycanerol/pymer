@@ -8,6 +8,8 @@ Created on Tue Nov 21 15:54:03 2017
 Collection of analysis functions
 """
 import numpy as np
+import os
+import glob
 
 
 def read_ods(experiment_dir, cutoff=4, defaultpath=True):
@@ -99,10 +101,75 @@ def read_ods(experiment_dir, cutoff=4, defaultpath=True):
     return clusters, metadata_dict
 
 
-def getframetimes(experiment_dir, stimnr, defaultpath=True, threshold=75,
-                  sampling_rate=10000, plotting=False, returnoffsets=False,
-                  time_offset=25, zeroADvalue=32768,
-                  microvoltsperADunit=25625/2048):
+def readframetimes(experiment_dir, stimnr, returnoffsets=False):
+    """
+    Reads the extracted frame times from experiment_dir/frametimes folder.
+
+    Parameters:
+    ----------
+        experiment_dir:
+            Path of the experiment data.
+        stimnr:
+            Order of the stimulus of interest.
+        returnoffsets:
+            Whether to return the offset times as well as onset times. If True,
+            two arrays are returned.
+
+    Returns:
+    -------
+        frametimings_on:
+            List of times in seconds where a pulse started, corresponding
+            to a frame update. Corrected for the monitor delay by time_offset.
+        frametimings_off:
+            List of times in seconds where a pulse ended. Only returned if
+            returnoffsets is True. Not to be used frequently, only if a
+            particular stimulus requires it.
+    """
+    filepath = os.path.join(experiment_dir, 'frametimes', str(stimnr)+'_*.npz')
+    filename = glob.glob(filepath)[0]
+    f = np.load(filename)
+
+    frametimings_on = f['f_on']
+
+    if returnoffsets:
+        frametimings_off = f['f_off']
+        return frametimings_on, frametimings_off
+    else:
+        return frametimings_on
+
+
+def saveframetimes(experiment_dir, **kwargs):
+    """
+    Save all frametiming data for one experiment.
+
+    Parameters:
+    ----------
+        experiment_dir:
+            Path to the experiment data.
+    """
+    for i in range(1, 100):
+        try:
+            stimname = np.sort(glob.glob('{}_*.mcd'.format(i)))[0]
+            stimname = stimname.strip('.mcd')
+            print(stimname)
+        except IndexError:
+            break
+        f_on, f_off = extractframetimes(experiment_dir, i, **kwargs)
+
+        savepath = os.path.join(experiment_dir, 'frametimes')
+
+        if not os.path.exists(savepath):
+            os.mkdir(savepath)
+
+        np.savez(os.path.join(savepath, stimname+'_frametimes'),
+                 f_on=f_on,
+                 f_off=f_off)
+
+
+def extractframetimes(experiment_dir, stimnr, threshold=75,
+                      sampling_rate=10000, plotting=False,
+                      time_offset=25, zeroADvalue=32768,
+                      microvoltsperADunit=25625/2048):
     """
     Extract frame timings from the triggered signal recorded alongside the
     MEA data.
@@ -127,15 +194,10 @@ def getframetimes(experiment_dir, stimnr, defaultpath=True, threshold=75,
     Parameters:
     ----------
         experiment_dir:
-            Path to the binary file. '.../<stimulus_nr>_253.bin'
+            Path of the experiment data.
         stimnr:
             Number of the stimulus, to find /<stimulus_nr>_253.bin for the
             stimulus of interest.
-        defaultpath:
-            Whether to use experiment_dir+'RawChannels/'+stim_nr+'_253.bin'
-            to access the frametimings binary file. Default is True. If False
-            full path should be passed with experiment_dir; stim_nr is not
-            important in this case, just pass empty.
         threshold:
             The threshold in milivolts for the trigger signal. Default is
             75 mV.
@@ -145,9 +207,6 @@ def getframetimes(experiment_dir, stimnr, defaultpath=True, threshold=75,
             Whether to plot the whole trace and signal on-offsets. Slow for
             long recordings and frequent pulses (e.g. checkerflicker). Default
             is False.
-        returnoffsets:
-            Whether to return the offset times as well as onset times. If True,
-            two arrays are returned.
         time_offset:
             The delay between the pulse generation and the disply actually
             updating. Default is 25 ms.
@@ -173,15 +232,11 @@ def getframetimes(experiment_dir, stimnr, defaultpath=True, threshold=75,
     import struct
     import os
 
-    if defaultpath:
-        filepath = os.path.join(experiment_dir, 'RawChannels',
-                                str(stimnr)+'_253.bin')
-    else:
-        filepath = experiment_dir
+    filepath = os.path.join(experiment_dir, 'RawChannels',
+                            str(stimnr)+'_253.bin')
 
     with open(filepath, mode='rb') as file:  # b is important -> binary
         fileContent = file.read()
-    # %%
 
     # The header contains the length of the recording as a unsigned 32 bit int
     length = struct.unpack('I', fileContent[:4])[0]
@@ -192,7 +247,7 @@ def getframetimes(experiment_dir, stimnr, defaultpath=True, threshold=75,
     voltage = (voltage_raw - zeroADvalue) / microvoltsperADunit
     # Set the baseline value to zero
     voltage = voltage - voltage[voltage < threshold].mean()
-    # %%
+
     time = np.arange(length) / (sampling_rate * 1e-3)  # In miliseconds
     time = time + time_offset  # Correct for the time delay
 
@@ -239,10 +294,7 @@ def getframetimes(experiment_dir, stimnr, defaultpath=True, threshold=75,
     frametimings_on = time[onsets]/1000
     frametimings_off = time[offsets]/1000
 
-    if returnoffsets:
-        return frametimings_on, frametimings_off
-    else:
-        return frametimings_on
+    return frametimings_on, frametimings_off
 
 
 def read_raster(experiment_dir, stimnr, channel, cluster, defaultpath=True):
@@ -253,7 +305,6 @@ def read_raster(experiment_dir, stimnr, channel, cluster, defaultpath=True):
     experiment_dir + '/results/rasters/'. In this case pass the full
     path to the raster with experiment_dir.
     """
-    import os
 
     if defaultpath:
         r = os.path.join(experiment_dir, 'results/rasters/')
@@ -298,8 +349,6 @@ def read_parameters(exp_dir, stimulusnr, defaultpath=True):
     activity.
 
     """
-    import glob
-    import os
 
     if defaultpath:
         stimdir = os.path.join(exp_dir, 'stimuli')
@@ -363,7 +412,7 @@ def binspikes(spiketimes, frametimings):
             Array containing times of when spikes happen, as output of
             read_rasters()
         frametimings:
-            Array containing frametimings as output of getframetimes()
+            Array containing frametimings as output of readframetimes()
     Returns:
     -------
         spikes:

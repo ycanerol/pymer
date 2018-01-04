@@ -114,8 +114,8 @@ def checkerflickeranalyzer(exp_dir, stimulusnr, clusterstoanalyze=None,
     # frame is delivered. For this reason, the offsets of the pulses
     # also denote a frame change as well as onsets.
     if nblinks == 1:
-        ft_on, ft_off = asc.getframetimes(exp_dir, stimulusnr,
-                                          returnoffsets=True)
+        ft_on, ft_off = asc.readframetimes(exp_dir, stimulusnr,
+                                           returnoffsets=True)
         # Initialize empty array twice the size of one of them, assign
         # value from on or off to every other element.
         frametimings = np.empty(ft_on.shape[0]*2, dtype=float)
@@ -125,7 +125,7 @@ def checkerflickeranalyzer(exp_dir, stimulusnr, clusterstoanalyze=None,
         # here is number of frames.
         filter_length = 40
     elif nblinks == 2:
-        frametimings = asc.getframetimes(exp_dir, stimulusnr)
+        frametimings = asc.readframetimes(exp_dir, stimulusnr)
         filter_length = 20
     else:
         raise ValueError('nblinks is expected to be 1 or 2.')

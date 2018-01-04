@@ -65,8 +65,8 @@ def onoffanalyzer(experiment_dir, stim_order, stim_duration,
     # The first trial will be discarded by dropping the first four frames
     # If we don't save the original and re-initialize for each cell,
     # frametimings will get smaller over time.
-    frametimings_original = asc.getframetimes(experiment_dir,
-                                              stim_order)
+    frametimings_original = asc.readframetimes(experiment_dir,
+                                               stim_order)
 
     for i in range(len(clusters[:, 0])):
         spikes = asc.read_raster(experiment_dir, stim_order,
