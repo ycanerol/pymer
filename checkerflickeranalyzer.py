@@ -214,7 +214,7 @@ def checkerflickeranalyzer(exp_dir, stimulusnr, clusterstoanalyze=None,
         keystosave = ['clusters', 'frametimings', 'all_spiketimes',
                       'frame_duration', 'max_inds', 'nblinks', 'stas',
                       'stx_h', 'stx_w', 'total_frames', 'sx', 'sy',
-                      'filter_length']
+                      'filter_length', 'stimname']
         lists = []
         for key in keystosave:
             f[key] = locals()[key]
@@ -230,4 +230,5 @@ def checkerflickeranalyzer(exp_dir, stimulusnr, clusterstoanalyze=None,
              stx_h=stx_h,
              stx_w=stx_w,
              total_frames=total_frames,
-             filter_length=filter_length)
+             filter_length=filter_length,
+             stimname=stimname)
