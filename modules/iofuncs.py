@@ -10,6 +10,7 @@ Functions related to reading/writing files.
 
 import os
 import glob
+import numpy as np
 
 
 def exp_dir_fixer(exp_name):
@@ -46,3 +47,60 @@ def exp_dir_fixer(exp_name):
                 else:
                     exp_dir = files[0]
     return exp_dir
+
+
+def loadh5(path):
+    """
+    Load data from h5 file into workspace.
+
+    Usage:
+        locals().update(miscfuncs.loadh5(path))
+
+    h5py module returns an HDF file object in memory when data is
+    read. This is not convenient for data manipulation, variables
+    should be in the active namespace. For this, loadh5 function
+    reads the HDF file and returns a dictionary containing all
+    the variable and variable name pairs. This dictionary then
+    can be used for loading the variables into workspace.
+
+    Parameters
+        path:
+            Full path to the .h5 file to be read.
+    Returns
+        data_in_dict:
+            All of the saved variables in a dictionary. This
+            should be used with locals().update(data_in_dict)
+            in order to load all of the data into main namespace.
+    """
+    import h5py
+    data_in_dict = {}
+    f = h5py.File(path, mode='r')
+    # Get all the variable names that were saved
+    keys = list(f.keys())
+    for key in keys:
+        item = f[key]
+        # To load numpy arrays [:] trick is needed
+        try:
+            item = item[:]
+        except ValueError:
+            # This is required to load scalar values into workspace,
+            # otherwise they appear as HDF5 dataset objects which are
+            # not visible in variable explorer.
+            try:
+                item = np.asscalar(np.array(item))
+            except AttributeError:
+                print('%s may not be loaded properly into namespace' % key)
+        data_in_dict[key] = item
+    # Some variables (e.g. STAs) are stored as lists originally
+    # but saving to and loading from HDF file converts them to
+    # numpy arrays with one additional dimension. To revert
+    # this, we need to turn them back into lists with list()
+    # function. The variables that should be converted are
+    # to be kept in list_items.
+    list_items = ['stas', 'max_inds', 'clusterids']
+
+    for list_item in list_items:
+        if list_item in keys:
+            data_in_dict[list_item] = list(data_in_dict[list_item])
+    f.close()
+    return data_in_dict

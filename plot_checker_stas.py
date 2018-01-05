@@ -8,7 +8,7 @@ Created on Tue Dec 12 19:00:09 2017
 import numpy as np
 import matplotlib.pyplot as plt
 import plotfuncs as plf
-import miscfuncs as msc
+import iofuncs as iof
 import analysis_scripts as asc
 import glob
 import os
@@ -44,7 +44,7 @@ def plot_checker_stas(exp_dir, stim_nr, filename=None):
         label = filename.strip('.h5')
         savefolder = 'STAs_' + label
 
-    data = msc.loadh5(datafile)
+    data = iof.loadh5(datafile)
 
     clusters = data['clusters']
     stas = data['stas']
