@@ -160,7 +160,7 @@ def loadh5(path):
     # this, we need to turn them back into lists with list()
     # function. The variables that should be converted are
     # to be kept in list_items.
-    list_items = ['stas', 'max_inds']
+    list_items = ['stas', 'max_inds', 'clusterids']
 
     for list_item in list_items:
         if list_item in keys:

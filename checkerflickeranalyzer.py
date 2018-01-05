@@ -191,8 +191,10 @@ def checkerflickeranalyzer(exp_dir, stimulusnr, clusterstoanalyze=None,
         print('Chunk {:>2} out of {} completed'
               ' in {}'.format(i+1, nrofchunks, datetime.datetime.now()-time))
         time = datetime.datetime.now()
-    #
+
     max_inds = []
+    # Store ID for clusters in a list for ease of use for plotting.
+    clusterids = []
     for i in range(clusters.shape[0]):
         stas[i] = stas[i]/np.sum(all_spiketimes[i])
         # Find the pixel with largest absolute value
@@ -203,6 +205,8 @@ def checkerflickeranalyzer(exp_dir, stimulusnr, clusterstoanalyze=None,
         if max_i.shape != (3,):
             max_i = max_i[:, 0]
         max_inds.append(max_i)
+        txt = '{:0>3}{:0>2}'.format(clusters[i, 0], clusters[i, 1])
+        clusterids.append(txt)
 
     print('Total elapsed'
           ' time: {}'.format(datetime.datetime.now()-startime))
@@ -215,7 +219,7 @@ def checkerflickeranalyzer(exp_dir, stimulusnr, clusterstoanalyze=None,
         keystosave = ['clusters', 'frametimings', 'all_spiketimes',
                       'frame_duration', 'max_inds', 'nblinks', 'stas',
                       'stx_h', 'stx_w', 'total_frames', 'sx', 'sy',
-                      'filter_length', 'stimname', 'exp_name']
+                      'filter_length', 'stimname', 'exp_name', 'clusterids']
         lists = []
         for key in keystosave:
             f[key] = locals()[key]
@@ -233,4 +237,5 @@ def checkerflickeranalyzer(exp_dir, stimulusnr, clusterstoanalyze=None,
              total_frames=total_frames,
              filter_length=filter_length,
              stimname=stimname,
-             exp_name=exp_name)
+             exp_name=exp_name,
+             clusterids=clusterids)
