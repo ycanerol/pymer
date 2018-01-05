@@ -32,17 +32,18 @@ def exp_dir_fixer(exp_name):
         exp_dir = os.path.join('/home/ycan/Documents/data/',
                                exp_name)
         if not os.path.isdir(exp_dir):
-            exp_dir = '/home/ycan/Documents/data/Erol_'+exp_name
+            if exp_name[0] == '2':
+                exp_dir = '/home/ycan/Documents/data/Erol_'+exp_name
             if not os.path.isdir(exp_dir):
                 files = glob.glob(exp_dir+'*')
 
                 if len(files) > 1:
-                    raise ValueError('Multiple files'
+                    raise ValueError('Multiple folders'
                                      'found matching'
                                      ' pattern: {}\n {}'.format(exp_name,
                                                                 files))
                 elif len(files) == 0:
-                    raise ValueError('No files matching'
+                    raise ValueError('No folders matching'
                                      ' pattern: {}'.format(exp_dir))
                 else:
                     exp_dir = files[0]
