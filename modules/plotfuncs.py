@@ -127,3 +127,19 @@ def numsubplots(n, recursive=False):
         return p, n
     else:
         return p
+
+
+def clusters_to_ids(clusters):
+    """
+    Turns clusters array into a list containing formatted IDs for
+    each cluster.
+
+    e.g. channel 7, cluster 2 should have cluster id 00702.
+    """
+    # Store ID for clusters in a list for ease of use for plotting.
+    clusterids = []
+
+    for i in range(clusters.shape[0]):
+        txt = '{:0>3}{:0>2}'.format(clusters[i, 0], clusters[i, 1])
+        clusterids.append(txt)
+    return clusterids
