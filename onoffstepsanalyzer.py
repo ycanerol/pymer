@@ -12,18 +12,18 @@ import matplotlib.pyplot as plt
 import analysis_scripts as asc
 import matplotlib as mpl
 import plotfuncs as plf
+import iofuncs as iof
 
 
-def onoffanalyzer(experiment_dir, stim_order, stim_duration,
+def onoffanalyzer(exp_name, stim_order, stim_duration,
                   preframe_duration, contrast=1):
     """
     Analyze onoffsteps data, plot and save it. Will make a directory
     /data_analysis/<stimulus_name> and save svg [and pdf in subfolder.].
 
     Parameters:
-        experiment_dir:
-            Experiment directory. Can be foldername directly under
-            /home/ycan/Documents/data/. If not, needs to be a full path.
+        exp_name:
+            Experiment name.
         stim_order:
             Order of the onoff steps stimulus.
         stim_duration:
@@ -46,30 +46,26 @@ def onoffanalyzer(experiment_dir, stim_order, stim_duration,
     stim_duration = stim_duration/60
     preframe_duration = preframe_duration/60
     total_cycle = (stim_duration+preframe_duration)*2
-    if not os.path.isdir(experiment_dir):
-        experiment_dir = os.path.join('/home/ycan/Documents/data/',
-                                      experiment_dir)
-    # Normalize path in case there is a trailing slash in the path name
-    experiment_dir = os.path.normpath(experiment_dir)
+    exp_dir = iof.exp_dir_fixer(exp_name)
     wdir = os.getcwd()
     try:
-        os.chdir(experiment_dir)
+        os.chdir(exp_dir)
         stimulusname = np.sort(glob.glob('%s_*.mcd' % stim_order))[0]
     finally:
         os.chdir(wdir)
 
     stim_names = stimulusname.split('.mcd')[0]
 
-    clusters, metadata = asc.read_ods(experiment_dir, cutoff=4)
+    clusters, metadata = asc.read_ods(exp_dir, cutoff=4)
 
     # The first trial will be discarded by dropping the first four frames
     # If we don't save the original and re-initialize for each cell,
     # frametimings will get smaller over time.
-    frametimings_original = asc.readframetimes(experiment_dir,
+    frametimings_original = asc.readframetimes(exp_dir,
                                                stim_order)
 
     for i in range(len(clusters[:, 0])):
-        spikes = asc.read_raster(experiment_dir, stim_order,
+        spikes = asc.read_raster(exp_dir, stim_order,
                                  clusters[i, 0], clusters[i, 1])
         frametimings = frametimings_original
         # Discard all the spikes that happen after the last frame
@@ -135,7 +131,7 @@ def onoffanalyzer(experiment_dir, stim_order, stim_duration,
         ax1.add_patch(rect3)
         ax1.add_patch(rect4)
 
-        plt.suptitle('{}\n{}'.format(os.path.split(experiment_dir)[-1],
+        plt.suptitle('{}\n{}'.format(os.path.split(exp_dir)[-1],
                                      stim_names))
         plt.title('{:0>3}{:0>2} Rating: {}'.format(clusters[i][0],
                                                    clusters[i][1],
@@ -174,7 +170,7 @@ def onoffanalyzer(experiment_dir, stim_order, stim_duration,
         plt.xlabel('Time[s]')
         plt.ylabel('Firing rate[spikes/s]')
 
-        savedir = os.path.join(experiment_dir, 'data_analysis', stim_names)
+        savedir = os.path.join(exp_dir, 'data_analysis', stim_names)
         os.makedirs(os.path.join(savedir, 'pdf'), exist_ok=True)
 
         # Save as svg for looking through data, pdf for

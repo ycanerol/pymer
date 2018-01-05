@@ -6,7 +6,6 @@ Created on Fri Dec  8 11:22:39 2017
 @author: ycan
 """
 
-import analysis_scripts as asc
 import numpy as np
 import randpy
 import datetime
@@ -14,9 +13,11 @@ import glob
 import os
 import h5py
 import warnings
+import analysis_scripts as asc
+import iofuncs as iof
 
 
-def checkerflickeranalyzer(exp_dir, stimulusnr, clusterstoanalyze=None,
+def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
                            frametimingsfraction=None, cutoff=4):
     """
     Analyzes checkerflicker data. Saves the results in .npz and .h5
@@ -24,8 +25,8 @@ def checkerflickeranalyzer(exp_dir, stimulusnr, clusterstoanalyze=None,
 
     Parameters:
     ----------
-        exp_dir:
-            Experiment directory.
+        exp_name:
+            Experiment name.
         stimulusnr:
             Number of the stimulus to be analyzed.
         clusterstoanalyze:
@@ -45,9 +46,9 @@ def checkerflickeranalyzer(exp_dir, stimulusnr, clusterstoanalyze=None,
            is 4. The source of this value is manual rating of each
            cluster.
     """
-
+    exp_dir = iof.exp_dir_fixer(exp_name)
     try:
-        stimfiles = np.sort(glob.glob(exp_dir+'%s_*.mcd' % stimulusnr))[0]
+        stimfiles = np.sort(glob.glob(os.path.join(exp_dir,'%s_*.mcd' % stimulusnr)))[0]
     except IndexError:
         raise IOError('File not found: %s_*.mcd' % (exp_dir+str(stimulusnr)))
     stimname = os.path.split(stimfiles)[-1]
@@ -108,7 +109,6 @@ def checkerflickeranalyzer(exp_dir, stimulusnr, clusterstoanalyze=None,
     else:
         raise ValueError('sx and sy must be integers')
 
-    # %%
     # If the frame rate of the checkerflicker stimulus is 16 ms, (i.e.
     # Nblinks is set to 1), frame timings should be handled differently
     # because the state of the pulse can only be changed when a new
@@ -143,11 +143,9 @@ def checkerflickeranalyzer(exp_dir, stimulusnr, clusterstoanalyze=None,
         print('Analyzing first {}% of'
               ' the recording'.format(frametimingsfraction*100))
         savefname += '_'+str(frametimingsfraction).replace('.', '')+'fraction'
-    ########
     frame_duration = np.average(np.ediff1d(frametimings))
     total_frames = frametimings.shape[0]
 
-    # %%
     all_spiketimes = []
     # Store spike triggered averages in a list containing correct shaped
     # arrays

@@ -10,25 +10,27 @@ Collection of analysis functions
 import numpy as np
 import os
 import glob
+import iofuncs as iof
 
 
-def read_ods(experiment_dir, cutoff=4, defaultpath=True):
+def read_ods(exp_name, cutoff=4, defaultpath=True):
     """
     Read metadata and cluster information from .ods file (manually
     created during spike sorting), return good clusters.
 
     Parameters:
     -----------
-        experiment_dir:
-            Experiment directory that contains the .ods file. The function
-            looks for /spike_sorting.ods under this directory.
+        exp_name:
+            Experiment name for the directory that contains the
+            .ods file. The function looks for /spike_sorting.ods
+            under this directory.
         cutoff:
             Worst rating that is wanted for the analysis. Default
             is 4. The source of this value is manual rating of each
             cluster.
         defaultpath:
             Whether to add '/spike_sorting.ods' to find the file. If False,
-            the full path to .ods should be supplied in experiment_dir.
+            the full path to .ods should be supplied in exp_dir.
 
     Returns:
     --------
@@ -51,11 +53,11 @@ def read_ods(experiment_dir, cutoff=4, defaultpath=True):
 
     First version: 2017-11-21 by Yunus
     """
-
+    exp_dir = iof.exp_dir_fixer(exp_name)
     if defaultpath:
-        filepath = experiment_dir + '/spike_sorting.ods'
+        filepath = exp_dir + '/spike_sorting.ods'
     else:
-        filepath = experiment_dir
+        filepath = exp_dir
 
     import pyexcel_ods as pyxo
     clusters = pyxo.get_data(filepath,
@@ -101,14 +103,14 @@ def read_ods(experiment_dir, cutoff=4, defaultpath=True):
     return clusters, metadata_dict
 
 
-def readframetimes(experiment_dir, stimnr, returnoffsets=False):
+def readframetimes(exp_name, stimnr, returnoffsets=False):
     """
-    Reads the extracted frame times from experiment_dir/frametimes folder.
+    Reads the extracted frame times from exp_dir/frametimes folder.
 
     Parameters:
     ----------
-        experiment_dir:
-            Path of the experiment data.
+        exp_name:
+            Experiment name to be used.
         stimnr:
             Order of the stimulus of interest.
         returnoffsets:
@@ -125,7 +127,9 @@ def readframetimes(experiment_dir, stimnr, returnoffsets=False):
             returnoffsets is True. Not to be used frequently, only if a
             particular stimulus requires it.
     """
-    filepath = os.path.join(experiment_dir, 'frametimes', str(stimnr)+'_*.npz')
+    exp_dir = iof.exp_dir_fixer(exp_name)
+
+    filepath = os.path.join(exp_dir, 'frametimes', str(stimnr)+'_*.npz')
     filename = glob.glob(filepath)[0]
     f = np.load(filename)
 
@@ -138,15 +142,17 @@ def readframetimes(experiment_dir, stimnr, returnoffsets=False):
         return frametimings_on
 
 
-def saveframetimes(experiment_dir, **kwargs):
+def saveframetimes(exp_name, **kwargs):
     """
     Save all frametiming data for one experiment.
 
     Parameters:
     ----------
-        experiment_dir:
-            Path to the experiment data.
+        exp_name:
+            Experiment name.
     """
+    exp_dir = iof.exp_dir_fixer(exp_name)
+
     for i in range(1, 100):
         try:
             stimname = np.sort(glob.glob('{}_*.mcd'.format(i)))[0]
@@ -154,9 +160,9 @@ def saveframetimes(experiment_dir, **kwargs):
             print(stimname)
         except IndexError:
             break
-        f_on, f_off = extractframetimes(experiment_dir, i, **kwargs)
+        f_on, f_off = extractframetimes(exp_dir, i, **kwargs)
 
-        savepath = os.path.join(experiment_dir, 'frametimes')
+        savepath = os.path.join(exp_dir, 'frametimes')
 
         if not os.path.exists(savepath):
             os.mkdir(savepath)
@@ -166,7 +172,7 @@ def saveframetimes(experiment_dir, **kwargs):
                  f_off=f_off)
 
 
-def extractframetimes(experiment_dir, stimnr, threshold=75,
+def extractframetimes(exp_name, stimnr, threshold=75,
                       sampling_rate=10000, plotting=False,
                       time_offset=25, zeroADvalue=32768,
                       microvoltsperADunit=25625/2048):
@@ -193,8 +199,8 @@ def extractframetimes(experiment_dir, stimnr, threshold=75,
 
     Parameters:
     ----------
-        experiment_dir:
-            Path of the experiment data.
+        exp_dir:
+            Experiment name.
         stimnr:
             Number of the stimulus, to find /<stimulus_nr>_253.bin for the
             stimulus of interest.
@@ -230,9 +236,9 @@ def extractframetimes(experiment_dir, stimnr, threshold=75,
 
     """
     import struct
-    import os
 
-    filepath = os.path.join(experiment_dir, 'RawChannels',
+    exp_dir = iof.exp_dir_fixer(exp_name)
+    filepath = os.path.join(exp_dir, 'RawChannels',
                             str(stimnr)+'_253.bin')
 
     with open(filepath, mode='rb') as file:  # b is important -> binary
@@ -297,19 +303,19 @@ def extractframetimes(experiment_dir, stimnr, threshold=75,
     return frametimings_on, frametimings_off
 
 
-def read_raster(experiment_dir, stimnr, channel, cluster, defaultpath=True):
+def read_raster(exp_name, stimnr, channel, cluster, defaultpath=True):
     """
     Return the spike times from the specified raster file.
 
     Use defaultpath=False if the raster directory is not
-    experiment_dir + '/results/rasters/'. In this case pass the full
-    path to the raster with experiment_dir.
+    exp_dir + '/results/rasters/'. In this case pass the full
+    path to the raster with exp_dir.
     """
-
+    exp_dir = iof.exp_dir_fixer(exp_name)
     if defaultpath:
-        r = os.path.join(experiment_dir, 'results/rasters/')
+        r = os.path.join(exp_dir, 'results/rasters/')
     else:
-        r = experiment_dir
+        r = exp_dir
     s = str(stimnr)
     c = str(channel)
     fullpath = r + s + '_SP_C' + c + '{:0>2}'.format(cluster) + '.txt'
@@ -320,22 +326,22 @@ def read_raster(experiment_dir, stimnr, channel, cluster, defaultpath=True):
     return spike_times
 
 
-def read_parameters(exp_dir, stimulusnr, defaultpath=True):
+def read_parameters(exp_name, stimulusnr, defaultpath=True):
     """
     Reads the parameters from stimulus files
 
     Parameters:
     -----------
-    exp_dir:
-        Main directory for the experiment. The function will look for 'stimuli'
-        folder under this directory.
+    exp_name:
+        Experiment name. The function will look for 'stimuli'
+        folder under the experiment directory.
     stimulusnr:
         The order of the stimulus. The function will open the files with the
         file name '<stimulusnr>_*' under the stimulus directory.
     defaultpath:
-         Whether to use experiment_dir+'/stimuli/' to access the stimuli
+         Whether to use exp_dir+'/stimuli/' to access the stimuli
          parameters. Default is True. If False full path to stimulus folder
-         should be passed with experiment_dir.
+         should be passed with exp_dir.
 
     Returns:
     -------
@@ -349,6 +355,7 @@ def read_parameters(exp_dir, stimulusnr, defaultpath=True):
     activity.
 
     """
+    exp_dir = iof.exp_dir_fixer(exp_name)
 
     if defaultpath:
         stimdir = os.path.join(exp_dir, 'stimuli')
