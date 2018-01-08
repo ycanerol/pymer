@@ -110,3 +110,21 @@ def cut_around_center(sta_original, max_i_o, f_size):
         sta = sta_original
         max_i = max_i_o
     return sta, max_i
+
+
+def timediff(starttime):
+    """
+    Calculates elapsed time since a given timepoint, strips the miliseconds
+    and returns the result.
+
+    Parameters:
+        starttime (datetime.datetime object)
+        Timepoint from which difference will be calculated.
+    Returns:
+        elapsed (datetime.timedelta object)
+        Time difference without miliseconds.
+    """
+    import datetime
+    elapsed = datetime.datetime.now()-starttime
+    elapsed -= datetime.timedelta(microseconds=elapsed.microseconds)
+    return elapsed

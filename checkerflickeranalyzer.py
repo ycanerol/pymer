@@ -15,6 +15,7 @@ import h5py
 import warnings
 import analysis_scripts as asc
 import iofuncs as iof
+import miscfuncs as msc
 
 
 def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
@@ -48,7 +49,8 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     """
     exp_dir = iof.exp_dir_fixer(exp_name)
     try:
-        stimfiles = np.sort(glob.glob(os.path.join(exp_dir,'%s_*.mcd' % stimulusnr)))[0]
+        stimfiles = glob.glob(os.path.join(exp_dir, '%s_*.mcd' % stimulusnr))
+        stimfiles = np.sort(stimfiles)[0]
     except IndexError:
         raise IOError('File not found: %s_*.mcd' % (exp_dir+str(stimulusnr)))
     stimname = os.path.split(stimfiles)[-1]
@@ -187,7 +189,7 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
                     spikenrs[j] += spikes[k]
 
         print('Chunk {:>2} out of {} completed'
-              ' in {}'.format(i+1, nrofchunks, datetime.datetime.now()-time))
+              ' in {}'.format(i+1, nrofchunks, msc.timediff(time)))
         time = datetime.datetime.now()
 
     max_inds = []
@@ -203,9 +205,8 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
             max_i = max_i[:, 0]
         max_inds.append(max_i)
 
-
     print('Total elapsed'
-          ' time: {}'.format(datetime.datetime.now()-startime))
+          ' time: {}'.format(msc.timediff(startime)))
 
     savepath = os.path.join(exp_dir, 'data_analysis', stimname)
     if not os.path.isdir(savepath):
