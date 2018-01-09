@@ -14,7 +14,7 @@ import glob
 import os
 
 
-def plot_checker_stas(exp_dir, stim_nr, filename=None):
+def plot_checker_stas(exp_name, stim_nr, filename=None):
     """
     Plot and save all STAs from checkerflicker analysis. The plots
     will be saved in a new folder called STAs under the data analysis
@@ -27,6 +27,7 @@ def plot_checker_stas(exp_dir, stim_nr, filename=None):
 
     from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
 
+    exp_dir = iof.exp_dir_fixer(exp_name)
     stim_nr = str(stim_nr)
     if filename:
         filename = str(filename)
