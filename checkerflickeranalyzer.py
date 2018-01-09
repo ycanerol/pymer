@@ -52,7 +52,8 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
         stimfiles = glob.glob(os.path.join(exp_dir, '%s_*.mcd' % stimulusnr))
         stimfiles = np.sort(stimfiles)[0]
     except IndexError:
-        raise IOError('File not found: %s_*.mcd' % (exp_dir+str(stimulusnr)))
+        raise IOError('File not found %s_*.mcd' % os.path.join(exp_dir,
+                                                               str(stimulusnr)))
     stimname = os.path.split(stimfiles)[-1]
     stimname = stimname.split('.mcd')[0]
     exp_name = os.path.split(exp_dir)[-1]
@@ -130,8 +131,13 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     elif nblinks == 2:
         frametimings = asc.readframetimes(exp_dir, stimulusnr)
         filter_length = 20
+    elif nblinks == 4:
+        frametimings = asc.readframetimes(exp_dir, stimulusnr)
+        # There are two pulses per frame
+        frametimings = frametimings[::2]
+        filter_length = 10
     else:
-        raise ValueError('nblinks is expected to be 1 or 2.')
+        raise ValueError('nblinks is expected to be 1, 2 or 4.')
 
     savefname = str(stimulusnr)+'_data'
 
@@ -162,10 +168,17 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
         all_spiketimes.append(spikes)
         stas.append(np.zeros((sx, sy, filter_length)))
 
+    # Empirically determined to be best for 32GB RAM
+    desired_chunk_size = 216000000
+
     # Length of the chunks (specified in number of frames)
-    chunklength = 10000
+    chunklength = int(desired_chunk_size/(sx*sy))
+
     chunksize = chunklength*sx*sy
     nrofchunks = int(np.ceil(total_frames/chunklength))
+
+    print('Chunk length :{} frames\n'
+          'Total nr of chunks: {}'.format(chunklength, nrofchunks))
     time = startime = datetime.datetime.now()
     for i in range(nrofchunks):
         randnrs, seed = randpy.ran1(seed, chunksize)
