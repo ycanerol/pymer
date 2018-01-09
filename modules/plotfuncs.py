@@ -143,3 +143,25 @@ def clusters_to_ids(clusters):
         txt = '{:0>3}{:0>2}'.format(clusters[i, 0], clusters[i, 1])
         clusterids.append(txt)
     return clusterids
+
+
+def colorbar(mappable, **kwargs):
+    """
+    Make colorbars that scale properly.
+
+    kwargs will be passed to colorbar
+
+    Usage:
+        img = ax.imshow(data)
+        colorbar(img)
+
+    Taken from
+    http://joseph-long.com/writing/colorbars/
+    """
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+    ax = mappable.axes
+    fig = ax.figure
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    return fig.colorbar(mappable, cax=cax, **kwargs)

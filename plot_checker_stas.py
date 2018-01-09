@@ -75,7 +75,7 @@ def plot_checker_stas(exp_dir, stim_nr, filename=None):
                                            size_vertical=1)
                 ax.add_artist(scalebar)
             if i == filter_length-1:
-                plt.colorbar(im)
+                plf.colorbar(im, ticks=[sta_min, 0, sta_max], format='%.2f')
         plt.suptitle('{}\n{}\n'
                      '{:0>3}{:0>2} Rating: {}'.format(exp_name,
                                                       stimname+label,
