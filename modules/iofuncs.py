@@ -105,3 +105,15 @@ def loadh5(path):
             data_in_dict[list_item] = list(data_in_dict[list_item])
     f.close()
     return data_in_dict
+
+
+def stimname(exp_name, stim_nr):
+    exp_dir = exp_dir_fixer(exp_name)
+    with open(os.path.join(exp_dir, 'parameters.txt')) as f:
+        lines = f.readlines()
+    lines = lines[1:]
+    name = None
+    for line in lines:
+        if line.startswith('%d_' % stim_nr):
+            name = line[:-4].strip(' ')
+    return name
