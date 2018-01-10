@@ -158,8 +158,7 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     # Store spike triggered averages in a list containing correct shaped
     # arrays
     stas = []
-    # Store number of spikes during the calculation to use in the averaging
-    spikenrs = np.zeros(clusters.shape[0]).astype('int')
+
     for i in range(len(clusters[:, 0])):
         spiketimes = asc.read_raster(exp_dir, stimulusnr,
                                      clusters[i, 0], clusters[i, 1])
@@ -199,16 +198,16 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
                 spikes = all_spiketimes[j][chunkind]
                 if spikes[k] != 0:
                     stas[j] += spikes[k]*stim_small
-                    spikenrs[j] += spikes[k]
 
         print('Chunk {:>2} out of {} completed'
               ' in {}'.format(i+1, nrofchunks, msc.timediff(time)))
         time = datetime.datetime.now()
 
     max_inds = []
+    spikenrs = np.array([spikearr.sum() for spikearr in all_spiketimes])
 
     for i in range(clusters.shape[0]):
-        stas[i] = stas[i]/np.sum(all_spiketimes[i])
+        stas[i] = stas[i]/spikenrs[i]
         # Find the pixel with largest absolute value
         max_i = np.squeeze(np.where(np.abs(stas[i])
                                     == np.max(np.abs(stas[i]))))
@@ -229,7 +228,7 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
         keystosave = ['clusters', 'frametimings', 'all_spiketimes',
                       'frame_duration', 'max_inds', 'nblinks', 'stas',
                       'stx_h', 'stx_w', 'total_frames', 'sx', 'sy',
-                      'filter_length', 'stimname', 'exp_name']
+                      'filter_length', 'stimname', 'exp_name', 'spikenrs']
         lists = []
         for key in keystosave:
             f[key] = locals()[key]
@@ -247,4 +246,5 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
              total_frames=total_frames,
              filter_length=filter_length,
              stimname=stimname,
-             exp_name=exp_name)
+             exp_name=exp_name,
+             spikenrs=spikenrs)
