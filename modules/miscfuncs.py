@@ -47,10 +47,11 @@ def show_sta(sta, max_i, f_size=10):
     sta_max = np.max(sta)
 
     for i in range(20):
-        plt.subplot(4, 5, i+1)
+        ax = plt.subplot(4, 5, i+1)
 
         plt.imshow(sta[:, :, i], vmin=sta_min, vmax=sta_max, cmap='Greys')
         plt.axis('off')
+    ax.set_aspect('equal')
     plt.show()
 
 

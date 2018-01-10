@@ -64,6 +64,7 @@ def plotsvd(file, f_size=10, filter_size=1):
     for i in range(6):
         ax = plt.subplot(rows, columns, i+1)
         im = plt.imshow(plotthese[i], vmin=vmin, vmax=vmax, cmap=plf.RFcolormap())
+        ax.set_aspect('equal')
         plt.xticks([])
         plt.yticks([])
         for child in ax.get_children():
