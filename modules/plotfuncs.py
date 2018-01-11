@@ -144,16 +144,22 @@ def clusters_to_ids(clusters):
         clusterids.append(txt)
     return clusterids
 
-
-def colorbar(mappable, **kwargs):
+def colorbar(mappable, size='5%', **kwargs):
     """
     Make colorbars that scale properly.
 
-    kwargs will be passed to colorbar
+    Size determines the proportion of the colorbar width
+    with respect to image axis.
+
+    kwargs will be passed to colorbar.
 
     Usage:
-        img = ax.imshow(data)
-        colorbar(img)
+        im = ax.imshow(data)
+        colorbar(im, size='5%)
+
+    With STAs:
+        im = ax.imshow(data)
+        colorbar(im, ticks=[vmin, 0, vmax], format='%.2f')
 
     Taken from
     http://joseph-long.com/writing/colorbars/
@@ -163,5 +169,8 @@ def colorbar(mappable, **kwargs):
     ax = mappable.axes
     fig = ax.figure
     divider = make_axes_locatable(ax)
-    cax = divider.append_axes("right", size="5%", pad=0.05)
-    return fig.colorbar(mappable, cax=cax, **kwargs)
+    cax = divider.append_axes("right", size=size, pad=0.05)
+    cb = fig.colorbar(mappable, cax=cax, **kwargs)
+    # Turn off the box around the colorbar.
+    cb.outline.set_linewidth(0)
+    return cb
