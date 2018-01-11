@@ -48,14 +48,9 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
            cluster.
     """
     exp_dir = iof.exp_dir_fixer(exp_name)
-    try:
-        stimfiles = glob.glob(os.path.join(exp_dir, '%s_*.mcd' % stimulusnr))
-        stimfiles = np.sort(stimfiles)[0]
-    except IndexError:
-        raise IOError('File not found %s_*.mcd' % os.path.join(exp_dir,
-                                                               str(stimulusnr)))
-    stimname = os.path.split(stimfiles)[-1]
-    stimname = stimname.split('.mcd')[0]
+
+    stimname = iof.stimname(exp_dir, stimulusnr)
+
     exp_name = os.path.split(exp_dir)[-1]
 
     clusters, metadata = asc.read_ods(exp_dir, cutoff=cutoff)

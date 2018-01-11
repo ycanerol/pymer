@@ -15,7 +15,7 @@ import plotfuncs as plf
 import iofuncs as iof
 
 
-def onoffanalyzer(exp_name, stim_order, stim_duration,
+def onoffanalyzer(exp_name, stim_nr, stim_duration,
                   preframe_duration, contrast=1):
     """
     Analyze onoffsteps data, plot and save it. Will make a directory
@@ -24,7 +24,7 @@ def onoffanalyzer(exp_name, stim_order, stim_duration,
     Parameters:
         exp_name:
             Experiment name.
-        stim_order:
+        stim_nr:
             Order of the onoff steps stimulus.
         stim_duration:
             The duration of on or off step presentation, number of frames
@@ -47,14 +47,8 @@ def onoffanalyzer(exp_name, stim_order, stim_duration,
     preframe_duration = preframe_duration/60
     total_cycle = (stim_duration+preframe_duration)*2
     exp_dir = iof.exp_dir_fixer(exp_name)
-    wdir = os.getcwd()
-    try:
-        os.chdir(exp_dir)
-        stimulusname = np.sort(glob.glob('%s_*.mcd' % stim_order))[0]
-    finally:
-        os.chdir(wdir)
 
-    stim_names = stimulusname.split('.mcd')[0]
+    stimname = iof.stimname(exp_dir, stim_nr)
 
     clusters, metadata = asc.read_ods(exp_dir, cutoff=4)
 
@@ -62,10 +56,10 @@ def onoffanalyzer(exp_name, stim_order, stim_duration,
     # If we don't save the original and re-initialize for each cell,
     # frametimings will get smaller over time.
     frametimings_original = asc.readframetimes(exp_dir,
-                                               stim_order)
+                                               stim_nr)
 
     for i in range(len(clusters[:, 0])):
-        spikes = asc.read_raster(exp_dir, stim_order,
+        spikes = asc.read_raster(exp_dir, stim_nr,
                                  clusters[i, 0], clusters[i, 1])
         frametimings = frametimings_original
         # Discard all the spikes that happen after the last frame
@@ -170,7 +164,7 @@ def onoffanalyzer(exp_name, stim_order, stim_duration,
         plt.xlabel('Time[s]')
         plt.ylabel('Firing rate[spikes/s]')
 
-        savedir = os.path.join(exp_dir, 'data_analysis', stim_names)
+        savedir = os.path.join(exp_dir, 'data_analysis', stimname)
         os.makedirs(os.path.join(savedir, 'pdf'), exist_ok=True)
 
         # Save as svg for looking through data, pdf for
