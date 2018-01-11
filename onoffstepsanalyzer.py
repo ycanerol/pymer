@@ -6,7 +6,6 @@ Created on Thu Nov 30 18:18:03 2017
 @author: ycan
 """
 import numpy as np
-import glob
 import os
 import matplotlib.pyplot as plt
 import analysis_scripts as asc
@@ -15,8 +14,7 @@ import plotfuncs as plf
 import iofuncs as iof
 
 
-def onoffanalyzer(exp_name, stim_nr, stim_duration,
-                  preframe_duration, contrast=1):
+def onoffstepsanalyzer(exp_name, stim_nr):
     """
     Analyze onoffsteps data, plot and save it. Will make a directory
     /data_analysis/<stimulus_name> and save svg [and pdf in subfolder.].
@@ -26,37 +24,37 @@ def onoffanalyzer(exp_name, stim_nr, stim_duration,
             Experiment name.
         stim_nr:
             Order of the onoff steps stimulus.
-        stim_duration:
-            The duration of on or off step presentation, number of frames
-        preframes_duration:
-            The duration of preframes between on-off steps, in number of frames
-        contrast:
-            The contrast parameter that is given to stimulator program, default
-            is 1.
 
-            Example: for 3_onoffsteps60_preframes120.mcd,
-            stim_order = 3
-            stim_duration = 60
-            preframe_duration = 120.
     Returns:
         Nothing. Will return PSTH in the future.
 
     """
-    # Convert from number of frames to seconds
-    stim_duration = stim_duration/60
-    preframe_duration = preframe_duration/60
-    total_cycle = (stim_duration+preframe_duration)*2
+
     exp_dir = iof.exp_dir_fixer(exp_name)
+
+    exp_name = os.path.split(exp_dir)[-1]
 
     stimname = iof.stimname(exp_dir, stim_nr)
 
     clusters, metadata = asc.read_ods(exp_dir, cutoff=4)
 
+    parameters = asc.read_parameters(exp_dir, stim_nr)
+
+    # Divide by 60 to convert from number of frames to seconds
+    stim_duration = parameters['Nframes']/60
+    try:
+        preframe_duration = parameters['preframes']/60
+    except KeyError:
+        preframe_duration = 0
+
+    contrast = parameters['contrast']
+
+    total_cycle = (stim_duration+preframe_duration)*2
+
     # The first trial will be discarded by dropping the first four frames
     # If we don't save the original and re-initialize for each cell,
     # frametimings will get smaller over time.
-    frametimings_original = asc.readframetimes(exp_dir,
-                                               stim_nr)
+    frametimings_original = asc.readframetimes(exp_dir, stim_nr)
 
     for i in range(len(clusters[:, 0])):
         spikes = asc.read_raster(exp_dir, stim_nr,
@@ -125,8 +123,7 @@ def onoffanalyzer(exp_name, stim_nr, stim_duration,
         ax1.add_patch(rect3)
         ax1.add_patch(rect4)
 
-        plt.suptitle('{}\n{}'.format(os.path.split(exp_dir)[-1],
-                                     stim_names))
+        plt.suptitle('{}\n{}'.format(exp_name, stimname))
         plt.title('{:0>3}{:0>2} Rating: {}'.format(clusters[i][0],
                                                    clusters[i][1],
                                                    clusters[i][2]))
