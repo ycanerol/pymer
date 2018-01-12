@@ -49,7 +49,7 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     """
     exp_dir = iof.exp_dir_fixer(exp_name)
 
-    stimname = iof.stimname(exp_dir, stimulusnr)
+    stimname = iof.getstimname(exp_dir, stimulusnr)
 
     exp_name = os.path.split(exp_dir)[-1]
 

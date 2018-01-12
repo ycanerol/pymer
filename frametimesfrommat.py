@@ -12,7 +12,7 @@ import iofuncs as iof
 import os
 
 path = iof.exp_dir_fixer('Kara')
-name = iof.stimname(path, 3)
+name = iof.getstimname(path, 3)
 
 """
 Extract frame times from .mat files. Needed for analyzing data

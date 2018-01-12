@@ -107,7 +107,7 @@ def loadh5(path):
     return data_in_dict
 
 
-def stimname(exp_name, stim_nr):
+def getstimname(exp_name, stim_nr):
     """
     Returns the stimulus name for a given experiment and stimulus
     number from parameters.txt file.

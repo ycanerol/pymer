@@ -34,7 +34,7 @@ def onoffstepsanalyzer(exp_name, stim_nr):
 
     exp_name = os.path.split(exp_dir)[-1]
 
-    stimname = iof.stimname(exp_dir, stim_nr)
+    stimname = iof.getstimname(exp_dir, stim_nr)
 
     clusters, metadata = asc.read_ods(exp_dir, cutoff=4)
 
