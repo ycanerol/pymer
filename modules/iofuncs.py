@@ -13,6 +13,16 @@ import glob
 import numpy as np
 
 
+# Some variables (e.g. STAs) are stored as lists originally
+# but saving to and loading from HDF/npz file converts them to
+# numpy arrays with one additional dimension. To revert
+# this, we need to turn them back into lists with list()
+# function. Any variables that is normally a list should be
+# kept in list_of_lists.
+
+list_of_lists = ['stas', 'max_inds']
+
+
 def exp_dir_fixer(exp_name):
     """
     Convert short experiment name into full path. If input is already
@@ -108,18 +118,56 @@ def loadh5(path):
             except AttributeError:
                 print('%s may not be loaded properly into namespace' % key)
         data_in_dict[key] = item
-    # Some variables (e.g. STAs) are stored as lists originally
-    # but saving to and loading from HDF file converts them to
-    # numpy arrays with one additional dimension. To revert
-    # this, we need to turn them back into lists with list()
-    # function. The variables that should be converted are
-    # to be kept in list_items.
-    list_items = ['stas', 'max_inds']
+
+    list_items = list_of_lists
 
     for list_item in list_items:
         if list_item in keys:
             data_in_dict[list_item] = list(data_in_dict[list_item])
     f.close()
+    return data_in_dict
+
+
+def load(exp_name, stimnr, fname=None):
+    """
+    Load data from .npz file to a dictionary, while fixing
+    lists, scalars and strings.
+
+    If the filename is something other than <stimnr>_data.npz,
+    it can be supplied via fname parameter.
+
+    locals().update(data) will load all of the variables in to
+    current workspace. This does not work within functions.
+
+    """
+    stimnr = str(stimnr)
+    exp_dir = exp_dir_fixer(exp_name)
+    stim_name = getstimname(exp_dir, stimnr)
+    if not fname:
+        fname = stimnr+'_data.npz'
+    path = os.path.join(exp_dir, 'data_analysis', stim_name,
+                        fname)
+
+    data_in_dict = {}
+    with np.load(path) as f:
+        # Get all the variable names that were saved
+        keys = list(f.keys())
+        for key in keys:
+            item = f[key]
+            if item.shape == ():
+                item = np.asscalar(item)
+            data_in_dict[key] = item
+    # Some variables (e.g. STAs) are stored as lists originally
+    # but saving to and loading from npz file converts them to
+    # numpy arrays with one additional dimension. To revert
+    # this, we need to turn them back into lists with list()
+    # function. The variables that should be converted are
+    # to be kept in list_items.
+    list_items = list_of_lists
+
+    for list_item in list_items:
+        if list_item in keys:
+            data_in_dict[list_item] = list(data_in_dict[list_item])
     return data_in_dict
 
 
