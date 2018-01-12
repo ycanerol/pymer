@@ -9,7 +9,6 @@ Created on Fri Dec  8 11:22:39 2017
 import numpy as np
 import randpy
 import datetime
-import glob
 import os
 import h5py
 import warnings
@@ -238,6 +237,8 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
              stas=stas,
              stx_h=stx_h,
              stx_w=stx_w,
+             sx=sx,
+             sy=sy,
              total_frames=total_frames,
              filter_length=filter_length,
              stimname=stimname,
