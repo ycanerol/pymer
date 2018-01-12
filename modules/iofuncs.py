@@ -52,10 +52,14 @@ def exp_dir_fixer(exp_name):
 
 def loadh5(path):
     """
-    Load data from h5 file into workspace.
+    Load data from h5 file in a dictionary.
 
     Usage:
-        locals().update(miscfuncs.loadh5(path))
+        data = loadh5(('20171116', 6))
+        stas = data['stas']
+
+    Usage:
+        locals().update(loadh5(path))
 
     h5py module returns an HDF file object in memory when data is
     read. This is not convenient for data manipulation, variables
@@ -67,13 +71,25 @@ def loadh5(path):
     Parameters
         path:
             Full path to the .h5 file to be read.
+
+            It can also be a tuple containing experiment name and stimulus
+            number, in which case _data.h5 file will be used.
     Returns
         data_in_dict:
             All of the saved variables in a dictionary. This
-            should be used with locals().update(data_in_dict)
+            can be used with locals().update(data_in_dict)
             in order to load all of the data into main namespace.
     """
     import h5py
+
+    if isinstance(path, tuple):
+        exp_name = path[0]
+        stimnr = str(path[1])
+        exp_dir = exp_dir_fixer(exp_name)
+        stim_name = getstimname(exp_dir, stimnr)
+        path = os.path.join(exp_dir, 'data_analysis', stim_name,
+                            stimnr+'_data.h5')
+
     data_in_dict = {}
     f = h5py.File(path, mode='r')
     # Get all the variable names that were saved
