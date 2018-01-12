@@ -446,3 +446,13 @@ def binspikes(spiketimes, frametimings):
         spikes = np.append(spikes, 0)
 
     return spikes
+
+
+def staquality(sta):
+    """
+    Calculates the z-score of the pixel that is furthest away
+    from the zero as a measure of STA quality.
+    """
+
+    z = (np.max(np.abs(sta)) - sta.mean()) / sta.std()
+    return z.astype('float16')
