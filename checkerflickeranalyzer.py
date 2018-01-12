@@ -218,29 +218,16 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     if not os.path.isdir(savepath):
         os.makedirs(savepath, exist_ok=True)
     savepath = os.path.join(savepath, savefname)
-    with h5py.File(savepath+'.h5', mode='w') as f:
-        keystosave = ['clusters', 'frametimings', 'all_spiketimes',
-                      'frame_duration', 'max_inds', 'nblinks', 'stas',
-                      'stx_h', 'stx_w', 'total_frames', 'sx', 'sy',
-                      'filter_length', 'stimname', 'exp_name', 'spikenrs']
-        lists = []
-        for key in keystosave:
-            f[key] = locals()[key]
 
-    np.savez(savepath,
-             clusters=clusters,
-             frametimings=frametimings,
-             all_spiketimes=all_spiketimes,
-             frame_duration=frame_duration,
-             max_inds=max_inds,
-             nblinks=nblinks,
-             stas=stas,
-             stx_h=stx_h,
-             stx_w=stx_w,
-             sx=sx,
-             sy=sy,
-             total_frames=total_frames,
-             filter_length=filter_length,
-             stimname=stimname,
-             exp_name=exp_name,
-             spikenrs=spikenrs)
+    keystosave = ['clusters', 'frametimings', 'all_spiketimes',
+                  'frame_duration', 'max_inds', 'nblinks', 'stas',
+                  'stx_h', 'stx_w', 'total_frames', 'sx', 'sy',
+                  'filter_length', 'stimname', 'exp_name', 'spikenrs',
+                  'clusterstoanalyze', 'frametimingsfraction', 'cutoff']
+    datadict = {}
+
+    with h5py.File(savepath+'.h5', mode='w') as f:
+        for key in keystosave:
+            f[key] = datadict[key] = locals()[key]
+
+    np.savez(savepath, **datadict)
