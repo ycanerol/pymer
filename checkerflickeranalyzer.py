@@ -14,6 +14,8 @@ import warnings
 import analysis_scripts as asc
 import iofuncs as iof
 import miscfuncs as msc
+import matplotlib.pyplot as plt
+import plotfuncs as plf
 
 
 def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
@@ -172,6 +174,9 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     print('Chunk length :{} frames\n'
           'Total nr of chunks: {}'.format(chunklength, nrofchunks))
     time = startime = datetime.datetime.now()
+
+    quals = np.zeros(len(stas))
+
     for i in range(nrofchunks):
         randnrs, seed = randpy.ran1(seed, chunksize)
         randnrs = [1 if i > .5 else -1 for i in randnrs]
@@ -191,10 +196,17 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
                 spikes = all_spiketimes[j][chunkind]
                 if spikes[k] != 0:
                     stas[j] += spikes[k]*stim_small
+        qual = np.array([])
+        for c in range(clusters.shape[0]):
+            qual = np.append(qual, asc.staquality(stas[c]))
+        quals = np.vstack((quals, qual))
 
         print('Chunk {:>2} out of {} completed'
               ' in {}'.format(i+1, nrofchunks, msc.timediff(time)))
         time = datetime.datetime.now()
+
+    # Remove the first row which is full of random nrs.
+    quals = quals[1:, :]
 
     max_inds = []
     spikenrs = np.array([spikearr.sum() for spikearr in all_spiketimes])
@@ -222,10 +234,25 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
                   'frame_duration', 'max_inds', 'nblinks', 'stas',
                   'stx_h', 'stx_w', 'total_frames', 'sx', 'sy',
                   'filter_length', 'stimname', 'exp_name', 'spikenrs',
-                  'clusterstoanalyze', 'frametimingsfraction', 'cutoff']
+                  'clusterstoanalyze', 'frametimingsfraction', 'cutoff',
+                  'quals', 'nrofchunks', 'chunklength']
     datadict = {}
 
     for key in keystosave:
         datadict[key] = locals()[key]
 
     np.savez(savepath, **datadict)
+
+    t = (np.arange(nrofchunks)*chunklength*frame_duration)/60
+    qmax = np.max(quals, axis=0)
+    qualsn = quals/qmax[np.newaxis, :]
+
+    ax = plt.subplot(111)
+    ax.plot(t, qualsn, alpha=0.3)
+    plt.ylabel('Z-score of center pixel (normalized)')
+    plt.xlabel('Minutes of stimulus analyzed')
+    plt.ylim([0, 1])
+    plf.spineless(ax, 'tr')
+    plt.title('Recording duration optimization\n{}\n {}'.format(exp_name,
+              savefname))
+    plt.savefig(savepath+'.svg', format='svg')
