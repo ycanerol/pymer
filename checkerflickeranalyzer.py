@@ -10,7 +10,6 @@ import numpy as np
 import randpy
 import datetime
 import os
-import h5py
 import warnings
 import analysis_scripts as asc
 import iofuncs as iof
@@ -226,8 +225,7 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
                   'clusterstoanalyze', 'frametimingsfraction', 'cutoff']
     datadict = {}
 
-    with h5py.File(savepath+'.h5', mode='w') as f:
-        for key in keystosave:
-            f[key] = datadict[key] = locals()[key]
+    for key in keystosave:
+        datadict[key] = locals()[key]
 
     np.savez(savepath, **datadict)
