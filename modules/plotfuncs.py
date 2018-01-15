@@ -144,6 +144,7 @@ def clusters_to_ids(clusters):
         clusterids.append(txt)
     return clusterids
 
+
 def colorbar(mappable, size='5%', **kwargs):
     """
     Make colorbars that scale properly.
@@ -173,4 +174,6 @@ def colorbar(mappable, size='5%', **kwargs):
     cb = fig.colorbar(mappable, cax=cax, **kwargs)
     # Turn off the box around the colorbar.
     cb.outline.set_linewidth(0)
+    # Turn off tick marks
+    cb.ax.tick_params(length=0)
     return cb
