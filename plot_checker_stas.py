@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 import plotfuncs as plf
 import iofuncs as iof
 import analysis_scripts as asc
-import glob
 import os
 
 
@@ -31,21 +30,18 @@ def plot_checker_stas(exp_name, stim_nr, filename=None):
     stim_nr = str(stim_nr)
     if filename:
         filename = str(filename)
-    parent_path = glob.glob(os.path.join(exp_dir, 'data_analysis',
-                                         stim_nr+'_*'))[0]
+
     _, metadata = asc.read_ods(exp_dir)
     px_size = metadata['pixel_size(um)']
 
     if not filename:
-        datafile = os.path.join(parent_path, stim_nr+'_data.h5')
         savefolder = 'STAs'
         label = ''
     else:
-        datafile = os.path.join(parent_path, filename)
-        label = filename.strip('.h5')
+        label = filename.strip('.npz')
         savefolder = 'STAs_' + label
 
-    data = iof.loadh5(datafile)
+    data = iof.load(exp_name, stim_nr, fname=filename)
 
     clusters = data['clusters']
     stas = data['stas']
@@ -84,10 +80,12 @@ def plot_checker_stas(exp_name, stim_nr, filename=None):
                                                       clusters[j][0],
                                                       clusters[j][1],
                                                       clusters[j][2]))
-        savepath = os.path.join(parent_path,
+
+        savepath = os.path.join(exp_dir, 'data_analysis', stimname,
                                 savefolder,
                                 '{:0>3}{:0>2}'.format(clusters[j][0],
                                                       clusters[j][1]))
+
         os.makedirs(os.path.split(savepath)[0], exist_ok=True)
 
         plt.savefig(savepath+'.png')
