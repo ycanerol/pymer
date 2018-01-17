@@ -76,14 +76,14 @@ for i in range(len(clusterids)):
         im = ax.imshow(sta, cmap='RdBu', vmin=vmin, vmax=vmax,
                        extent=[0, t[-1], -vscale, vscale], aspect='auto')
         if j >= 2:
-            plt.xlabel('Frame duration: {:2.1f}'
+            plt.xlabel('Time [s]\n\nFrame duration: {:2.1f}'
                        'ms'.format(frame_duration*1000))
         else:
             ax.axes.get_xaxis().set_visible(False)
         if j == 0:
-            plt.ylabel('B&W')
+            plt.ylabel('B&W\n\nDistance[µm]')
         if j == 2:
-            plt.ylabel('Gaussian')
+            plt.ylabel('Gaussian\n\nDistance[µm]')
         if j % 2 == 1:
             ax.axes.get_yaxis().set_visible(False)
 
