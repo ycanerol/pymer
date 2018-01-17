@@ -433,6 +433,10 @@ def binspikes(spiketimes, frametimings):
         before or after stimulus presentation are discarded in the output.
     """
     spikes = np.bincount(np.digitize(spiketimes, frametimings))
+    if spikes.shape == (0,):
+        # If there are no spikes for a particular cell,
+        # set it to an array of zeros.
+        spikes = np.zeros((frametimings.shape[0]+1,))
     spikes[0] = 0
     spikes = spikes[:-1]
 
