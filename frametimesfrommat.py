@@ -7,12 +7,12 @@ Created on Mon Jan  8 19:01:30 2018
 """
 
 import numpy as np
-import scipy
+import scipy.io
 import iofuncs as iof
 import os
 
 path = iof.exp_dir_fixer('Kara')
-name = iof.getstimname(path, 3)
+name = iof.getstimname(path, 8)
 
 """
 Extract frame times from .mat files. Needed for analyzing data
