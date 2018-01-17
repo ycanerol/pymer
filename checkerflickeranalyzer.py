@@ -7,7 +7,7 @@ Created on Fri Dec  8 11:22:39 2017
 """
 
 import numpy as np
-import randpy
+from randpy import randpy
 import datetime
 import os
 import warnings

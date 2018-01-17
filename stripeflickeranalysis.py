@@ -11,7 +11,7 @@ from os.path import join as pjoin
 import os
 import analysis_scripts as asc
 import iofuncs as iof
-import randpy
+from randpy import randpy
 
 
 def stripeflickeranalysis(exp_name, stim_nr):
