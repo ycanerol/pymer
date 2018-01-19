@@ -155,8 +155,7 @@ def saveframetimes(exp_name, **kwargs):
 
     for i in range(1, 100):
         try:
-            stimname = np.sort(glob.glob('{}_*.mcd'.format(i)))[0]
-            stimname = stimname.strip('.mcd')
+            stimname = iof.getstimname(exp_name, i)
             print(stimname)
         except IndexError:
             break

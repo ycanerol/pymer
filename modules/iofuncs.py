@@ -184,4 +184,8 @@ def getstimname(exp_name, stim_nr):
     for line in lines:
         if line.startswith('%s_' % stim_nr):
             name = line[:-4].strip(' ')
-    return name
+    if name:
+        return name
+    else:
+        raise IndexError('Stimulus {} does not exist in experiment:'
+                         '\n{}'.format(stim_nr, exp_dir))
