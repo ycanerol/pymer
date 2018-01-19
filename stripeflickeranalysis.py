@@ -111,7 +111,12 @@ def stripeflickeranalysis(exp_name, stim_nr):
         # If there are multiple pixels with largest value,
         # take the first one.
         if max_i.shape != (2,):
-            max_i = max_i[:, 0]
+            try:
+                max_i = max_i[:, 0]
+            # If max_i cannot be found just set it to zeros.
+            except IndexError:
+                max_i = np.array([0, 0])
+
         max_inds.append(max_i)
 
         quals = np.append(quals, asc.staquality(stas[i]))
