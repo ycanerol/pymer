@@ -15,4 +15,6 @@ def nametests():
     assert getstimname('20171122', 6) == '6_checkerflicker5x5bw1blink'
     assert getstimname('20171122', 7) == '7_checkerflicker5x5bw2blinks'
     assert getstimname('V', 10) == '10_checkerflicker_2x2bw_4blinks'
+    assert getstimname('20180118', 10) == '10_onoffsteps_highl'
+    assert getstimname('20180118', 1) == '1_spontaneous_dark_lowl1'
 
