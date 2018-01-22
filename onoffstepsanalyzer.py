@@ -128,6 +128,7 @@ def onoffstepsanalyzer(exp_name, stim_nr):
                                                    clusters[i][1],
                                                    clusters[i][2]))
         plt.ylabel('Trial')
+        plt.gca().invert_yaxis()
         ax1.set_xticks([])
         plf.spineless(ax1)
 
