@@ -16,10 +16,6 @@ import analysis_scripts as asc
 import os
 from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
 
-stimnr = 6
-expname = '20171122'
-filename = None
-
 
 def plotcheckersvd(expname, stimnr, filename=None):
     """
