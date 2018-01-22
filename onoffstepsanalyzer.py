@@ -82,7 +82,7 @@ def onoffstepsanalyzer(exp_name, stim_nr):
         # Workaround for matplotlib issue #6412.
         # https://github.com/matplotlib/matplotlib/issues/6412
         # If a cell has no spikes for the first trial i.e. the first
-        # element of the list is empty, an error is raies due to
+        # element of the list is empty, an error is raised due to
         # a plt.eventplot bug.
         if len(rasterplot[0]) == 0:
             rasterplot[0] = [-1]
