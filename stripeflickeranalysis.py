@@ -81,6 +81,7 @@ def stripeflickeranalysis(exp_name, stim_nr):
         spikes = asc.binspikes(spiketimes, frametimings)
         all_spiketimes.append(spikes)
         stas.append(np.zeros((sy, filter_length)))
+            # If max_i cannot be found just set it to zeros.
 
     if bw:
         randnrs, seed = randpy.ran1(seed, sy*total_frames)
