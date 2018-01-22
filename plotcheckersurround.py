@@ -192,7 +192,6 @@ def plotcheckersurround(exp_name, stim_nr, filename=None, spikecutoff=1000,
         if not os.path.isdir(plotpath):
             os.makedirs(plotpath, exist_ok=True)
 
-#        plt.savefig(os.path.join(plotpath, clusterids[i])+'.svg',
-#                    format='svg', dpi=300)
-        plt.show()
+        plt.savefig(os.path.join(plotpath, clusterids[i])+'.svg',
+                    format='svg', dpi=300)
         plt.close()
