@@ -265,6 +265,11 @@ def extractframetimes(exp_name, stimnr, threshold=75,
                 oncross[i] = True
             if array[i-1] > threshold and array[i] < threshold:
                 offcross[i] = True
+        # If a pulse is interrupted at the end, it will cause a bug
+        # that the first element in offcross is True (due to negative
+        # index referring to the end.)
+        # This fixes that issue.
+        offcross[0] = False
         return oncross, offcross
 
     print('Total recording time: {:6.1f} seconds'
@@ -273,7 +278,10 @@ def extractframetimes(exp_name, stimnr, threshold=75,
 
     onsets, offsets = thr_cros(voltage, threshold)
     if onsets.sum() != offsets.sum():
-        print('Number of pulse onset and offsets are not equal!')
+        print('Number of pulse onset and offsets are not equal!'
+              'The last pulse probably was interrupted. Last pulse'
+              ' onset was omitted to fix.')
+        onsets[np.where(onsets)[0][-1]] = False
     if plotting:
         import matplotlib.pyplot as plt
         # Plot the whole voltage trace
