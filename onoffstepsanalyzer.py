@@ -25,12 +25,11 @@ def onoffstepsanalyzer(exp_name, stim_nr):
         stim_nr:
             Order of the onoff steps stimulus.
 
-    Returns:
-        Nothing. Will return PSTH in the future.
-
     """
 
     exp_dir = iof.exp_dir_fixer(exp_name)
+
+    stim_nr = str(stim_nr)
 
     exp_name = os.path.split(exp_dir)[-1]
 
@@ -55,6 +54,12 @@ def onoffstepsanalyzer(exp_name, stim_nr):
     # If we don't save the original and re-initialize for each cell,
     # frametimings will get smaller over time.
     frametimings_original = asc.readframetimes(exp_dir, stim_nr)
+
+    savedir = os.path.join(exp_dir, 'data_analysis', stimname)
+    os.makedirs(os.path.join(savedir, 'pdf'), exist_ok=True)
+
+    # Collect all firing rates in a list
+    all_frs = []
 
     for i in range(len(clusters[:, 0])):
         spikes = asc.read_raster(exp_dir, stim_nr,
@@ -156,14 +161,12 @@ def onoffstepsanalyzer(exp_name, stim_nr):
         while fr1.shape[0] < bins:
             fr1 = np.append(fr1, 0)
 
+        all_frs.append(fr1)
         plt.plot(t, fr1)
         plf.spineless(ax2)
         plt.axis([0, total_cycle, fr1.min(), fr1.max()])
         plt.xlabel('Time[s]')
         plt.ylabel('Firing rate[spikes/s]')
-
-        savedir = os.path.join(exp_dir, 'data_analysis', stimname)
-        os.makedirs(os.path.join(savedir, 'pdf'), exist_ok=True)
 
         # Save as svg for looking through data, pdf for
         # inserting into presentations
@@ -175,3 +178,12 @@ def onoffstepsanalyzer(exp_name, stim_nr):
                                                            clusters[i, 1])),
                     format='pdf')
         plt.close()
+
+    keystosave = ['clusters', 'total_cycle', 'bins', 'tstep',
+                  'stimname', 'stim_duration', 'preframe_duration',
+                  'contrast', 'all_frs', 't', 'exp_name']
+    data_in_dict = {}
+    for key in keystosave:
+        data_in_dict[key] = locals()[key]
+
+    np.savez(os.path.join(savedir, stim_nr + '_data'), **data_in_dict)
