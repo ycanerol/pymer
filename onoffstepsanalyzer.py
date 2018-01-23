@@ -144,7 +144,9 @@ def onoffstepsanalyzer(exp_name, stim_nr):
         for ii in range(len(rasterplot)):
             ras = np.append(ras, rasterplot[ii])
 
-        bins = 150
+        # Set the bins to be 10 ms
+        tstep = 0.01
+        bins = int(total_cycle/tstep)+1
         t = np.linspace(0, total_cycle, num=bins)
 
         # Sort into time bins and count how many spikes happened in each
