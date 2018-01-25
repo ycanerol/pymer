@@ -9,7 +9,6 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 import analysis_scripts as asc
-import matplotlib as mpl
 import plotfuncs as plf
 import iofuncs as iof
 
