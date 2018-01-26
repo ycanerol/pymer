@@ -14,112 +14,116 @@ import plotfuncs as plf
 import matplotlib.pyplot as plt
 
 
-def fffanalyzer(exp_name, stimnr):
+def fffanalyzer(exp_name, stimnrs):
     """
     Analyzes and plots data from full field flicker
     stimulus.
     """
-    stimnr = str(stimnr)
     exp_dir = iof.exp_dir_fixer(exp_name)
     exp_name = os.path.split(exp_dir)[-1]
 
-    stimname = iof.getstimname(exp_name, stimnr)
+    for stimnr in stimnrs:
+        stimnr = str(stimnr)
 
-    clusters, metadata = asc.read_ods(exp_dir)
+        stimname = iof.getstimname(exp_name, stimnr)
 
-    parameters = asc.read_parameters(exp_dir, stimnr)
+        clusters, metadata = asc.read_ods(exp_dir)
 
-    clusterids = plf.clusters_to_ids(clusters)
+        parameters = asc.read_parameters(exp_dir, stimnr)
 
-    if parameters['stixelheight'] < 600 or parameters['stixelwidth'] < 800:
-        raise ValueError('Make sure the stimulus is full field flicker.')
+        clusterids = plf.clusters_to_ids(clusters)
 
-    nblinks = parameters['Nblinks']
-    try:
-        bw = parameters['blackwhite']
-    except KeyError:
-        bw = False
+        if parameters['stixelheight'] < 600 or parameters['stixelwidth'] < 800:
+            raise ValueError('Make sure the stimulus is full field flicker.')
 
-    try:
-        seed = parameters['seed']
-    except KeyError:
-        seed = -10000
+        nblinks = parameters['Nblinks']
+        try:
+            bw = parameters['blackwhite']
+        except KeyError:
+            bw = False
 
-    if nblinks == 1:
-        ft_on, ft_off = asc.readframetimes(exp_dir, stimnr,
-                                           returnoffsets=True)
-        # Initialize empty array twice the size of one of them, assign
-        # value from on or off to every other element.
-        frametimings = np.empty(ft_on.shape[0]*2, dtype=float)
-        frametimings[::2] = ft_on
-        frametimings[1::2] = ft_off
-        # Set filter length so that temporal filter is ~600 ms. The unit
-        # here is number of frames.
-        filter_length = 40
-    elif nblinks == 2:
-        frametimings = asc.readframetimes(exp_dir, stimnr)
-        filter_length = 20
-    else:
-        raise ValueError('Unexpected value for nblinks.')
+        try:
+            seed = parameters['seed']
+        except KeyError:
+            seed = -10000
 
-    frame_duration = np.average(np.ediff1d(frametimings))
-    total_frames = frametimings.shape[0]
+        if nblinks == 1:
+            ft_on, ft_off = asc.readframetimes(exp_dir, stimnr,
+                                               returnoffsets=True)
+            # Initialize empty array twice the size of one of them, assign
+            # value from on or off to every other element.
+            frametimings = np.empty(ft_on.shape[0]*2, dtype=float)
+            frametimings[::2] = ft_on
+            frametimings[1::2] = ft_off
+            # Set filter length so that temporal filter is ~600 ms. The unit
+            # here is number of frames.
+            filter_length = 40
+        elif nblinks == 2:
+            frametimings = asc.readframetimes(exp_dir, stimnr)
+            filter_length = 20
+        else:
+            raise ValueError('Unexpected value for nblinks.')
 
-    all_spiketimes = []
-    # Store spike triggered averages in a list containing correct shaped
-    # arrays
-    stas = []
+        frame_duration = np.average(np.ediff1d(frametimings))
+        total_frames = frametimings.shape[0]
 
-    for i in range(len(clusters[:, 0])):
-        spiketimes = asc.read_raster(exp_dir, stimnr,
-                                     clusters[i, 0], clusters[i, 1])
-        spikes = asc.binspikes(spiketimes, frametimings)
-        all_spiketimes.append(spikes)
-        stas.append(np.zeros(filter_length))
+        all_spiketimes = []
+        # Store spike triggered averages in a list containing correct shaped
+        # arrays
+        stas = []
 
-    if bw:
-        randnrs, seed = randpy.ran1(seed, total_frames)
-        randnrs = [1 if i > .5 else -1 for i in randnrs]
-    else:
-        randnrs, seed = randpy.gasdev(seed, total_frames)
+        for i in range(len(clusters[:, 0])):
+            spiketimes = asc.read_raster(exp_dir, stimnr,
+                                         clusters[i, 0], clusters[i, 1])
+            spikes = asc.binspikes(spiketimes, frametimings)
+            all_spiketimes.append(spikes)
+            stas.append(np.zeros(filter_length))
 
-    stimulus = np.array(randnrs)
+        if bw:
+            randnrs, seed = randpy.ran1(seed, total_frames)
+            randnrs = [1 if i > .5 else -1 for i in randnrs]
+        else:
+            randnrs, seed = randpy.gasdev(seed, total_frames)
 
-    for k in range(filter_length, total_frames-filter_length+1):
-        stim_small = stimulus[k-filter_length+1:k+1][::-1]
-        for j in range(clusters.shape[0]):
-            spikes = all_spiketimes[j]
-            if spikes[k] != 0:
-                stas[j] += spikes[k]*stim_small
-    spikenrs = np.array([spikearr.sum() for spikearr in all_spiketimes])
+        stimulus = np.array(randnrs)
 
-    plotpath = os.path.join(exp_dir, 'data_analysis',
-                            stimname, 'filters')
-    if not os.path.isdir(plotpath):
-        os.makedirs(plotpath, exist_ok=True)
+        for k in range(filter_length, total_frames-filter_length+1):
+            stim_small = stimulus[k-filter_length+1:k+1][::-1]
+            for j in range(clusters.shape[0]):
+                spikes = all_spiketimes[j]
+                if spikes[k] != 0:
+                    stas[j] += spikes[k]*stim_small
+        spikenrs = np.array([spikearr.sum() for spikearr in all_spiketimes])
 
-    t = np.arange(filter_length)*frame_duration*1000
+        plotpath = os.path.join(exp_dir, 'data_analysis',
+                                stimname, 'filters')
+        if not os.path.isdir(plotpath):
+            os.makedirs(plotpath, exist_ok=True)
 
-    for i in range(clusters.shape[0]):
-        stas[i] = stas[i]/spikenrs[i]
-        ax = plt.subplot(111)
-        ax.plot(t, stas[i])
-        plf.spineless(ax)
-        plt.xlabel('Time[ms]')
-        plt.title('{}\n{}\n{} Rating: {}{} '
-                  'spikes'.format(exp_name, stimname, clusterids[i],
-                                  clusters[i, 2], int(spikenrs[i])))
-        plt.savefig(os.path.join(plotpath, clusterids[i])+'.svg',
-                    format='svg', dpi=300)
-        plt.close()
+        t = np.arange(filter_length)*frame_duration*1000
 
-    savepath = os.path.join(os.path.split(plotpath)[0], stimnr+'_data')
+        for i in range(clusters.shape[0]):
+            stas[i] = stas[i]/spikenrs[i]
+            ax = plt.subplot(111)
+            ax.plot(t, stas[i])
+            plf.spineless(ax)
+            plt.xlabel('Time[ms]')
+            plt.title('{}\n{}\n{} Rating: {}{} '
+                      'spikes'.format(exp_name, stimname, clusterids[i],
+                                      clusters[i, 2], int(spikenrs[i])))
+            plt.savefig(os.path.join(plotpath, clusterids[i])+'.svg',
+                        format='svg', dpi=300)
+            plt.close()
 
-    keystosave = ['stas', 'clusters', 'frame_duration', 'all_spiketimes',
-                  'stimname', 'total_frames', 'spikenrs', 'bw', 'nblinks',
-                  'filter_length', 'exp_name']
-    data_in_dict = {}
-    for key in keystosave:
-        data_in_dict[key] = locals()[key]
+        savepath = os.path.join(os.path.split(plotpath)[0], stimnr+'_data')
 
-    np.savez(savepath, **data_in_dict)
+        keystosave = ['stas', 'clusters', 'frame_duration', 'all_spiketimes',
+                      'stimname', 'total_frames', 'spikenrs', 'bw', 'nblinks',
+                      'filter_length', 'exp_name']
+        data_in_dict = {}
+        for key in keystosave:
+            data_in_dict[key] = locals()[key]
+
+        np.savez(savepath, **data_in_dict)
+        print(f'Analysis of {stimname} completed.')
+
