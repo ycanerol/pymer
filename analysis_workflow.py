@@ -7,38 +7,46 @@ Created on Mon Jan 22 15:21:30 2018
 """
 import analysis_scripts as asc
 
-exp_name = '2018'
+exp_name = '20180124'
 
-spontaneous = [1, 2, 8, 15]
-fullfieldflicker = [4, 12, 17]
-onoffsteps = [3, 9, 10, 16]
-checkerflicker = [5, 6, 13, 18]
-stripeflicker = [7, 14, 19]
+spontaneous = [1, 2, 7, 13]
+fullfieldflicker = [4, 10, 15]
+onoffsteps = [3, 8, 14]
+checkerflicker = [5, 11, 16]
+stripeflicker = [6, 12, 17]
 
-runfile('/home/ycan/Documents/scripts/onoffstepsanalyzer.py')
-#  %%
+from spontanalyzer import spontanalyzer
+from fffanalyzer import fffanalyzer
+from onoffstepsanalyzer import onoffstepsanalyzer
+from checkerflickeranalyzer import checkerflickeranalyzer
+from plot_checker_stas import plot_checker_stas
+from plotcheckersvd import plotcheckersvd
+from plotcheckersurround import plotcheckersurround
+from stripeflickeranalysis import stripeflickeranalysis
+from plotstripestas import plotstripestas
+from allonoff import allonoff
+
+# %%
 asc.saveframetimes(exp_name)
 
 # %%
-for i in spontaneous:
-    spontanalyzer(exp_name, i)
+spontanalyzer(exp_name, spontaneous)
 
-# %%
-for i in fullfieldflicker:
-    fffanalyzer(exp_name, i)
+fffanalyzer(exp_name, fullfieldflicker)
 
-# %%
-for i in onoffsteps:
-    onoffstepsanalyzer(exp_name, i)
+onoffstepsanalyzer(exp_name, onoffsteps)
+allonoff(exp_name, onoffsteps)
+
+stripeflickeranalysis(exp_name, stripeflicker)
+plotstripestas(exp_name, stripeflicker)
 
 # %%
 for i in checkerflicker:
-    checkerflickeranalyzer(exp_name, i)
+#    checkerflickeranalyzer(exp_name, i)
+#    print(i)
     plot_checker_stas(exp_name, i)
+    print(i)
     plotcheckersvd(exp_name, i)
+    print(i)
     plotcheckersurround(exp_name, i)
-
-# %%
-for i in stripeflicker:
-    stripeflickeranalysis(exp_name, i)
-    plot_stripestas(exp_name, i)
+    print(i)
