@@ -24,6 +24,9 @@ def spontanalyzer(exp_name, stim_nrs):
 
     exp_name = os.path.split(exp_dir)[-1]
 
+    if isinstance(stim_nrs, int):
+        stim_nrs = [stim_nrs]
+
     for stim_nr in stim_nrs:
         stim_nr = str(stim_nr)
 

@@ -17,6 +17,9 @@ from randpy import randpy
 def stripeflickeranalysis(exp_name, stim_nrs):
     exp_dir = iof.exp_dir_fixer(exp_name)
 
+    if isinstance(stim_nrs, int):
+        stim_nrs = [stim_nrs]
+
     for stim_nr in stim_nrs:
         stimname = iof.getstimname(exp_name, stim_nr)
 

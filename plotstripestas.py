@@ -22,6 +22,9 @@ def plotstripestas(exp_name, stim_nrs):
     _, metadata = asc.read_ods(exp_dir)
     px_size = metadata['pixel_size(um)']
 
+    if isinstance(stim_nrs, int):
+        stim_nrs = [stim_nrs]
+
     for stim_nr in stim_nrs:
         data = iof.load(exp_name, stim_nr)
 

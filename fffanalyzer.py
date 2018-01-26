@@ -22,6 +22,9 @@ def fffanalyzer(exp_name, stimnrs):
     exp_dir = iof.exp_dir_fixer(exp_name)
     exp_name = os.path.split(exp_dir)[-1]
 
+    if isinstance(stimnrs, int):
+        stimnrs = [stimnrs]
+
     for stimnr in stimnrs:
         stimnr = str(stimnr)
 
