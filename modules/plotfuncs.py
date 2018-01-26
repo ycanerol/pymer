@@ -233,3 +233,4 @@ def drawonoff(ax, preframedur, stimdur, h=1, contrast=1):
     ax.add_patch(rect2)
     ax.add_patch(rect3)
     ax.add_patch(rect4)
+    ax.set_xlim(0, totaldur)
