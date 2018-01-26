@@ -5,7 +5,7 @@ Created on Tue Nov 14 13:37:25 2017
 
 @author: ycan
 """
-import matplotlib
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import os
 
@@ -63,7 +63,7 @@ def RFcolormap(colors=None):
                   "#7678B4","#6D6FAF","#6668AB","#5E61A8","#585AA5","#5254A3",
                   "#4C4FA1","#46499F","#41449E","#3B3F9D","#363A9D","#30359D",
                   "#2A309E","#232AA0","#1A24A2")
-    cm = matplotlib.colors.ListedColormap(colors)
+    cm = mpl.colors.ListedColormap(colors)
     return cm
 
 
@@ -177,3 +177,59 @@ def colorbar(mappable, size='5%', **kwargs):
     # Turn off tick marks
     cb.ax.tick_params(length=0)
     return cb
+
+def drawonoff(ax, preframedur, stimdur, h=1, contrast=1):
+    """
+    Draws rectangles on plot to represent different parts of
+    the on off steps stimulus.
+
+    Parameters:
+        ax: matplotlib.Axes object
+            The Axes object of the plot to draw rectangles on
+
+        preframedur:
+            Duration of the gray period in seconds
+
+        stimdur:
+            Duration of stimulus (step) in seconds
+
+        h:
+            Height of the rectangles to draw
+
+        contrast:
+            Stimulus contrast as given in parameter file
+
+    Note:
+        Rectangles are drawn starting from top left of the
+        available area, therefore -h is used in the function
+        as the height of the rectangles.
+    """
+    h = -h
+    totaldur = 2*(preframedur+stimdur)
+
+    rect1 = mpl.patches.Rectangle((0, 1),
+                                  width=preframedur/totaldur,
+                                  height=h,
+                                  transform=ax.transAxes, color='k',
+                                  alpha=.5)
+    rect2 = mpl.patches.Rectangle((preframedur/totaldur, 1),
+                                  width=stimdur/totaldur,
+                                  height=h,
+                                  transform=ax.transAxes, color='k',
+                                  alpha=.5*(1-contrast))
+    rect3 = mpl.patches.Rectangle(((preframedur +
+                                  stimdur)/totaldur, 1),
+                                  width=preframedur/totaldur,
+                                  height=h,
+                                  transform=ax.transAxes, color='k',
+                                  alpha=.5)
+    rect4 = mpl.patches.Rectangle(((2*preframedur +
+                                  stimdur)/totaldur, 1),
+                                  width=stimdur/totaldur,
+                                  height=h,
+                                  transform=ax.transAxes, color='k',
+                                  alpha=.5*(1+contrast))
+    ax.add_patch(rect1)
+    ax.add_patch(rect2)
+    ax.add_patch(rect3)
+    ax.add_patch(rect4)

@@ -101,32 +101,7 @@ def onoffstepsanalyzer(exp_name, stim_nr):
 
         # Draw rectangles to represent different parts of the on off
         # steps stimulus
-        rect1 = mpl.patches.Rectangle((0, 0),
-                                      width=preframe_duration/total_cycle,
-                                      height=1,
-                                      transform=ax1.transAxes, color='k',
-                                      alpha=.5)
-        rect2 = mpl.patches.Rectangle((preframe_duration/total_cycle, 0),
-                                      width=stim_duration/total_cycle,
-                                      height=1,
-                                      transform=ax1.transAxes, color='k',
-                                      alpha=.5*(1-contrast))
-        rect3 = mpl.patches.Rectangle(((preframe_duration +
-                                        stim_duration)/total_cycle, 0),
-                                      width=preframe_duration/total_cycle,
-                                      height=1,
-                                      transform=ax1.transAxes, color='k',
-                                      alpha=.5)
-        rect4 = mpl.patches.Rectangle(((2*preframe_duration +
-                                        stim_duration)/total_cycle, 0),
-                                      width=stim_duration/total_cycle,
-                                      height=1,
-                                      transform=ax1.transAxes, color='k',
-                                      alpha=.5*(1+contrast))
-        ax1.add_patch(rect1)
-        ax1.add_patch(rect2)
-        ax1.add_patch(rect3)
-        ax1.add_patch(rect4)
+        plf.drawonoff(ax1, preframe_duration, stim_duration, contrast=contrast)
 
         plt.suptitle('{}\n{}'.format(exp_name, stimname))
         plt.title('{:0>3}{:0>2} Rating: {}'.format(clusters[i][0],
