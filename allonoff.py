@@ -12,9 +12,6 @@ import plotfuncs as plf
 import os
 
 
-#exp_name = '20180124'
-#onoffsteps = [3, 8, 14]
-
 def allonoff(exp_name, stim_nrs):
 
     if isinstance(stim_nrs, int):
@@ -54,5 +51,3 @@ def allonoff(exp_name, stim_nrs):
         plt.savefig(os.path.join(plotpath, clusterids[i])+'.svg',
                     format='svg', dpi=300)
         plt.close()
-
-allonoff('20180124',)
