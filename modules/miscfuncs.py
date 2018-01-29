@@ -109,15 +109,21 @@ def cut_around_center(sta_original, max_i_o, f_size):
         max_i_o[1] - f_size < 1):
         raise ValueError('Frame is out of the STA dimension')
 
-    if f_size is not 0:
+    if len(sta_original.shape) == 3:
+        if f_size is not 0:
+            sta = sta_original[max_i_o[0]-f_size:max_i_o[0]+f_size+1,
+                               max_i_o[1]-f_size:max_i_o[1]+f_size+1,
+                               :]
+            max_i = np.append([f_size]*2, max_i_o[2])
+
+        else:
+            sta = sta_original
+            max_i = max_i_o
+    elif len(sta_original.shape) == 2:
         sta = sta_original[max_i_o[0]-f_size:max_i_o[0]+f_size+1,
-                           max_i_o[1]-f_size:max_i_o[1]+f_size+1,
-                           :]
+                           max_i_o[1]-f_size:max_i_o[1]+f_size+1]
         max_i = np.append([f_size]*2, max_i_o[2])
 
-    else:
-        sta = sta_original
-        max_i = max_i_o
     return sta, max_i
 
 
