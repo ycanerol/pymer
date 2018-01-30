@@ -13,14 +13,6 @@ import matplotlib.pyplot as plt
 import gaussfitter as gfit
 #%%
 
-def stashow(frame, ax):
-    vmax = np.abs(frame).max()
-    vmin = -vmax
-    im = ax.imshow(frame, cmap='RdBu', vmin=vmin, vmax=vmax)
-    plf.spineless(ax)
-    plf.colorbar(im, size='2%', ticks=[vmin, vmax], format='%.2f')
-    return im
-
 def getfit(frame):
     if np.max(frame) != np.max(np.abs(frame)):
         onoroff = -1
@@ -117,7 +109,7 @@ Z0 = f(Y, X)
 Z0m = mahalonobis_convert(Z0, pars0)
 
 ax0 = plt.subplot(rows, columns, 1)
-stashow(sp, ax0)
+plf.stashow(sp, ax0)
 ax0.contour(X, Y, Z0m, [2])
 
 d1 = sp - Z0*pol0
@@ -126,7 +118,7 @@ Z1 = f1(Y, X)
 Z1m = mahalonobis_convert(Z1, pars1)
 
 ax1 = plt.subplot(rows, columns, 2)
-stashow(d1, ax1)
+plf.stashow(d1, ax1)
 ax1.contour(X, Y, Z1m, [1.4])
 
 d2 = sp - Z1*pol1
@@ -134,7 +126,7 @@ f2, pars2, pol2 = getfit(d2)
 Z2 = f2(Y, X)
 Z2m = mahalonobis_convert(Z2, pars2)
 ax2 = plt.subplot(rows, columns, 3)
-stashow(d2, ax2)
+plf.stashow(d2, ax2)
 ax2.contour(X, Y, Z2m, [2])
 plt.show()
 #%%
@@ -142,10 +134,10 @@ plt.figure(figsize=(20,15))
 rec = Z0*pol0+Z1*pol1*2
 
 ax3 = plt.subplot(221)
-stashow(rec, ax3)
+plf.stashow(rec, ax3)
 
 ax4 = plt.subplot(222)
-stashow(sp, ax4)
+plf.stashow(sp, ax4)
 
 ax5 = plt.subplot(223)
-stashow(sp-rec, ax5)
+plf.stashow(sp-rec, ax5)

@@ -8,7 +8,6 @@ Created on Mon Nov 13 14:58:16 2017
 Collection of functions that are used for various stages of analysis
 """
 import numpy as np
-import matplotlib.pyplot as plt
 import glob
 
 
@@ -40,20 +39,6 @@ def svd(sta, flip=False):
             t2 = -t2
 
     return sp1, sp2, t1, t2, u, v
-
-
-def show_sta(sta, max_i, f_size=10):
-    plt.plot(figsize=(12, 12), dpi=200)
-    sta_min = np.min(sta)
-    sta_max = np.max(sta)
-
-    for i in range(20):
-        ax = plt.subplot(4, 5, i+1)
-
-        plt.imshow(sta[:, :, i], vmin=sta_min, vmax=sta_max, cmap='Greys')
-        plt.axis('off')
-    ax.set_aspect('equal')
-    plt.show()
 
 
 def readexps(directory, test=False):

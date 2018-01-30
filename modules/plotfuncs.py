@@ -7,6 +7,7 @@ Created on Tue Nov 14 13:37:25 2017
 """
 import matplotlib as mpl
 import matplotlib.pyplot as plt
+import numpy as np
 import os
 
 
@@ -234,3 +235,29 @@ def drawonoff(ax, preframedur, stimdur, h=1, contrast=1):
     ax.add_patch(rect3)
     ax.add_patch(rect4)
     ax.set_xlim(0, totaldur)
+
+
+def stashow(sta, ax, cbar=True, **kwargs):
+    """
+    Plot STA in a nice way with proper colormap and colorbar.
+
+    STA can be single frame from checkerflicker or whole STA
+    from stripeflicker.
+
+    If kwargs are present, they will be passed onto colorbar
+    function.
+
+    Usage:
+        ax = plt.subplot(111)
+        stashow(sta, ax)
+    """
+    vmax = np.abs(sta).max()
+    vmin = -vmax
+    im = ax.imshow(sta, cmap='RdBu', vmin=vmin, vmax=vmax)
+    spineless(ax)
+    if cbar:
+        if kwargs:
+            colorbar(im, **kwargs)
+        else:
+            colorbar(im, size='2%', ticks=[vmin, vmax], format='%.2f')
+    return im
