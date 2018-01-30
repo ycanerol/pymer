@@ -128,3 +128,11 @@ def timediff(starttime):
     elapsed = datetime.datetime.now()-starttime
     elapsed -= datetime.timedelta(microseconds=elapsed.microseconds)
     return elapsed
+
+
+def cutstripe(sta, max_i, fsize):
+    if max_i[0] - fsize <= 0 or max_i[0] + fsize > sta.shape[0]:
+        raise ValueError('Cutting outside the STA range.')
+    sta_r = sta[max_i[0]-fsize:max_i[0]+fsize+1, :]
+    max_i_r = np.append(fsize, max_i[-1])
+    return sta_r, max_i_r

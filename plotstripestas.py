@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import plotfuncs as plf
 import numpy as np
 import analysis_scripts as asc
+import miscfuncs as msc
 import os
 
 
@@ -49,7 +50,7 @@ def plotstripestas(exp_name, stim_nrs):
             sta = stas[i]
             max_i = max_inds[i]
             try:
-                sta, max_i = cutstripe(sta, max_i, fsize)
+                sta, max_i = msc.cutstripe(sta, max_i, fsize)
             except ValueError:
                 continue
             vmax = np.max(np.abs(sta))
@@ -79,10 +80,3 @@ def plotstripestas(exp_name, stim_nrs):
             plt.close()
         print(f'Plotting of {stimname} completed.')
 
-
-def cutstripe(sta, max_i, fsize):
-    if max_i[0] - fsize <= 0 or max_i[0] + fsize > sta.shape[0]:
-        raise ValueError('Cutting outside the STA range.')
-    sta_r = sta[max_i[0]-fsize:max_i[0]+fsize+1, :]
-    max_i_r = np.append(fsize, max_i[-1])
-    return sta_r, max_i_r
