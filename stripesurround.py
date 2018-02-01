@@ -51,6 +51,12 @@ def stripesurround(exp_name, stimnrs):
         frame_duration = data['frame_duration']
         quals = data['quals']
 
+        # Record which clusters are ignored during analysis
+        try:
+            included = data['included']
+        except KeyError:
+            included = [True]*clusters.shape[0]
+
         # Average STA values 100 ms around the brightest frame to
         # minimize noise
         cut_time = int(100/(frame_duration*1000)/2)
@@ -78,6 +84,7 @@ def stripesurround(exp_name, stimnrs):
                 sta, max_i = msc.cutstripe(sta, max_i, fsize*2)
             except ValueError as e:
                 if str(e) == 'Cutting outside the STA range.':
+                    included[i] = False
                     continue
                 else:
                     print(f'Error while analyzing {stimname}\n'+
@@ -130,7 +137,14 @@ def stripesurround(exp_name, stimnrs):
                         er.startswith("Optimal parameters not found")):
                     popt, _ = curve_fit(onedgauss, s, fitv, p0=p_initial[:3])
                     popt = np.append(popt, [0, popt[1], popt[2]])
+                elif er == "array must not contain infs or NaNs":
+                    included[i] = False
+                    continue
                 else:
+                    print(f'Error while analyzing {stimname}\n'+
+                          f'Index:{i}    Cluster:{clusterids[i]}')
+                    import pdb
+                    pdb.set_trace()
                     raise
 
             fit = centersurround_onedim(s, *popt)
@@ -163,6 +177,7 @@ def stripesurround(exp_name, stimnrs):
                                      clusterids[i]+'.svg'))
             plt.close()
 
-        data.update({'cs_inds':cs_inds, 'polarities':polarities})
+        data.update({'cs_inds':cs_inds, 'polarities':polarities,
+                     'included':included})
         np.savez(os.path.join(savepath, f'{stimnr}_data.npz'), **data)
         print(f'Surround plotted and saved for {stimname}.')
