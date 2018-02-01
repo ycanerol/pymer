@@ -59,8 +59,8 @@ def plotstripestas(exp_name, stim_nrs):
             ax = plt.subplot(111)
             im = ax.imshow(sta, cmap='RdBu', vmin=vmin, vmax=vmax,
                            extent=[0, t[-1], -vscale, vscale], aspect='auto')
-            plt.xlabel('Time [s]')
-            plt.ylabel('Distance[µm]')
+            plt.xlabel('Time [ms]')
+            plt.ylabel('Distance [µm]')
 
             plf.spineless(ax)
             plf.colorbar(im, ticks=[vmin, 0, vmax], format='%.2f', size='2%')
