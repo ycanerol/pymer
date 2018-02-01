@@ -244,20 +244,36 @@ def stashow(sta, ax, cbar=True, **kwargs):
     STA can be single frame from checkerflicker or whole STA
     from stripeflicker.
 
-    If kwargs are present, they will be passed onto colorbar
-    function.
-
+    Following kwargs are available:
+        imshow
+            extent: Change the labels of the axes. [xmin, xmax, ymin, ymax]
+            aspect: Aspect ratio of the image. 'auto', 'equal'
+            cmap:  Colormap to be used. Default is 'RdBu'
+        colorbar
+            size: Width of the colorbar as percentage of image dimension
+                  Default is 2%
+            ticks: Where the ticks should be placed on the colorbar.
+            format: Format for the tick labels. Default is '%.2f'
     Usage:
         ax = plt.subplot(111)
         stashow(sta, ax)
     """
     vmax = np.abs(sta).max()
     vmin = -vmax
-    im = ax.imshow(sta, cmap='RdBu', vmin=vmin, vmax=vmax)
+
+    # Make a dictionary for imshow and colorbar kwargs
+    imshowkw = {'cmap':'RdBu', 'vmin':vmin, 'vmax':vmax}
+    cbarkw = {'size':'2%', 'ticks':[vmin, vmax], 'format':'%.2f'}
+    for key in kwargs.keys():
+        if key in ['extent', 'aspect', 'cmap']:
+            imshowkw.update({key:kwargs[key]})
+        elif key in ['size', 'ticks', 'format']:
+            cbarkw.update({key:kwargs[key]})
+        else:
+            raise ValueError(f'Unknown kwarg: {key}')
+
+    im = ax.imshow(sta, **imshowkw)
     spineless(ax)
     if cbar:
-        if kwargs:
-            colorbar(im, **kwargs)
-        else:
-            colorbar(im, size='2%', ticks=[vmin, vmax], format='%.2f')
+        colorbar(im, **cbarkw)
     return im
