@@ -91,12 +91,6 @@ def stripesurround(exp_name, stimnrs):
                           f'Index:{i}    Cluster:{clusterids[i]}')
                     raise
 
-            plt.figure(figsize=(12, 10))
-            ax = plt.subplot(121)
-            plf.stashow(sta, ax, extent=[0, t[-1], -vscale, vscale])
-            ax.set_xlabel('Time [ms]')
-            ax.set_ylabel('Distance [µm]')
-
             # Isolate the time point from which the fit will
             # be obtained
             fitv = np.mean(sta[:, max_i[1]-cut_time:max_i[1]+cut_time+1],
@@ -153,6 +147,12 @@ def stripesurround(exp_name, stimnrs):
 
             csi = popt[3]/popt[0]
             cs_inds[i] = csi
+
+            plt.figure(figsize=(12, 10))
+            ax = plt.subplot(121)
+            plf.stashow(sta, ax, extent=[0, t[-1], -vscale, vscale])
+            ax.set_xlabel('Time [ms]')
+            ax.set_ylabel('Distance [µm]')
 
             ax = plt.subplot(122)
             plf.spineless(ax)
