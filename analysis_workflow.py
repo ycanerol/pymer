@@ -25,6 +25,7 @@ from plotcheckersurround import plotcheckersurround
 from stripeflickeranalysis import stripeflickeranalysis
 from plotstripestas import plotstripestas
 from allonoff import allonoff
+from stripesurround import stripesurround
 
 # %%
 asc.saveframetimes(exp_name)
@@ -39,6 +40,7 @@ allonoff(exp_name, onoffsteps)
 
 stripeflickeranalysis(exp_name, stripeflicker)
 plotstripestas(exp_name, stripeflicker)
+stripesurround(exp_name, stripeflicker)
 
 # %%
 for i in checkerflicker:
