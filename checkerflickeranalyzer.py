@@ -163,7 +163,7 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
         stas.append(np.zeros((sx, sy, filter_length)))
 
     # Empirically determined to be best for 32GB RAM
-    desired_chunk_size = 216000000
+    desired_chunk_size = 21600000
 
     # Length of the chunks (specified in number of frames)
     chunklength = int(desired_chunk_size/(sx*sy))
@@ -171,8 +171,8 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     chunksize = chunklength*sx*sy
     nrofchunks = int(np.ceil(total_frames/chunklength))
 
-    print('Chunk length :{} frames\n'
-          'Total nr of chunks: {}'.format(chunklength, nrofchunks))
+    print(f'\nAnalyzing {stimname}.\nTotal chunks: {nrofchunks}')
+
     time = startime = datetime.datetime.now()
 
     quals = np.zeros(len(stas))
@@ -201,8 +201,9 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
             qual = np.append(qual, asc.staquality(stas[c]))
         quals = np.vstack((quals, qual))
 
-        print('Chunk {:>2} out of {} completed'
-              ' in {}'.format(i+1, nrofchunks, msc.timediff(time)))
+        if i == 1:
+            print('Estimated analysis time: '
+                  f'{msc.timediff(time)*(nrofchunks)}\n')
         time = datetime.datetime.now()
 
     # Remove the first row which is full of random nrs.
@@ -227,8 +228,8 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
 
         max_inds.append(max_i)
 
-    print('Total elapsed'
-          ' time: {}'.format(msc.timediff(startime)))
+    print(f'Completed. Total elapsed time: {msc.timediff(startime)}\n'+
+          f'Finished on {datetime.datetime.now().strftime("%A %X")}')
 
     savepath = os.path.join(exp_dir, 'data_analysis', stimname)
     if not os.path.isdir(savepath):
@@ -261,3 +262,4 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     plt.title('Recording duration optimization\n{}\n {}'.format(exp_name,
               savefname))
     plt.savefig(savepath+'.svg', format='svg')
+    plt.close()

@@ -44,11 +44,7 @@ stripesurround(exp_name, stripeflicker)
 
 # %%
 for i in checkerflicker:
-#    checkerflickeranalyzer(exp_name, i)
-#    print(i)
+    checkerflickeranalyzer(exp_name, i)
     plot_checker_stas(exp_name, i)
-    print(i)
-    plotcheckersvd(exp_name, i)
-    print(i)
     plotcheckersurround(exp_name, i)
-    print(i)
+    plotcheckersvd(exp_name, i)
