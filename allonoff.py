@@ -10,28 +10,33 @@ import numpy as np
 import matplotlib.pyplot as plt
 import plotfuncs as plf
 import os
+import warnings
 
 
 def allonoff(exp_name, stim_nrs):
 
-    if isinstance(stim_nrs, int):
-        raise ValueError('Multiple stimuli should be given!')
+    if isinstance(stim_nrs, int) or len(stim_nrs)==1:
+        warnings.warn('Multiple stimuli should be given!')
+        return
 
     exp_dir = iof.exp_dir_fixer(exp_name)
     exp_name = os.path.split(exp_dir)[-1]
 
 
-    for i, stim in enumerate(stim_nrs):
+    for j, stim in enumerate(stim_nrs):
         data = iof.load(exp_name, stim)
         all_frs = data['all_frs']
         clusters = data['clusters']
         preframe_duration = data['preframe_duration']
         stim_duration = data['stim_duration']
+        onoffbias = data['onoffbias']
         t = data['t']
 
-        if i == 0:
+        if j == 0:
             a = np.zeros((clusters.shape[0], t.shape[0], len(stim_nrs)))
-        a[:, :, i] = np.array(all_frs)
+            bias = np.zeros((clusters.shape[0], len(stim_nrs)))
+        a[:, :, j] = np.array(all_frs)
+        bias[:, j] = onoffbias
 
     plotpath = os.path.join(exp_dir, 'data_analysis', 'allonoff')
     clusterids = plf.clusters_to_ids(clusters)
@@ -40,9 +45,12 @@ def allonoff(exp_name, stim_nrs):
 
     for i in range(clusters.shape[0]):
         ax = plt.subplot(111)
-        for j in range(len(stim_nrs)):
+        for j, stim in enumerate(stim_nrs):
+            labeltxt = (iof.getstimname(exp_name,
+                                       stim).replace('onoffsteps_', '')
+                        + f' Bias: {bias[i, j]:4.2f}')
             plt.plot(t, a[i, :, j], alpha = .5,
-                     label=iof.getstimname(exp_name, stim_nrs[j]))
+                     label=labeltxt)
         plt.title(f'{exp_name}\n{clusterids[i]}')
         plt.legend()
         plf.spineless(ax)

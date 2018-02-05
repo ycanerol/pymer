@@ -40,6 +40,8 @@ def onoffstepsanalyzer(exp_name, stim_nrs):
 
         clusters, metadata = asc.read_ods(exp_dir, cutoff=4)
 
+        clusterids = plf.clusters_to_ids(clusters)
+
         parameters = asc.read_parameters(exp_dir, stim_nr)
 
         # Divide by 60 to convert from number of frames to seconds
@@ -52,6 +54,40 @@ def onoffstepsanalyzer(exp_name, stim_nrs):
         contrast = parameters['contrast']
 
         total_cycle = (stim_duration+preframe_duration)*2
+
+        # Set the bins to be 10 ms
+        tstep = 0.01
+        bins = int(total_cycle/tstep)+1
+        t = np.linspace(0, total_cycle, num=bins)
+
+        # Setup for onoff bias calculation
+        onbegin = preframe_duration
+        onend = onbegin+stim_duration
+        offbegin = onend+preframe_duration
+        offend = offbegin+stim_duration
+
+        # Determine the indices for each period
+        a = []
+        for i in [onbegin, onend, offbegin, offend]:
+            yo = np.asscalar(np.where(np.abs(t-i) < tstep/2)[0][-1])
+            a.append(yo)
+
+        # To exclude stimulus offset affecting the bias, use
+        # last 1 second of preframe period
+        prefs = []
+        cut_time = 1
+        for i in [onbegin-1, onbegin, offbegin-1, offbegin]:
+            yo = np.asscalar(np.where(np.abs(t-i) < tstep/2)[0][-1])
+            prefs.append(yo)
+
+        onper = slice(a[0], a[1])
+        offper = slice(a[2], a[3])
+
+        pref1 = slice(prefs[0], prefs[1])
+        pref2 = slice(prefs[2], prefs[3])
+
+        onoffbias = np.empty(clusters.shape[0])
+        baselines = np.empty(clusters.shape[0])
 
         # The first trial will be discarded by dropping the first four frames
         # If we don't save the original and re-initialize for each cell,
@@ -106,45 +142,58 @@ def onoffstepsanalyzer(exp_name, stim_nrs):
             plf.drawonoff(ax1, preframe_duration, stim_duration,
                           contrast=contrast)
 
-            plt.suptitle('{}\n{}'.format(exp_name, stimname))
-            plt.title('{:0>3}{:0>2} Rating: {}'.format(clusters[i][0],
-                                                       clusters[i][1],
-                                                       clusters[i][2]))
             plt.ylabel('Trial')
             plt.gca().invert_yaxis()
             ax1.set_xticks([])
             plf.spineless(ax1)
 
-            ax2 = plt.subplot(212)
 
             # Collect all trials in one array to calculate firing rates
             ras = np.array([])
             for ii in range(len(rasterplot)):
                 ras = np.append(ras, rasterplot[ii])
 
-            # Set the bins to be 10 ms
-            tstep = 0.01
-            bins = int(total_cycle/tstep)+1
-            t = np.linspace(0, total_cycle, num=bins)
-
             # Sort into time bins and count how many spikes happened in each
             fr = np.digitize(ras, t)
-            fr1 = np.bincount(fr)
+            fr = np.bincount(fr)
             # Normalize so that units are spikes/s
-            fr1 = fr1 * (bins/total_cycle) / (len(rasterplot)-1)
+            fr = fr * (bins/total_cycle) / (len(rasterplot)-1)
             # Equalize the length of the two arrays for plotting.
             # np.bincount(x) normally produces x.max()+1 bins
-            if fr1.shape[0] == bins+1:
-                fr1 = fr1[:-1]
+            if fr.shape[0] == bins+1:
+                fr = fr[:-1]
             # If there aren't any spikes at the last trial, the firing
             # rates array is too short and plt.plot raises error.
-            while fr1.shape[0] < bins:
-                fr1 = np.append(fr1, 0)
+            while fr.shape[0] < bins:
+                fr = np.append(fr, 0)
 
-            all_frs.append(fr1)
-            plt.plot(t, fr1)
+            prefr = np.append(fr[pref1], fr[pref2])
+            baseline = np.median(np.round(prefr))
+
+            fr_corr = fr - baseline
+
+            r_on = np.sum(fr_corr[onper])
+            r_off = np.sum(fr_corr[offper])
+
+            bias = (r_on-r_off)/(np.abs(r_on)+np.abs(r_off))
+
+            plt.suptitle(f'{exp_name}\n{stimname}'
+                         f'\n{clusterids[i]} Rating: {clusters[i][2]}\n')
+
+            if fr.max() < 20:
+                bias = np.nan
+
+            onoffbias[i] = bias
+            baselines[i] = baseline
+
+            all_frs.append(fr)
+
+            ax2 = plt.subplot(212)
+            plt.plot(t, fr)
             plf.spineless(ax2)
-            plt.axis([0, total_cycle, fr1.min(), fr1.max()])
+            plt.axis([0, total_cycle, fr.min(), fr.max()])
+
+            plt.title(f'Baseline: {baseline:2.0f} Hz Bias: {bias:0.2f}')
             plt.xlabel('Time[s]')
             plt.ylabel('Firing rate[spikes/s]')
 
@@ -162,7 +211,8 @@ def onoffstepsanalyzer(exp_name, stim_nrs):
 
         keystosave = ['clusters', 'total_cycle', 'bins', 'tstep',
                       'stimname', 'stim_duration', 'preframe_duration',
-                      'contrast', 'all_frs', 't', 'exp_name']
+                      'contrast', 'all_frs', 't', 'exp_name', 'onoffbias',
+                      'baselines']
         data_in_dict = {}
         for key in keystosave:
             data_in_dict[key] = locals()[key]
