@@ -70,6 +70,9 @@ def stripeflickeranalysis(exp_name, stim_nrs):
         else:
             raise ValueError('Unexpected value for nblinks.')
 
+        # Omit everything that happens before the first 10 seconds
+        cut_time = 10
+
         frame_duration = np.average(np.ediff1d(frametimings))
         total_frames = frametimings.shape[0]
 
@@ -81,11 +84,9 @@ def stripeflickeranalysis(exp_name, stim_nrs):
         for i in range(len(clusters[:, 0])):
             spiketimes = asc.read_raster(exp_dir, stim_nr,
                                          clusters[i, 0], clusters[i, 1])
-
             spikes = asc.binspikes(spiketimes, frametimings)
             all_spiketimes.append(spikes)
             stas.append(np.zeros((sy, filter_length)))
-                # If max_i cannot be found just set it to zeros.
 
         if bw:
             randnrs, seed = randpy.ran1(seed, sy*total_frames)
@@ -100,7 +101,7 @@ def stripeflickeranalysis(exp_name, stim_nrs):
             stim_small = stimulus[:, k-filter_length+1:k+1][:, ::-1]
             for j in range(clusters.shape[0]):
                 spikes = all_spiketimes[j]
-                if spikes[k] != 0:
+                if spikes[k] != 0 and frametimings[k]>cut_time:
                     stas[j] += spikes[k]*stim_small
 
         max_inds = []
