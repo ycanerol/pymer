@@ -7,13 +7,15 @@ Created on Mon Jan 22 15:21:30 2018
 """
 import analysis_scripts as asc
 
-exp_name = '20180124'
+exp_name = '20180118'
 
-spontaneous = [1, 2, 7, 13]
-fullfieldflicker = [4, 10, 15]
-onoffsteps = [3, 8, 14]
-checkerflicker = [5, 11, 16]
-stripeflicker = [6, 12, 17]
+sorted_stimuli = asc.stimulisorter(exp_name)
+
+spontaneous = sorted_stimuli['spontaneous']
+fullfieldflicker = sorted_stimuli['fff']
+onoffsteps = sorted_stimuli['onoffsteps']
+checkerflicker = sorted_stimuli['checkerflicker']
+stripeflicker = sorted_stimuli['stripeflicker']
 
 from spontanalyzer import spontanalyzer
 from fffanalyzer import fffanalyzer
