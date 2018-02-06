@@ -130,7 +130,10 @@ def readframetimes(exp_name, stimnr, returnoffsets=False):
     exp_dir = iof.exp_dir_fixer(exp_name)
 
     filepath = os.path.join(exp_dir, 'frametimes', str(stimnr)+'_*.npz')
-    filename = glob.glob(filepath)[0]
+    try:
+        filename = glob.glob(filepath)[0]
+    except IndexError:
+        raise ValueError(f'No frametimes file for {stimnr} in {exp_name}.')
     f = np.load(filename)
 
     frametimings_on = f['f_on']
@@ -142,9 +145,12 @@ def readframetimes(exp_name, stimnr, returnoffsets=False):
         return frametimings_on
 
 
-def saveframetimes(exp_name, **kwargs):
+def saveframetimes(exp_name, forceextraction=False, **kwargs):
     """
     Save all frametiming data for one experiment.
+
+    Nothing will be saved if frametimings files already exist.
+    forceextraction parameter can be used to override this behaviour.
 
     Parameters:
     ----------
@@ -154,21 +160,31 @@ def saveframetimes(exp_name, **kwargs):
     exp_dir = iof.exp_dir_fixer(exp_name)
 
     for i in range(1, 100):
+        alreadyextracted = True
+        # If we have already extracted the frametimes, no need to do it twice.
         try:
-            stimname = iof.getstimname(exp_name, i)
-            print(stimname)
-        except IndexError:
-            break
-        f_on, f_off = extractframetimes(exp_dir, i, **kwargs)
+            readframetimes(exp_dir, i);
+        except ValueError as e:
+            if str(e).startswith('No frametimes file'):
+                alreadyextracted = False
+        if forceextraction:
+            alreadyextracted = False
+        if not alreadyextracted:
+            try:
+                stimname = iof.getstimname(exp_name, i)
+                print(stimname)
+            except IndexError:
+                break
+            f_on, f_off = extractframetimes(exp_dir, i, **kwargs)
 
-        savepath = os.path.join(exp_dir, 'frametimes')
+            savepath = os.path.join(exp_dir, 'frametimes')
 
-        if not os.path.exists(savepath):
-            os.mkdir(savepath)
+            if not os.path.exists(savepath):
+                os.mkdir(savepath)
 
-        np.savez(os.path.join(savepath, stimname+'_frametimes'),
-                 f_on=f_on,
-                 f_off=f_off)
+            np.savez(os.path.join(savepath, stimname+'_frametimes'),
+                     f_on=f_on,
+                     f_off=f_off)
 
 
 def extractframetimes(exp_name, stimnr, threshold=75,
@@ -291,7 +307,7 @@ def extractframetimes(exp_name, stimnr, threshold=75,
 
         # Put all stimulus onset and offsets on top of each other
         # This part takes very long time for long recordings
-        plt.figure()
+        plt.figure(figsize=(9, 6))
         for i in range(onsets.shape[0]):
             if onsets[i]:
                 plt.subplot(211)
