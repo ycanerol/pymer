@@ -14,7 +14,7 @@ import os
 
 def allonoff(exp_name, stim_nrs):
 
-    if isinstance(stim_nrs, int) or len(stim_nrs)==1:
+    if isinstance(stim_nrs, int) or len(stim_nrs)<=1:
        print('Multiple onoffsteps stimuli expected, '
              'allonoff analysis will be skipped.')
        return
