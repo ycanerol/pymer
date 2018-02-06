@@ -6,17 +6,6 @@ Created on Mon Jan 22 15:21:30 2018
 @author: ycan
 """
 import analysis_scripts as asc
-
-exp_name = '20180118'
-
-sorted_stimuli = asc.stimulisorter(exp_name)
-
-spontaneous = sorted_stimuli['spontaneous']
-fullfieldflicker = sorted_stimuli['fff']
-onoffsteps = sorted_stimuli['onoffsteps']
-checkerflicker = sorted_stimuli['checkerflicker']
-stripeflicker = sorted_stimuli['stripeflicker']
-
 from spontanalyzer import spontanalyzer
 from fffanalyzer import fffanalyzer
 from onoffstepsanalyzer import onoffstepsanalyzer
@@ -29,7 +18,16 @@ from plotstripestas import plotstripestas
 from allonoff import allonoff
 from stripesurround import stripesurround
 
-# %%
+exp_name = '20171122'
+
+sorted_stimuli = asc.stimulisorter(exp_name)
+
+spontaneous = sorted_stimuli['spontaneous']
+fullfieldflicker = sorted_stimuli['fff']
+onoffsteps = sorted_stimuli['onoffsteps']
+checkerflicker = sorted_stimuli['checkerflicker']
+stripeflicker = sorted_stimuli['stripeflicker']
+
 asc.saveframetimes(exp_name)
 
 # %%
