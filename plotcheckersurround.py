@@ -8,6 +8,7 @@ Created on Tue Oct 10 11:51:38 2017
 
 import numpy as np
 import matplotlib.pyplot as plt
+import warnings
 import gaussfitter as gfit
 import iofuncs as iof
 import miscfuncs as mf
@@ -110,16 +111,23 @@ def plotcheckersurround(exp_name, stim_nr, filename=None, spikecutoff=1000,
         else:
             onoroff = 1
 
-        pars = gfit.gaussfit(fit_frame*onoroff)
 
-        f = gfit.twodgaussian(pars)
 
         Y, X = np.meshgrid(np.arange(fit_frame.shape[1]),
                            np.arange(fit_frame.shape[0]))
-        Z = f(X, Y)
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore',
+                                    '.*divide by zero*.',  RuntimeWarning)
+            pars = gfit.gaussfit(fit_frame*onoroff)
+            f = gfit.twodgaussian(pars)
+            Z = f(X, Y)
 
         # Correcting for Mahalonobis dist.
-        Zm = np.log((Z-pars[0])/pars[1])
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore',
+                                    '.*divide by zero*.',  RuntimeWarning)
+            Zm = np.log((Z-pars[0])/pars[1])
         Zm[np.isinf(Zm)] = np.nan
         Zm = np.sqrt(Zm*-2)
 
@@ -132,8 +140,11 @@ def plotcheckersurround(exp_name, stim_nr, filename=None, spikecutoff=1000,
         plf.spineless(ax)
         plf.colorbar(im, ticks=[vmin, 0, vmax], format='%.2f')
 
-        ax.contour(Y, X, Zm, [inner_b, outer_b],
-                   cmap=plf.RFcolormap(('C0', 'C1')))
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', category=UserWarning)
+            warnings.filterwarnings('ignore', '.*invalid value encountered*.')
+            ax.contour(Y, X, Zm, [inner_b, outer_b],
+                       cmap=plf.RFcolormap(('C0', 'C1')))
 
         barsize = 100/(stx_h*px_size)
         scalebar = AnchoredSizeBar(ax.transData,
@@ -145,13 +156,16 @@ def plotcheckersurround(exp_name, stim_nr, filename=None, spikecutoff=1000,
                                    size_vertical=.2)
         ax.add_artist(scalebar)
 
-        center_mask = np.logical_not(Zm < inner_b)
-        center_mask_3d = np.broadcast_arrays(sta,
-                                             center_mask[..., None])[1]
-        surround_mask = np.logical_not(np.logical_and(Zm > inner_b,
-                                                      Zm < outer_b))
-        surround_mask_3d = np.broadcast_arrays(sta,
-                                               surround_mask[..., None])[1]
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore',
+                        '.*invalid value encountered in*.',  RuntimeWarning)
+            center_mask = np.logical_not(Zm < inner_b)
+            center_mask_3d = np.broadcast_arrays(sta,
+                                                 center_mask[..., None])[1]
+            surround_mask = np.logical_not(np.logical_and(Zm > inner_b,
+                                                          Zm < outer_b))
+            surround_mask_3d = np.broadcast_arrays(sta,
+                                                   surround_mask[..., None])[1]
 
         sta_center = np.ma.array(sta, mask=center_mask_3d)
         sta_surround = np.ma.array(sta, mask=surround_mask_3d)

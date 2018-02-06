@@ -93,6 +93,8 @@ def stripesurround(exp_name, stimnrs):
 
             # Isolate the time point from which the fit will
             # be obtained
+            if max_i[1] < cut_time:
+                max_i[1] = cut_time+1
             fitv = np.mean(sta[:, max_i[1]-cut_time:max_i[1]+cut_time+1],
                            axis=1)
             # Make a space vector

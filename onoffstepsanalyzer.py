@@ -131,7 +131,7 @@ def onoffstepsanalyzer(exp_name, stim_nrs):
             if len(rasterplot[0]) == 0:
                 rasterplot[0] = [-1]
 
-            fig = plt.figure(figsize=(9, 12))
+            fig = plt.figure(figsize=(9, 9))
             ax1 = plt.subplot(211)
             plt.eventplot(rasterplot, linewidth=.5, color='r')
             # Set the axis so they align with the rectangles
@@ -175,7 +175,10 @@ def onoffstepsanalyzer(exp_name, stim_nrs):
             r_on = np.sum(fr_corr[onper])
             r_off = np.sum(fr_corr[offper])
 
-            bias = (r_on-r_off)/(np.abs(r_on)+np.abs(r_off))
+            if r_on == 0 and r_off == 0:
+                bias = np.nan
+            else:
+                bias = (r_on-r_off)/(np.abs(r_on)+np.abs(r_off))
 
             plt.suptitle(f'{exp_name}\n{stimname}'
                          f'\n{clusterids[i]} Rating: {clusters[i][2]}\n')
