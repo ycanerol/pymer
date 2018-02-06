@@ -5,8 +5,8 @@ Created on Thu Nov 30 18:18:03 2017
 
 @author: ycan
 """
-import numpy as np
 import os
+import numpy as np
 import matplotlib.pyplot as plt
 import analysis_scripts as asc
 import plotfuncs as plf
@@ -38,7 +38,7 @@ def onoffstepsanalyzer(exp_name, stim_nrs):
 
         stimname = iof.getstimname(exp_dir, stim_nr)
 
-        clusters, metadata = asc.read_ods(exp_dir, cutoff=4)
+        clusters, _ = asc.read_ods(exp_dir, cutoff=4)
 
         clusterids = plf.clusters_to_ids(clusters)
 
@@ -75,7 +75,6 @@ def onoffstepsanalyzer(exp_name, stim_nrs):
         # To exclude stimulus offset affecting the bias, use
         # last 1 second of preframe period
         prefs = []
-        cut_time = 1
         for i in [onbegin-1, onbegin, offbegin-1, offbegin]:
             yo = np.asscalar(np.where(np.abs(t-i) < tstep/2)[0][-1])
             prefs.append(yo)
@@ -131,7 +130,7 @@ def onoffstepsanalyzer(exp_name, stim_nrs):
             if len(rasterplot[0]) == 0:
                 rasterplot[0] = [-1]
 
-            fig = plt.figure(figsize=(9, 9))
+            plt.figure(figsize=(9, 9))
             ax1 = plt.subplot(211)
             plt.eventplot(rasterplot, linewidth=.5, color='r')
             # Set the axis so they align with the rectangles

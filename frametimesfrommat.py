@@ -6,10 +6,10 @@ Created on Mon Jan  8 19:01:30 2018
 @author: ycan
 """
 
+import os
 import numpy as np
 import scipy.io
 import iofuncs as iof
-import os
 
 exp_dir = iof.exp_dir_fixer('V')
 """

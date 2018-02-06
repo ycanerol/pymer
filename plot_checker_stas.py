@@ -5,12 +5,12 @@ Created on Tue Dec 12 19:00:09 2017
 
 @author: ycan
 """
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 import plotfuncs as plf
 import iofuncs as iof
 import analysis_scripts as asc
-import os
 
 
 def plot_checker_stas(exp_name, stim_nr, filename=None):

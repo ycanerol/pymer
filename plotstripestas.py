@@ -5,12 +5,12 @@ Created on Tue Jan 16 13:48:31 2018
 
 @author: ycan
 """
+import os
 import iofuncs as iof
 import matplotlib.pyplot as plt
 import plotfuncs as plf
 import numpy as np
 import analysis_scripts as asc
-import os
 
 
 def plotstripestas(exp_name, stim_nrs):

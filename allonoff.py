@@ -5,19 +5,19 @@ Created on Fri Jan 26 11:20:35 2018
 
 @author: ycan
 """
+import os
 import iofuncs as iof
 import numpy as np
 import matplotlib.pyplot as plt
 import plotfuncs as plf
-import os
 
 
 def allonoff(exp_name, stim_nrs):
 
-    if isinstance(stim_nrs, int) or len(stim_nrs)<=1:
-       print('Multiple onoffsteps stimuli expected, '
-             'allonoff analysis will be skipped.')
-       return
+    if isinstance(stim_nrs, int) or len(stim_nrs) <= 1:
+        print('Multiple onoffsteps stimuli expected, '
+              'allonoff analysis will be skipped.')
+        return
 
     exp_dir = iof.exp_dir_fixer(exp_name)
     exp_name = os.path.split(exp_dir)[-1]
@@ -47,9 +47,9 @@ def allonoff(exp_name, stim_nrs):
         ax = plt.subplot(111)
         for j, stim in enumerate(stim_nrs):
             labeltxt = (iof.getstimname(exp_name,
-                                       stim).replace('onoffsteps_', '')
+                                        stim).replace('onoffsteps_', '')
                         + f' Bias: {bias[i, j]:4.2f}')
-            plt.plot(t, a[i, :, j], alpha = .5,
+            plt.plot(t, a[i, :, j], alpha=.5,
                      label=labeltxt)
         plt.title(f'{exp_name}\n{clusterids[i]}')
         plt.legend()

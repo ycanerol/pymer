@@ -9,12 +9,12 @@ Plot multiple stripeflicker STAs together to see the
 effect of parameters.
 
 """
+import os
 import iofuncs as iof
 import matplotlib.pyplot as plt
 import plotfuncs as plf
 import numpy as np
 import analysis_scripts as asc
-import os
 
 
 def cutstripe(sta, max_i, fsize):

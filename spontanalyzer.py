@@ -5,8 +5,8 @@ Created on Thu Nov 30 18:18:03 2017
 
 @author: ycan
 """
-import numpy as np
 import os
+import numpy as np
 import matplotlib.pyplot as plt
 import analysis_scripts as asc
 import plotfuncs as plf
@@ -32,7 +32,7 @@ def spontanalyzer(exp_name, stim_nrs):
 
         stimname = iof.getstimname(exp_dir, stim_nr)
 
-        clusters, metadata = asc.read_ods(exp_dir, cutoff=4)
+        clusters, _ = asc.read_ods(exp_dir, cutoff=4)
 
         # Length of chunks we use for dividing the activity for plotting.
         step = 1
@@ -47,7 +47,7 @@ def spontanalyzer(exp_name, stim_nrs):
         # Use the time of the last spike to determine the total recording time.
         last_spike = np.max([np.max(allspikes[i])\
                              for i in range(clusters.shape[0])
-                      if len(allspikes[i])>0])
+                             if len(allspikes[i]) > 0])
         totalrecordingtime = np.int(np.ceil(last_spike) + 1)
         times = np.arange(0, totalrecordingtime, step)
 

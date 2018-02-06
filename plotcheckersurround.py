@@ -6,15 +6,15 @@ Created on Tue Oct 10 11:51:38 2017
 @author: ycan
 """
 
+import os
+import warnings
 import numpy as np
 import matplotlib.pyplot as plt
-import warnings
 import gaussfitter as gfit
 import iofuncs as iof
 import miscfuncs as mf
 import plotfuncs as plf
 import analysis_scripts as asc
-import os
 from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
 
 
@@ -118,7 +118,7 @@ def plotcheckersurround(exp_name, stim_nr, filename=None, spikecutoff=1000,
 
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore',
-                                    '.*divide by zero*.',  RuntimeWarning)
+                                    '.*divide by zero*.', RuntimeWarning)
             pars = gfit.gaussfit(fit_frame*onoroff)
             f = gfit.twodgaussian(pars)
             Z = f(X, Y)
@@ -126,7 +126,7 @@ def plotcheckersurround(exp_name, stim_nr, filename=None, spikecutoff=1000,
         # Correcting for Mahalonobis dist.
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore',
-                                    '.*divide by zero*.',  RuntimeWarning)
+                                    '.*divide by zero*.', RuntimeWarning)
             Zm = np.log((Z-pars[0])/pars[1])
         Zm[np.isinf(Zm)] = np.nan
         Zm = np.sqrt(Zm*-2)
@@ -158,7 +158,8 @@ def plotcheckersurround(exp_name, stim_nr, filename=None, spikecutoff=1000,
 
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore',
-                        '.*invalid value encountered in*.',  RuntimeWarning)
+                                    '.*invalid value encountered in*.',
+                                    RuntimeWarning)
             center_mask = np.logical_not(Zm < inner_b)
             center_mask_3d = np.broadcast_arrays(sta,
                                                  center_mask[..., None])[1]
@@ -196,8 +197,7 @@ def plotcheckersurround(exp_name, stim_nr, filename=None, spikecutoff=1000,
         labels = [line.get_label() for line in lines]
         plt.legend(lines, labels, fontsize=7)
         plt.title('Temporal components')
-        plt.suptitle('{}\n{}\n{}'.format(exp_name,
-                     stimname+label, clusterids[i]))
+        plt.suptitle(f'{exp_name}\n{stimname}\n{clusterids[i]}')
 
         plt.subplots_adjust(wspace=.5, top=.85)
 

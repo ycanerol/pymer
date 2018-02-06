@@ -7,8 +7,8 @@ Created on Mon Nov 13 14:58:16 2017
 
 Collection of functions that are used for various stages of analysis
 """
-import numpy as np
 import glob
+import numpy as np
 
 
 def svd(sta, flip=False):

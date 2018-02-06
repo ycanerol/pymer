@@ -7,9 +7,9 @@ Created on Tue Nov 21 15:54:03 2017
 
 Collection of analysis functions
 """
-import numpy as np
 import os
 import glob
+import numpy as np
 import iofuncs as iof
 
 
@@ -78,7 +78,6 @@ def read_ods(exp_name, cutoff=4, defaultpath=True):
         # columns that are left blank.
         raise ValueError('.ods file is missing information! Check that '
                          'all clusters have a rating!')
-        return None, None
     # The channels with multiple clusters have an empty line after the first
     # line. Fill the empty lines using the first line of each channel.
     for i in range(len(clusters[:, 0])):
@@ -163,7 +162,7 @@ def saveframetimes(exp_name, forceextraction=False, **kwargs):
         alreadyextracted = True
         # If we have already extracted the frametimes, no need to do it twice.
         try:
-            readframetimes(exp_dir, i);
+            readframetimes(exp_dir, i)
         except ValueError as e:
             if str(e).startswith('No frametimes file'):
                 alreadyextracted = False
@@ -257,12 +256,12 @@ def extractframetimes(exp_name, stimnr, threshold=75,
                             str(stimnr)+'_253.bin')
 
     with open(filepath, mode='rb') as file:  # b is important -> binary
-        fileContent = file.read()
+        file_content = file.read()
 
     # The header contains the length of the recording as a unsigned 32 bit int
-    length = struct.unpack('I', fileContent[:4])[0]
+    length = struct.unpack('I', file_content[:4])[0]
     # The rest of the binary data is the voltage trace, as unsigned 16 bit int
-    voltage_raw = np.array(struct.unpack('H'*length, fileContent[16:]))
+    voltage_raw = np.array(struct.unpack('H'*length, file_content[16:]))
 
     # Convert units to microvolts, using constants from Norma(?)'s script
     voltage = (voltage_raw - zeroADvalue) / microvoltsperADunit

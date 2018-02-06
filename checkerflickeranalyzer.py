@@ -6,11 +6,11 @@ Created on Fri Dec  8 11:22:39 2017
 @author: ycan
 """
 
-import numpy as np
-from randpy import randpy
 import datetime
 import os
 import warnings
+import numpy as np
+from randpy import randpy
 import analysis_scripts as asc
 import iofuncs as iof
 import miscfuncs as msc
@@ -259,7 +259,6 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     plt.xlabel('Minutes of stimulus analyzed')
     plt.ylim([0, 1])
     plf.spineless(ax, 'tr')
-    plt.title('Recording duration optimization\n{}\n {}'.format(exp_name,
-              savefname))
+    plt.title(f'Recording duration optimization\n{exp_name}\n {savefname}')
     plt.savefig(savepath+'.svg', format='svg')
     plt.close()

@@ -5,10 +5,10 @@ Created on Tue Nov 14 13:37:25 2017
 
 @author: ycan
 """
+import os
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
-import os
 
 
 def spineless(ax, which='trlb'):
@@ -219,13 +219,13 @@ def drawonoff(ax, preframedur, stimdur, h=1, contrast=1):
                                   transform=ax.transAxes, color='k',
                                   alpha=.5*(1-contrast))
     rect3 = mpl.patches.Rectangle(((preframedur +
-                                  stimdur)/totaldur, 1),
+                                    stimdur)/totaldur, 1),
                                   width=preframedur/totaldur,
                                   height=h,
                                   transform=ax.transAxes, color='k',
                                   alpha=.5)
     rect4 = mpl.patches.Rectangle(((2*preframedur +
-                                  stimdur)/totaldur, 1),
+                                    stimdur)/totaldur, 1),
                                   width=stimdur/totaldur,
                                   height=h,
                                   transform=ax.transAxes, color='k',

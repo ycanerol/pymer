@@ -66,31 +66,31 @@ stac, max_i = msc.cut_around_center(sta, max_i, f_size+2)
 sp1, sp2, t1, t2, _, _ = msc.svd(stac)
 
 #%%
-plt.figure(figsize=(12,10))
+plt.figure(figsize=(12, 10))
 vmax = np.max(np.abs([sp1, sp2]))
 vmin = -vmax
 plt.subplot(131)
-plt.imshow(sp1, cmap = 'RdBu', vmin=vmin, vmax=vmax)
+plt.imshow(sp1, cmap='RdBu', vmin=vmin, vmax=vmax)
 plt.subplot(132)
-plt.imshow(sp2, cmap = 'RdBu', vmin=vmin, vmax=vmax)
+plt.imshow(sp2, cmap='RdBu', vmin=vmin, vmax=vmax)
 plt.subplot(133)
-im = plt.imshow(fit_frame, cmap = 'RdBu', vmin=vmin, vmax=vmax)
+im = plt.imshow(fit_frame, cmap='RdBu', vmin=vmin, vmax=vmax)
 plf.colorbar(im, size='2%', ticks=[vmin, vmax], format='%.2f')
 plt.show()
 
 sp1c, maxic = msc.cut_around_center(sp1, max_i, f_size)
 sp2c, maxic = msc.cut_around_center(sp2, max_i, f_size)
-fit_framec , maxic = msc.cut_around_center(fit_frame, max_i, f_size)
+fit_framec, maxic = msc.cut_around_center(fit_frame, max_i, f_size)
 
-plt.figure(figsize=(12,10))
+plt.figure(figsize=(12, 10))
 vmax = np.max(np.abs([sp1c, sp2c]))
 vmin = -vmax
 plt.subplot(131)
-plt.imshow(sp1c, cmap = 'RdBu', vmin=vmin, vmax=vmax)
+plt.imshow(sp1c, cmap='RdBu', vmin=vmin, vmax=vmax)
 plt.subplot(132)
-plt.imshow(sp2c, cmap = 'RdBu', vmin=vmin, vmax=vmax)
+plt.imshow(sp2c, cmap='RdBu', vmin=vmin, vmax=vmax)
 plt.subplot(133)
-im = plt.imshow(fit_framec, cmap = 'RdBu', vmin=vmin, vmax=vmax)
+im = plt.imshow(fit_framec, cmap='RdBu', vmin=vmin, vmax=vmax)
 plf.colorbar(im, size='2%', ticks=[vmin, vmax], format='%.2f')
 plt.show()
 
@@ -99,7 +99,7 @@ sp = sp1c
 
 rows = 2
 columns = 2
-plt.figure(figsize=(12,10))
+plt.figure(figsize=(12, 10))
 
 f, pars0, pol0 = getfit(sp)
 
@@ -130,7 +130,7 @@ plf.stashow(d2, ax2)
 ax2.contour(X, Y, Z2m, [2])
 plt.show()
 #%%
-plt.figure(figsize=(20,15))
+plt.figure(figsize=(20, 15))
 rec = Z0*pol0+Z1*pol1*2
 
 ax3 = plt.subplot(221)

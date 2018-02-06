@@ -6,9 +6,9 @@ Created on Wed Jan 10 14:36:31 2018
 @author: ycan
 """
 
-import numpy as np
-from os.path import join as pjoin
 import os
+from os.path import join as pjoin
+import numpy as np
 import analysis_scripts as asc
 import iofuncs as iof
 from randpy import randpy
@@ -101,7 +101,7 @@ def stripeflickeranalysis(exp_name, stim_nrs):
             stim_small = stimulus[:, k-filter_length+1:k+1][:, ::-1]
             for j in range(clusters.shape[0]):
                 spikes = all_spiketimes[j]
-                if spikes[k] != 0 and frametimings[k]>cut_time:
+                if spikes[k] != 0 and frametimings[k] > cut_time:
                     stas[j] += spikes[k]*stim_small
 
         max_inds = []

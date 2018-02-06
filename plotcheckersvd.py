@@ -6,14 +6,14 @@ Created on Tue Jan  2 15:54:05 2018
 @author: ycan
 """
 
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib
+import analysis_scripts as asc
 import iofuncs as iof
 import miscfuncs as msc
 import plotfuncs as plf
-import matplotlib.pyplot as plt
-import numpy as np
-import matplotlib
-import analysis_scripts as asc
-import os
 from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
 
 
@@ -59,7 +59,7 @@ def plotcheckersvd(expname, stimnr, filename=None):
             sta, max_i = msc.cut_around_center(sta, max_i, f_size=f_size)
         except ValueError:
             continue
-        fit_frame = sta[:, :,  max_i[2]]
+        fit_frame = sta[:, :, max_i[2]]
 
         try:
             sp1, sp2, t1, t2, _, _ = msc.svd(sta)
@@ -71,8 +71,7 @@ def plotcheckersvd(expname, stimnr, filename=None):
         plotthese = [fit_frame, sp1, sp2]
 
         plt.figure(dpi=200)
-        plt.suptitle('{}\n{}\n{}'.format(exp_name, stimname,
-                     clusterids[i]))
+        plt.suptitle(f'{exp_name}\n{stimname}\n{clusterids[i]}')
         rows = 2
         cols = 3
 
