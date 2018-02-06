@@ -5,6 +5,7 @@ Created on Mon Jan 22 15:21:30 2018
 
 @author: ycan
 """
+import sys
 import analysis_scripts as asc
 from spontanalyzer import spontanalyzer
 from fffanalyzer import fffanalyzer
@@ -18,7 +19,11 @@ from plotstripestas import plotstripestas
 from allonoff import allonoff
 from stripesurround import stripesurround
 
-exp_name = '20171122'
+# Attempt to read from stdin
+try:
+    exp_name = str(sys.argv[1])
+except IndexError:
+    exp_name = input('Enter the experiment name to be analyzed: ')
 
 sorted_stimuli = asc.stimulisorter(exp_name)
 
