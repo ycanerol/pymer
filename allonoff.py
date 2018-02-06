@@ -10,14 +10,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import plotfuncs as plf
 import os
-import warnings
 
 
 def allonoff(exp_name, stim_nrs):
 
     if isinstance(stim_nrs, int) or len(stim_nrs)==1:
-        warnings.warn('Multiple stimuli should be given!')
-        return
+       print('Multiple onoffsteps stimuli expected, '
+             'allonoff analysis will be skipped.')
+       return
 
     exp_dir = iof.exp_dir_fixer(exp_name)
     exp_name = os.path.split(exp_dir)[-1]
