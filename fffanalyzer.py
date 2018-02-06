@@ -5,8 +5,8 @@ Created on Wed Jan 17 15:21:50 2018
 
 @author: ycan
 """
-import numpy as np
 import os
+import numpy as np
 import analysis_scripts as asc
 import iofuncs as iof
 from randpy import randpy
@@ -30,7 +30,7 @@ def fffanalyzer(exp_name, stimnrs):
 
         stimname = iof.getstimname(exp_name, stimnr)
 
-        clusters, metadata = asc.read_ods(exp_dir)
+        clusters, _ = asc.read_ods(exp_dir)
 
         parameters = asc.read_parameters(exp_dir, stimnr)
 
@@ -107,6 +107,7 @@ def fffanalyzer(exp_name, stimnrs):
 
         for i in range(clusters.shape[0]):
             stas[i] = stas[i]/spikenrs[i]
+            plt.figure(figsize=(9, 6))
             ax = plt.subplot(111)
             ax.plot(t, stas[i])
             plf.spineless(ax)
@@ -129,4 +130,3 @@ def fffanalyzer(exp_name, stimnrs):
 
         np.savez(savepath, **data_in_dict)
         print(f'Analysis of {stimname} completed.')
-

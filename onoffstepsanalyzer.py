@@ -131,7 +131,7 @@ def onoffstepsanalyzer(exp_name, stim_nrs):
             if len(rasterplot[0]) == 0:
                 rasterplot[0] = [-1]
 
-            fig = plt.figure()
+            fig = plt.figure(figsize=(9, 12))
             ax1 = plt.subplot(211)
             plt.eventplot(rasterplot, linewidth=.5, color='r')
             # Set the axis so they align with the rectangles
