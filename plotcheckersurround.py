@@ -195,3 +195,4 @@ def plotcheckersurround(exp_name, stim_nr, filename=None, spikecutoff=1000,
         plt.savefig(os.path.join(plotpath, clusterids[i])+'.svg',
                     format='svg', dpi=300)
         plt.close()
+    print(f'Plotted checkerflicker surround for {stimname}')

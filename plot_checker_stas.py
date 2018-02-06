@@ -90,3 +90,4 @@ def plot_checker_stas(exp_name, stim_nr, filename=None):
 
         plt.savefig(savepath+'.png')
         plt.close()
+    print(f'Plotted checkerflicker STA for {stimname}')

@@ -123,3 +123,4 @@ def plotcheckersvd(expname, stimnr, filename=None):
             os.makedirs(plotpath, exist_ok=True)
         plt.savefig(os.path.join(plotpath, clusterids[i]+'.svg'), dpi=300)
         plt.close()
+    print(f'Plotted checkerflicker SVD for {stimname}')
