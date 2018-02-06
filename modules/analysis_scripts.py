@@ -490,24 +490,18 @@ def stimulisorter(exp_name):
     Read parameters.txt file and return the stimuli type and
     stimuli numbers in a dictionary.
     """
-
     possible_stim_names = ['spontaneous', 'onoffsteps', 'fff', 'stripeflicker',
                            'checkerflicker', 'directiongratingsequence',
                            'rotatingstripes']
-    sorted_stimuli = {}
-
+    sorted_stimuli = {key:[] for key in possible_stim_names}
     exp_dir = iof.exp_dir_fixer(exp_name)
 
     file = open(os.path.join(exp_dir, 'parameters.txt'), 'r')
 
     for line in file:
         for stimname in possible_stim_names:
-            if line.find(stimname)>0:
+            if line.find(stimname) > 0:
                 stimnr = int(line.split('_')[0])
-                try:
-                    toadd = sorted_stimuli[stimname]
-                    toadd = toadd.append(stimnr)
-                except KeyError:
-                    toadd = {stimname:[stimnr]}
-                    sorted_stimuli.update(toadd)
+                toadd = sorted_stimuli[stimname]
+                toadd = toadd.append(stimnr)
     return sorted_stimuli
