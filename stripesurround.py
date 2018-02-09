@@ -150,7 +150,7 @@ def stripesurround(exp_name, stimnrs):
             csi = popt[3]/popt[0]
             cs_inds[i] = csi
 
-            plt.figure(figsize=(12, 10))
+            plt.figure(figsize=(10, 9))
             ax = plt.subplot(121)
             plf.stashow(sta, ax, extent=[0, t[-1], -vscale, vscale])
             ax.set_xlabel('Time [ms]')
@@ -169,14 +169,14 @@ def stripesurround(exp_name, stimnrs):
                       f'Surround: a: {popt[3]:4.2f}, μ: {popt[4]:4.2f},'+
                       f' σ: {popt[5]:4.2f}'+
                       f'\n CS index: {csi:4.2f}')
-            plt.subplots_adjust(top=.80)
+            plt.subplots_adjust(top=.85)
             plt.suptitle(f'{exp_name}\n{stimname}\n{clusterids[i]} '+
                          f'Q: {quals[i]:4.2f}')
             os.makedirs(os.path.join(savepath, 'stripesurrounds'),
                         exist_ok=True)
-            plt.savefig(os.path.join(savepath,
-                                     'stripesurrounds',
-                                     clusterids[i]+'.svg'))
+            plt.savefig(os.path.join(savepath, 'stripesurrounds',
+                                     clusterids[i]+'.svg'),
+                        bbox_inches='tight')
             plt.close()
 
         data.update({'cs_inds':cs_inds, 'polarities':polarities,

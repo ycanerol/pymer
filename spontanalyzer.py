@@ -99,11 +99,11 @@ def spontanalyzer(exp_name, stim_nrs):
             # inserting into presentations
             plt.savefig(savedir+'/{:0>3}{:0>2}.svg'.format(clusters[i, 0],
                                                            clusters[i, 1]),
-                        format='svg')
+                        format='svg', bbox_inches='tight')
             plt.savefig(os.path.join(savedir, 'pdf',
                                      '{:0>3}'
                                      '{:0>2}.pdf'.format(clusters[i, 0],
                                                          clusters[i, 1])),
-                        format='pdf')
+                        format='pdf', bbox_inches='tight')
             plt.close()
         print(f'Analysis of {stimname} completed.')

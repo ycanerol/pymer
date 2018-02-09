@@ -88,6 +88,6 @@ def plot_checker_stas(exp_name, stim_nr, filename=None):
 
         os.makedirs(os.path.split(savepath)[0], exist_ok=True)
 
-        plt.savefig(savepath+'.png')
+        plt.savefig(savepath+'.png', bbox_inches='tight')
         plt.close()
     print(f'Plotted checkerflicker STA for {stimname}')
