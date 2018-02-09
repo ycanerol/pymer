@@ -7,6 +7,7 @@ Created on Mon Jan 22 15:21:30 2018
 """
 import sys
 import analysis_scripts as asc
+import datetime
 from spontanalyzer import spontanalyzer
 from fffanalyzer import fffanalyzer
 from onoffstepsanalyzer import onoffstepsanalyzer
@@ -25,6 +26,8 @@ try:
 except IndexError:
     exp_name = input('Enter the experiment name to be analyzed: ')
 
+start_time = datetime.datetime.now().strftime('%A %X')
+print(f'Analysis started on {start_time}')
 sorted_stimuli = asc.stimulisorter(exp_name)
 
 spontaneous = sorted_stimuli['spontaneous']
@@ -53,3 +56,6 @@ for i in checkerflicker:
     plot_checker_stas(exp_name, i)
     plotcheckersurround(exp_name, i)
     plotcheckersvd(exp_name, i)
+
+end_time = datetime.datetime.now().strftime('%A %X')
+print(f'Analysis completed on {end_time}')
