@@ -11,7 +11,7 @@ import os
 import glob
 import numpy as np
 import iofuncs as iof
-
+import warnings
 
 def read_ods(exp_name, cutoff=4, defaultpath=True):
     """
@@ -479,8 +479,9 @@ def staquality(sta):
     Calculates the z-score of the pixel that is furthest away
     from the zero as a measure of STA quality.
     """
-
-    z = (np.max(np.abs(sta)) - sta.mean()) / sta.std()
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', category=RuntimeWarning)
+        z = (np.max(np.abs(sta)) - sta.mean()) / sta.std()
     return z.astype('float16')
 
 
