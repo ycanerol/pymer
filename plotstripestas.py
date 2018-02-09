@@ -57,13 +57,9 @@ def plotstripestas(exp_name, stim_nrs):
 
             plf.spineless(ax)
             plf.colorbar(im, ticks=[vmin, 0, vmax], format='%.2f', size='2%')
-            plt.suptitle('{}\n{}\n'
-                         '{} Rating: {}\n'
-                         'STA quality: {:4.2f}'.format(exp_name,
-                                                       stimname,
-                                                       clusterids[i],
-                                                       clusters[i][2],
-                                                       quals[i]))
+            plt.suptitle(f'{exp_name}\n{stimname}\n'
+                         f'{clusterids[i]} Rating: {clusters[i][2]}\n'
+                         f'STA quality: {quals[i]:4.2f}')
             plt.subplots_adjust(top=.90)
             savepath = os.path.join(exp_dir, 'data_analysis',
                                     stimname, 'STAs')
