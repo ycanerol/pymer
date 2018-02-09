@@ -88,11 +88,6 @@ def stripeflickeranalysis(exp_name, stim_nrs):
             all_spiketimes.append(spikes)
             stas.append(np.zeros((sy, filter_length)))
 
-        # Add one more element to correct for random noise
-        clusters = np.vstack((clusters, [0, 0, 0]))
-        all_spiketimes.append(np.ones(frametimings.shape, dtype=int))
-        stas.append(np.zeros((sy, filter_length)))
-
         if bw:
             randnrs, seed = randpy.ran1(seed, sy*total_frames)
             randnrs = [1 if i > .5 else -1 for i in randnrs]
@@ -114,15 +109,8 @@ def stripeflickeranalysis(exp_name, stim_nrs):
 
         quals = np.array([])
 
-        # Remove the random noise correction element from clusters
-        correction = stas.pop()/spikenrs[-1]
-        clusters = clusters[:-1, :]
-        all_spiketimes.pop()
-        spikenrs = spikenrs[:-1]
-
         for i in range(clusters.shape[0]):
             stas[i] = stas[i]/spikenrs[i]
-            stas[i] = stas[i]-correction
             # Find the pixel with largest absolute value
             max_i = np.squeeze(np.where(np.abs(stas[i])
                                         == np.max(np.abs(stas[i]))))
@@ -148,7 +136,7 @@ def stripeflickeranalysis(exp_name, stim_nrs):
             os.makedirs(savepath, exist_ok=True)
         savepath = os.path.join(savepath, savefname)
 
-        keystosave = ['stas', 'max_inds', 'clusters', 'sy', 'correction',
+        keystosave = ['stas', 'max_inds', 'clusters', 'sy',
                       'frame_duration', 'all_spiketimes', 'stimname',
                       'total_frames', 'stx_w', 'spikenrs', 'bw',
                       'quals', 'nblinks', 'filter_length', 'exp_name']
