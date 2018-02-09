@@ -115,12 +115,12 @@ def stripesurround(exp_name, stimnrs):
             p_initial = [centerpeak, max_i[0], 2, surroundpeak, max_i[0], 8]
             if onoroff == 1:
                 bounds = ([0, -np.inf, -np.inf,
-                           0, max_i[0]-dtol, 6],
+                           0, max_i[0]-dtol, 4],
                           [np.inf, np.inf, np.inf,
                            np.inf, max_i[0]+dtol, 20])
             elif onoroff == -1:
                 bounds = ([-np.inf, -np.inf, -np.inf,
-                           -np.inf, max_i[0]-dtol, 6],
+                           -np.inf, max_i[0]-dtol, 4],
                           [0, np.inf, np.inf,
                            0, max_i[0]+dtol, 20])
 
