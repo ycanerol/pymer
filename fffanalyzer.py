@@ -112,7 +112,7 @@ def fffanalyzer(exp_name, stimnrs):
             ax.plot(t, stas[i])
             plf.spineless(ax)
             plt.xlabel('Time[ms]')
-            plt.title('{}\n{}\n{} Rating: {}{} '
+            plt.title('{}\n{}\n{} Rating: {} {}'
                       'spikes'.format(exp_name, stimname, clusterids[i],
                                       clusters[i, 2], int(spikenrs[i])))
             plt.savefig(os.path.join(plotpath, clusterids[i])+'.svg',
