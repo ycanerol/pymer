@@ -192,6 +192,11 @@ def onoffstepsanalyzer(exp_name, stim_nrs):
 
             ax2 = plt.subplot(212)
             plt.plot(t, fr)
+            for eachslice in [onper, offper]:
+                ax2.fill_between(t[eachslice], fr[eachslice],
+                                 baseline, where=fr[eachslice]>baseline,
+                                 facecolor='lightgray')
+
             plf.spineless(ax2)
             plt.axis([0, total_cycle, fr.min(), fr.max()])
 
