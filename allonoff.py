@@ -6,6 +6,7 @@ Created on Fri Jan 26 11:20:35 2018
 @author: ycan
 """
 import os
+import warnings
 import iofuncs as iof
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,7 +22,6 @@ def allonoff(exp_name, stim_nrs):
 
     exp_dir = iof.exp_dir_fixer(exp_name)
     exp_name = os.path.split(exp_dir)[-1]
-
 
     for j, stim in enumerate(stim_nrs):
         data = iof.load(exp_name, stim)
@@ -59,3 +59,25 @@ def allonoff(exp_name, stim_nrs):
         plt.savefig(os.path.join(plotpath, clusterids[i])+'.svg',
                     format='svg', dpi=300)
         plt.close()
+
+    rows = len(stim_nrs)
+    columns = 1
+    _, axes = plt.subplots(rows, columns, sharex=True)
+    colors = plt.get_cmap('tab10')
+
+    for i, stim in enumerate(stim_nrs):
+        ax = axes[i]
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', category=RuntimeWarning)
+            ax.hist(bias[:, i], bins=20, color=colors(i),
+                    range=[-1, 1], alpha=.5)
+
+        ax.set_ylabel(iof.getstimname(exp_name,
+                                      stim).replace('onoffsteps_', ''))
+        plf.spineless(ax)
+    plt.suptitle(f'Distribution of On-Off Indices for {exp_name}')
+    plt.subplots_adjust(top=.95)
+    plt.xlabel('On-Off index')
+    plt.savefig(os.path.join(exp_dir, 'data_analysis', 'onoffindex_dist.svg'),
+                format='svg', dpi=300)
+    plt.close()
