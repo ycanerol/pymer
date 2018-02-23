@@ -9,19 +9,18 @@ Code taken from
 http://bkanuka.com/articles/native-latex-plots/
 Native Looking matplotlib Plots in LaTeX
 
+Changed use of mpl.use('pgf') based on
+https://matplotlib.org/users/pgf.html
+Special characters like mu are rendered correctly on saved
+plots but not inline displayed ones, no idea why.
+
 """
-import warnings
 import numpy as np
 import matplotlib as mpl
 
-with warnings.catch_warnings():
-    warnings.filterwarnings('error', category=UserWarning)
-    try:
-        mpl.use('pgf')
-    except UserWarning as e:
-        raise ValueError('Do not call this function from Spyder '
-                         'as it will not render LaTeX commands '
-                         'properly.')
+from matplotlib.backends.backend_pgf import FigureCanvasPgf
+mpl.backend_bases.register_backend('pdf', FigureCanvasPgf)
+
 
 def figsize(scale):
     fig_width_pt = 433.62                          # Get this from LaTeX using \the\textwidth
@@ -46,7 +45,7 @@ pgf_with_latex = {                      # setup matplotlib to use latex for outp
     "ytick.labelsize": 8,
     "figure.figsize": figsize(0.9),     # default fig size of 0.9 textwidth
     "pgf.preamble": [
-        r"\usepackage[utf8x]{inputenc}",    # use utf8 fonts becasue your computer can handle it :)
+        r"\usepackage[utf8]{inputenc}",    # use utf8 fonts becasue your computer can handle it :)
         r"\usepackage[T1]{fontenc}",        # plots will be generated using this preamble
         r"\usepackage{upgreek}",
         ]
@@ -57,5 +56,7 @@ import matplotlib.pyplot as plt
 
 def texfig(width):
     plt.clf()
-    fig = plt.figure(figsize=figsize(width ))
+    fig = plt.figure(figsize=figsize(width))
     return fig
+
+savepath = '/home/ycan/Documents/thesis/figures/'
