@@ -74,13 +74,15 @@ def fffanalyzer(exp_name, stimnrs):
         # Store spike triggered averages in a list containing correct shaped
         # arrays
         stas = []
-
+        # Make a list for covariances of the spike triggered ensemble
+        covars = []
         for i in range(len(clusters[:, 0])):
             spiketimes = asc.read_raster(exp_dir, stimnr,
                                          clusters[i, 0], clusters[i, 1])
             spikes = asc.binspikes(spiketimes, frametimings)
             all_spiketimes.append(spikes)
             stas.append(np.zeros(filter_length))
+            covars.append(np.zeros((filter_length, filter_length)))
 
         if bw:
             randnrs, seed = randpy.ran1(seed, total_frames)
@@ -96,6 +98,13 @@ def fffanalyzer(exp_name, stimnrs):
                 spikes = all_spiketimes[j]
                 if spikes[k] != 0:
                     stas[j] += spikes[k]*stim_small
+                    # This trick is needed to use .T for tranposing
+                    stim_small_n = stim_small[np.newaxis, :]
+                    # Calculate the covariance as the weighted outer product
+                    # of small stimulus(i.e. snippet) with itself
+                    # This is non-centered STC (a la Cantrell et al., 2010)
+                    covars[j] += spikes[k]*(np.dot(stim_small_n.T,
+                                                   stim_small_n))
         spikenrs = np.array([spikearr.sum() for spikearr in all_spiketimes])
 
         plotpath = os.path.join(exp_dir, 'data_analysis',
@@ -105,8 +114,14 @@ def fffanalyzer(exp_name, stimnrs):
 
         t = np.arange(filter_length)*frame_duration*1000
 
+        eigvals = [np.zeros((filter_length)) for i in range(clusters.shape[0])]
+        eigvecs = [np.zeros((filter_length,
+                             filter_length)) for i in range(clusters.shape[0])]
+
         for i in range(clusters.shape[0]):
             stas[i] = stas[i]/spikenrs[i]
+            covars[i] = covars[i]/spikenrs[i]
+            eigvals[i], eigvecs[i] = np.linalg.eigh(covars[i])
             plt.figure(figsize=(9, 6))
             ax = plt.subplot(111)
             ax.plot(t, stas[i])
@@ -123,7 +138,8 @@ def fffanalyzer(exp_name, stimnrs):
 
         keystosave = ['stas', 'clusters', 'frame_duration', 'all_spiketimes',
                       'stimname', 'total_frames', 'spikenrs', 'bw', 'nblinks',
-                      'filter_length', 'exp_name']
+                      'filter_length', 'exp_name', 'covars', 'eigvals',
+                      'eigvecs']
         data_in_dict = {}
         for key in keystosave:
             data_in_dict[key] = locals()[key]
