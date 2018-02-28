@@ -122,14 +122,25 @@ def fffanalyzer(exp_name, stimnrs):
             stas[i] = stas[i]/spikenrs[i]
             covars[i] = covars[i]/spikenrs[i]
             eigvals[i], eigvecs[i] = np.linalg.eigh(covars[i])
-            plt.figure(figsize=(9, 6))
+            fig = plt.figure(figsize=(9, 6))
             ax = plt.subplot(111)
-            ax.plot(t, stas[i])
+            ax.plot(t, stas[i], label='STA')
+            ax.plot(t, eigvecs[i][:, 0], label='STC component 1', alpha=.5)
+            ax.plot(t, eigvecs[i][:, -1], label='STC component 2', alpha=.5)
+            # Add eigenvalues as inset
+            ax2 = fig.add_axes([.65, .15, .2, .2])
+            # Highlight the first and second components which are plotted
+            ax2.plot(0, eigvals[i][0], 'o',
+                     markersize=7, markerfacecolor='C1', markeredgewidth=0)
+            ax2.plot(filter_length-1, eigvals[i][-1], 'o',
+                     markersize=7, markerfacecolor='C2', markeredgewidth=0)
+            ax2.plot(eigvals[i], 'ko', alpha=.5, markersize=4,
+                     markeredgewidth=0)
+            ax2.set_axis_off()
             plf.spineless(ax)
-            plt.xlabel('Time[ms]')
-            plt.title('{}\n{}\n{} Rating: {} {}'
-                      'spikes'.format(exp_name, stimname, clusterids[i],
-                                      clusters[i, 2], int(spikenrs[i])))
+            ax.set_xlabel('Time[ms]')
+            ax.set_title(f'{exp_name}\n{stimname}\n{clusterids[i]} Rating:'
+                         f' {clusters[i, 2]} {int(spikenrs[i])} spikes')
             plt.savefig(os.path.join(plotpath, clusterids[i])+'.svg',
                         format='svg', dpi=300)
             plt.close()
