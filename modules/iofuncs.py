@@ -20,7 +20,7 @@ import numpy as np
 # function. Any variables that is normally a list should be
 # kept in list_of_lists.
 
-list_of_lists = ['stas', 'max_inds', 'all_frs']
+list_of_lists = ['stas', 'max_inds', 'all_frs', 'all_parameters', 'fits']
 
 
 def exp_dir_fixer(exp_name):

@@ -17,6 +17,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 fig = texplot.texfig(.9)
+from stripesurround import onedgauss
+
 
 exp_name = '20180207'
 stimnr = 12
@@ -37,11 +39,15 @@ exp_name = data['exp_name']
 stimname = data['stimname']
 frame_duration = data['frame_duration']
 quals = data['quals']
+all_parameters = data['all_parameters']
+fits = data['fits']
 
 index = 5
 sta = data['stas'][index]
 max_i = data['max_inds'][index]
 onoroff = data['polarities'][index]
+fit = fits[index]
+popt = all_parameters[index]
 
 cut_time = int(100/(frame_duration*1000)/2)
 fsize = int(700/(stx_w*px_size))
@@ -67,6 +73,9 @@ ax2.set_yticks([])
 ax2.set_xticks([])
 ax2.plot()
 ax2.plot(onoroff*fitv, -s, label='Data')
+ax2.plot(onedgauss(s, *popt[:3]), -s,  '--', label='Center')
+ax2.plot(-onedgauss(s, *popt[3:]), -s,  '--', label='Surround')
+
 
 plt.savefig('/home/ycan/Downloads/sta.pdf', bbox_inches='tight')
 plt.show()

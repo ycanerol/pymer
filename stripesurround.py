@@ -74,6 +74,9 @@ def stripesurround(exp_name, stimnrs):
         cs_inds = np.empty(clusters.shape[0])
         polarities = np.empty(clusters.shape[0])
 
+        fits = []
+        all_parameters = []
+
         savepath = os.path.join(exp_dir, 'data_analysis', stimname)
 
         for i in range(clusters.shape[0]):
@@ -144,8 +147,10 @@ def stripesurround(exp_name, stimnrs):
                     raise
 
             fit = centersurround_onedim(s, *popt)
+            fits.append(fit)
             popt[0] = popt[0]*onoroff
             popt[3] = popt[3]*onoroff
+            all_parameters.append(popt)
 
             csi = popt[3]/popt[0]
             cs_inds[i] = csi
@@ -180,6 +185,7 @@ def stripesurround(exp_name, stimnrs):
             plt.close()
 
         data.update({'cs_inds':cs_inds, 'polarities':polarities,
-                     'included':included})
+                     'included':included, 'all_parameters':all_parameters,
+                     'fits':fits})
         np.savez(os.path.join(savepath, f'{stimnr}_data.npz'), **data)
         print(f'Surround plotted and saved for {stimname}.')
