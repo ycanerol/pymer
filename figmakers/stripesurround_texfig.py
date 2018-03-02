@@ -79,5 +79,5 @@ ax2.plot(onedgauss(s, *popt[:3]), -s,  '--', label='Center')
 ax2.plot(-onedgauss(s, *popt[3:]), -s,  '--', label='Surround')
 
 
-plt.savefig('/home/ycan/Downloads/sta.pdf', bbox_inches='tight')
+plt.savefig(texplot.savepath+'barsta.pdf', bbox_inches='tight')
 plt.show()
