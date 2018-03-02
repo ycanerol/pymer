@@ -16,9 +16,9 @@ import plotfuncs as plf
 import matplotlib.pyplot as plt
 import numpy as np
 
-fig = texplot.texfig(.9)
 from stripesurround import onedgauss
 
+fig = texplot.texfig(1.2)
 
 exp_name = '20180207'
 stimnr = 12
@@ -58,6 +58,7 @@ sta, max_i = msc.cutstripe(sta, max_i, fsize*2)
 
 
 ax1 = fig.add_subplot(121)
+plf.subplottext('A', ax1)
 plf.stashow(sta, ax1, extent=[0, t[-1], -vscale, vscale])
 ax1.set_xlabel('Time [ms]')
 ax1.set_ylabel(r'Distance [$\upmu$m]')
@@ -68,6 +69,7 @@ fitv = np.mean(sta[:, max_i[1]-cut_time:max_i[1]+cut_time+1],
 s = np.arange(fitv.shape[0])
 
 ax2 = fig.add_subplot(122)
+plf.subplottext('B', ax2, x=-.1)
 plf.spineless(ax2)
 ax2.set_yticks([])
 ax2.set_xticks([])

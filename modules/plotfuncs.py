@@ -277,3 +277,7 @@ def stashow(sta, ax, cbar=True, **kwargs):
     if cbar:
         colorbar(im, **cbarkw)
     return im
+
+def subplottext(text, axis, x=-.3, y=1.1, **kwargs):
+    axis.text(x, y, text, transform=axis.transAxes,fontsize=12,
+         fontweight='bold', va='top', ha='right', **kwargs)

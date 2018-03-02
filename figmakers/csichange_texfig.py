@@ -110,7 +110,7 @@ patches = []
 for color, label in zip(colorcategories, colorlabels):
     patches.append(mpatches.Patch(color=color, label=label))
 
-fig = texplot.texfig(.9)
+fig = texplot.texfig(1.2)
 
 ax = fig.add_subplot(111)
 ax.scatter(csi[0, :], csi[1, :], **scatterkwargs)
