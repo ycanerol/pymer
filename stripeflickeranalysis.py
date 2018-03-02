@@ -134,7 +134,10 @@ def stripeflickeranalysis(exp_name, stim_nrs):
                 # If max_i cannot be found just set it to zeros.
                 except IndexError:
                     max_i = np.array([0, 0])
-
+            # In case of spike numbers being zero, all elements are NaN
+            # imshow and savefig do not play nice with NaN so set all to zero
+            if np.all(np.isnan(stas[i])):
+                stas[i] = np.zeros(stas[i].shape)
             max_inds.append(max_i)
 
             quals = np.append(quals, asc.staquality(stas[i]))
