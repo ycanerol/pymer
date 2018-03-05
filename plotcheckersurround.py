@@ -133,12 +133,8 @@ def plotcheckersurround(exp_name, stim_nr, filename=None, spikecutoff=1000,
 
         ax = plt.subplot(1, 2, 1)
 
-        vmax = np.abs(fit_frame).max()
-        vmin = -vmax
-        im = ax.imshow(fit_frame, cmap='RdBu', vmin=vmin, vmax=vmax)
+        plf.stashow(fit_frame, ax)
         ax.set_aspect('equal')
-        plf.spineless(ax)
-        plf.colorbar(im, ticks=[vmin, 0, vmax], format='%.2f')
 
         with warnings.catch_warnings():
             warnings.filterwarnings('ignore', category=UserWarning)
