@@ -123,5 +123,5 @@ ax.set_ylabel('Photopic')
 ax.set_title('Center Surround Index Change')
 ax.set_aspect('equal')
 
-plt.savefig(texplot.savepath+'csichange.pdf', bbox_inches='tight')
+texplot.savefig('csichange')
 plt.show()

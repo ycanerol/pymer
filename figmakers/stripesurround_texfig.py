@@ -59,7 +59,7 @@ sta, max_i = msc.cutstripe(sta, max_i, fsize*2)
 
 ax1 = fig.add_subplot(121)
 plf.subplottext('A', ax1)
-plf.stashow(sta, ax1, extent=[0, t[-1], -vscale, vscale])
+plf.stashow(sta, ax1, extent=[0, t[-1], -vscale, vscale], cmap=texplot.cmap)
 ax1.set_xlabel('Time [ms]')
 ax1.set_ylabel(r'Distance [$\upmu$m]')
 
@@ -78,6 +78,5 @@ ax2.plot(onoroff*fitv, -s, label='Data')
 ax2.plot(onedgauss(s, *popt[:3]), -s,  '--', label='Center')
 ax2.plot(-onedgauss(s, *popt[3:]), -s,  '--', label='Surround')
 
-
-plt.savefig(texplot.savepath+'barsta.pdf', bbox_inches='tight')
+texplot.savefig('barsta')
 plt.show()

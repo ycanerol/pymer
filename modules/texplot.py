@@ -17,6 +17,7 @@ plots but not inline displayed ones, no idea why.
 """
 import numpy as np
 import matplotlib as mpl
+import os
 
 from matplotlib.backends.backend_pgf import FigureCanvasPgf
 mpl.backend_bases.register_backend('pdf', FigureCanvasPgf)
@@ -28,7 +29,7 @@ def figsize(scale):
     golden_mean = (np.sqrt(5.0)-1.0)/2.0            # Aesthetic ratio (you could change this)
     fig_width = fig_width_pt*inches_per_pt*scale    # width in inches
     fig_height = fig_width*golden_mean              # height in inches
-    fig_size = [fig_width,fig_height]
+    fig_size = [fig_width, fig_height]
     return fig_size
 
 pgf_with_latex = {                      # setup matplotlib to use latex for output
@@ -60,3 +61,30 @@ def texfig(width):
     return fig
 
 savepath = '/home/ycan/Documents/thesis/figures/'
+maindir = '/home/ycan/Documents/thesis/'
+# To be able to easily change all STA colormaps, in case of
+# low distinguishability in printed form.
+cmap = 'RdBu'
+
+def savefig(name):
+    """
+    Plot name should be without extension, .pgf and .pdf versions will
+    be saved as well as associated .pngs
+
+    For pgf files, any images (like STA) are saved as .pngs and they
+    have to be in the main directory for LaTeX to find them. This
+    function moves any generated .pngs one directory up.
+    See note at the beginning of results.tex for more details.
+    """
+    if name.endswith('.pdf'):
+        raise ValueError('File name should be without extension.')
+    # .pdf is saved for checking, the font quality is very low
+    # only .pgf should be used in LaTeX document.
+    plt.savefig(savepath+name+'.pdf', bbox_inches='tight')
+    plt.savefig(savepath+name+'.pgf', bbox_inches='tight')
+    # The generated png files are in the format fname-img<i>.png
+    tomove = [i for i in os.listdir(savepath) if i.startswith(name)
+                                                and i.endswith('.png')]
+    [os.rename(savepath+i, maindir+i) for i in tomove]
+    print('Moved following files to main directory: ')
+    print(tomove)
