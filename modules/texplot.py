@@ -23,12 +23,14 @@ from matplotlib.backends.backend_pgf import FigureCanvasPgf
 mpl.backend_bases.register_backend('pdf', FigureCanvasPgf)
 
 
-def figsize(scale):
+def figsize(scale, aspect=None):
     fig_width_pt = 433.62                          # Get this from LaTeX using \the\textwidth
     inches_per_pt = 1.0/72.27                       # Convert pt to inch
     golden_mean = (np.sqrt(5.0)-1.0)/2.0            # Aesthetic ratio (you could change this)
+    if aspect is None:
+        aspect = golden_mean
     fig_width = fig_width_pt*inches_per_pt*scale    # width in inches
-    fig_height = fig_width*golden_mean              # height in inches
+    fig_height = fig_width*aspect              # height in inches
     fig_size = [fig_width, fig_height]
     return fig_size
 
@@ -55,9 +57,9 @@ mpl.rcParams.update(pgf_with_latex)
 
 import matplotlib.pyplot as plt
 
-def texfig(width):
+def texfig(width, aspect=None):
     plt.clf()
-    fig = plt.figure(figsize=figsize(width))
+    fig = plt.figure(figsize=figsize(width, aspect))
     return fig
 
 savepath = '/home/ycan/Documents/thesis/figures/'
