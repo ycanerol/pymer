@@ -279,5 +279,10 @@ def stashow(sta, ax, cbar=True, **kwargs):
     return im
 
 def subplottext(text, axis, x=-.3, y=1.1, **kwargs):
-    axis.text(x, y, text, transform=axis.transAxes,fontsize=12,
-         fontweight='bold', va='top', ha='right', **kwargs)
+    textkwargs = {'transform':axis.transAxes,
+                  'fontsize':12,
+                  'fontweight':'bold',
+                  'va':'top',
+                  'ha':'right'}
+    textkwargs.update(kwargs)
+    axis.text(x, y, text, **textkwargs)
