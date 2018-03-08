@@ -18,65 +18,91 @@ import numpy as np
 
 from stripesurround import onedgauss
 
-fig = texplot.texfig(1.2)
 
-exp_name = '20180207'
-stimnr = 12
+toplot = [
+        ('20180207', '03001', 'onbarsta'),
+        ('20180124', '02103', 'offbarsta'),
+        ]
 
-exp_dir = iof.exp_dir_fixer(exp_name)
+rows = 2
+columns = 2
 
-_, metadata = asc.read_ods(exp_dir)
-px_size = metadata['pixel_size(um)']
+for i, (exp_name, clustertoplot, label) in enumerate(toplot):
 
-data = iof.load(exp_name, stimnr)
+    if '20180124' in exp_name or '20180207' in exp_name:
+        stripeflicker = [6, 12]
+    elif '20180118' in exp_name:
+        stripeflicker = [7, 14]
 
-clusters = data['clusters']
-stas = data['stas']
-max_inds = data['max_inds']
-filter_length = data['filter_length']
-stx_w = data['stx_w']
-exp_name = data['exp_name']
-stimname = data['stimname']
-frame_duration = data['frame_duration']
-quals = data['quals']
-all_parameters = data['all_parameters']
-fits = data['fits']
+    fig = texplot.texfig(1.2, aspect=1.2)
+    axes = [fig.add_subplot(rows, columns, i+1) for i in range(rows*columns)]
 
-index = 5
-sta = data['stas'][index]
-max_i = data['max_inds'][index]
-onoroff = data['polarities'][index]
-fit = fits[index]
-popt = all_parameters[index]
+    for j, stimnr in enumerate(stripeflicker):
 
-cut_time = int(100/(frame_duration*1000)/2)
-fsize = int(700/(stx_w*px_size))
-t = np.arange(filter_length)*frame_duration*1000
-vscale = fsize * stx_w*px_size
+        exp_dir = iof.exp_dir_fixer(exp_name)
 
-sta, max_i = msc.cutstripe(sta, max_i, fsize*2)
+        _, metadata = asc.read_ods(exp_dir)
+        px_size = metadata['pixel_size(um)']
 
+        data = iof.load(exp_name, stimnr)
 
-ax1 = fig.add_subplot(121)
-plf.subplottext('A', ax1)
-plf.stashow(sta, ax1, extent=[0, t[-1], -vscale, vscale], cmap=texplot.cmap)
-ax1.set_xlabel('Time [ms]')
-ax1.set_ylabel(r'Distance [$\upmu$m]')
+        clusters = data['clusters']
+        stas = data['stas']
+        max_inds = data['max_inds']
+        filter_length = data['filter_length']
+        stx_w = data['stx_w']
+        exp_name = data['exp_name']
+        stimname = data['stimname']
+        frame_duration = data['frame_duration']
+        quals = data['quals']
+        all_parameters = data['all_parameters']
+        fits = data['fits']
 
-fitv = np.mean(sta[:, max_i[1]-cut_time:max_i[1]+cut_time+1],
-               axis=1)
+        clusterids = plf.clusters_to_ids(clusters)
+        index = np.where(np.array(clusterids) == clustertoplot)[0]
+        index = np.asscalar(index)
 
-s = np.arange(fitv.shape[0])
+        sta = data['stas'][index]
+        max_i = data['max_inds'][index]
+        onoroff = data['polarities'][index]
+        csi = data['cs_inds'][index]
+        fit = fits[index]
+        popt = all_parameters[index]
 
-ax2 = fig.add_subplot(122)
-plf.subplottext('B', ax2, x=-.1)
-plf.spineless(ax2)
-ax2.set_yticks([])
-ax2.set_xticks([])
-ax2.plot()
-ax2.plot(onoroff*fitv, -s, label='Data')
-ax2.plot(onedgauss(s, *popt[:3]), -s,  '--', label='Center')
-ax2.plot(-onedgauss(s, *popt[3:]), -s,  '--', label='Surround')
+        cut_time = int(100/(frame_duration*1000)/2)
+        fsize = int(700/(stx_w*px_size))
+        t = np.arange(filter_length)*frame_duration*1000
+        vscale = fsize * stx_w*px_size
 
-texplot.savefig('barsta')
-plt.show()
+        sta, max_i = msc.cutstripe(sta, max_i, fsize*2)
+
+        ax1 = axes[2*j]
+        plf.subplottext(['A', 'C'][j], ax1, x=-.4)
+        plf.subplottext(['Mesopic', 'Photopic'][j],
+                        ax1, x=-.6, y=.5, rotation=90, va='center')
+        plf.stashow(sta, ax1, extent=[0, t[-1], -vscale, vscale],
+                    cmap=texplot.cmap)
+        ax1.set_xlabel('Time [ms]')
+        ax1.set_ylabel(r'Distance [$\upmu$m]')
+
+        fitv = np.mean(sta[:, max_i[1]-cut_time:max_i[1]+cut_time+1],
+                       axis=1)
+
+        s = np.arange(fitv.shape[0])
+
+        ax2 = axes[2*j+1]
+        plf.subplottext(['B', 'D'][j], ax2, x=-.1)
+        plf.subplottext(f'Center-Surround Index: {csi:4.2f}',
+                        ax2, x=.95, y=.15, fontsize=8, fontweight='normal')
+        plf.spineless(ax2)
+        ax2.set_yticks([])
+        ax2.set_xticks([])
+        ax2.plot()
+        ax2.plot(onoroff*fitv, -s, label='Data')
+        ax2.plot(onedgauss(s, *popt[:3]), -s,  '--', label='Center')
+        ax2.plot(-onedgauss(s, *popt[3:]), -s,  '--', label='Surround')
+
+#    plt.subplots_adjust(hspace = .2, wspace=0.2)
+#    plt.savefig(f'/home/ycan/Downloads/{label}.pdf')
+    texplot.savefig(label)
+    plt.show()
