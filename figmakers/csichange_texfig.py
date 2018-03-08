@@ -14,8 +14,8 @@ import plotfuncs as plf
 import analysis_scripts as asc
 import texplot
 
-
-def csindexchange(exp_name, onoffcutoff=.5, qualcutoff=9):
+qualcutoff = 11
+def csindexchange(exp_name, onoffcutoff=.5, qualcutoff=qualcutoff):
     """
     Returns in center surround indexes and ON-OFF classfication in
     mesopic and photopic light levels.
@@ -55,11 +55,16 @@ def csindexchange(exp_name, onoffcutoff=.5, qualcutoff=9):
 
     # Filter them according to the quality cutoff value
     # and set excluded ones to NaN
+
     for j in range(quals.shape[1]):
         if not np.all(quals[:, j] > qualcutoff):
             quals_f[:, j] = np.nan
             csinds_f[:, j] = np.nan
             onoffbias_f[:, j] = np.nan
+
+    # Calculate the change of polarity for each cell
+    # np.diff gives the high-low value
+    biaschange = np.diff(onoffbias_f, axis=0)[0]
 
     # Define the color for each point depending on each cell's ON-OFF index
     # by appending the color name in an array.
@@ -67,16 +72,24 @@ def csindexchange(exp_name, onoffcutoff=.5, qualcutoff=9):
     for j in range(onoffbias_f.shape[1]):
         if np.all(onoffbias_f[:, j] > onoffcutoff):
             # If it stays ON througout
-            colors.append('blue')
+            colors.append(colorcategories[0])
         elif np.all(onoffbias_f[:, j] < -onoffcutoff):
             # If it stays OFF throughout
-            colors.append('red')
+            colors.append(colorcategories[1])
         elif (np.all(onoffcutoff > onoffbias_f[:, j]) and
               np.all(onoffbias_f[:, j] > -onoffcutoff)):
             # If it's ON-OFF throughout
-            colors.append('black')
+            colors.append(colorcategories[2])
+        elif biaschange[j] > 0:
+            # Increasing polarity
+            # If it's not consistent in any category and
+            # polarity change is positive
+            colors.append(colorcategories[3])
+        elif biaschange[j] < 0:
+            # Decreasing polarity
+            colors.append(colorcategories[4])
         else:
-            colors.append('orange')
+            colors.append('yellow')
 
     return csinds_f, colors, onoffbias_f, quals_f
 
@@ -97,31 +110,68 @@ def allinds(**kwargs):
         quals = np.hstack((quals, quals_r))
     return csi, colors, bias, quals, cells
 
+colorcategories = ['mediumblue', 'crimson', 'darkorange', 'springgreen',
+                   'deepskyblue']
+colorlabels = ['ON', 'OFF', 'ON-OFF',
+               'Increased polarity bias', 'Decreased polarity bias']
+
 csi, colors, bias, quals, cells = allinds()
 x = [np.nanmin(csi), np.nanmax(csi)]
 
-scatterkwargs = {'c':colors, 'alpha':.6, 'linewidths':0, 's':4}
+include = np.all(quals > qualcutoff, axis=0)
+include = np.logical_and(include, ~np.any(np.isnan(bias), axis=0))
+include = np.logical_and(include, ~np.any(np.isnan(csi), axis=0))
 
-colorcategories = ['blue', 'red', 'black', 'orange']
-colorlabels = ['ON', 'OFF', 'ON-OFF', 'Unstable']
+quals = quals[:, include]
+csi = csi[:, include]
+bias = bias[:, include]
+colors = [color for i, color in enumerate(colors) if include[i]]
+cells = [cell for i, cell in enumerate(cells) if include[i]]
+
+
+scatterkwargs = {'c':colors, 'alpha':.8, 'linewidths':.5,
+                 'edgecolor':'k',
+                 's':35}
 
 # Create an array for all the colors to use with plt.legend()
 patches = []
 for color, label in zip(colorcategories, colorlabels):
     patches.append(mpatches.Patch(color=color, label=label))
 
-fig = texplot.texfig(.8, aspect=1)
+fig = texplot.texfig(.85, aspect=1.85)
+#ax = fig.add_subplot(111)
 
-ax = fig.add_subplot(111)
+ax = plt.subplot2grid((5, 3), (0, 0), colspan=3, rowspan=3)
+ax.plot(x, x, 'k--', alpha=.5)
+plf.subplottext('A', ax, x=-0.05)
 ax.scatter(csi[0, :], csi[1, :], **scatterkwargs)
-ax.plot(x, x, 'r--', alpha=.5)
 ax.legend(handles=patches, fontsize='xx-small')
-#ax.set_xlim([0, .4])
-#ax.set_ylim([0, .4])
-ax.set_xlabel('Mesopic')
-ax.set_ylabel('Photopic')
-ax.set_title('Center Surround Index Change')
+lims = [-.025, .4]
+#ax.set_xlim(lims)
+#ax.set_ylim(lims)
+ax.set_xlabel('Center Surround Index at \\textbf{Mesopic} conditions')
+ax.set_ylabel('Center Surround Index at \\textbf{Photopic} conditions')
 ax.set_aspect('equal')
 
+for i, color in enumerate(colorcategories):
+    group = [index for index, c in enumerate(colors) if c == color]
+#    ax = axes[i]
+    ax = plt.subplot2grid((5,3), (3+int((np.round((i-1)/3))), i%3))
+    ax.plot(['Mesopic', 'Photopic'], csi[:, group], color=color, linewidth=.4)
+    plf.subplottext(['B', 'C', 'D', 'E', 'F'][i], ax, x=-.25)
+    ax.set_xlim([-.075, csi.max()+.075])
+    ax.set_ylim([-.075, csi.max()+.075])
+    ax.set_yticks([0, 1])
+    ax.set_aspect('equal')
+    plf.spineless(ax, 'tr')
+plt.subplots_adjust(hspace=.4, wspace=.4)
 texplot.savefig('csichange')
+
 plt.show()
+
+np.savez('/home/ycan/Documents/thesis/analysis_auxillary_files/thesis_csiplotting.npz',
+         cells = cells,
+         include=include,
+         colors=colors,
+         colorcategories=colorcategories,
+         csi=csi)
