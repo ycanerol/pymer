@@ -116,7 +116,6 @@ colorlabels = ['ON', 'OFF', 'ON-OFF',
                'Increased polarity bias', 'Decreased polarity bias']
 
 csi, colors, bias, quals, cells = allinds()
-x = [np.nanmin(csi), np.nanmax(csi)]
 
 include = np.all(quals > qualcutoff, axis=0)
 include = np.logical_and(include, ~np.any(np.isnan(bias), axis=0))
@@ -129,7 +128,7 @@ bias = bias[:, include]
 colors = [color for i, color in enumerate(colors) if include[i]]
 cells = [cell for i, cell in enumerate(cells) if include[i]]
 
-
+x = [np.nanmin(csi), np.nanmax(csi)]
 scatterkwargs = {'c':colors, 'alpha':.8, 'linewidths':.5,
                  'edgecolor':'k',
                  's':35}
@@ -140,29 +139,31 @@ for color, label in zip(colorcategories, colorlabels):
     patches.append(mpatches.Patch(color=color, label=label))
 
 fig = texplot.texfig(.85, aspect=1.85)
-#ax = fig.add_subplot(111)
 
 ax = plt.subplot2grid((5, 3), (0, 0), colspan=3, rowspan=3)
 ax.plot(x, x, 'k--', alpha=.5)
 plf.subplottext('A', ax, x=-0.05)
 ax.scatter(csi[0, :], csi[1, :], **scatterkwargs)
 ax.legend(handles=patches, fontsize='xx-small')
-lims = [-.025, .4]
-#ax.set_xlim(lims)
-#ax.set_ylim(lims)
+
 ax.set_xlabel('Center Surround Index at \\textbf{Mesopic} conditions')
 ax.set_ylabel('Center Surround Index at \\textbf{Photopic} conditions')
 ax.set_aspect('equal')
 
 for i, color in enumerate(colorcategories):
     group = [index for index, c in enumerate(colors) if c == color]
-#    ax = axes[i]
     ax = plt.subplot2grid((5,3), (3+int((np.round((i-1)/3))), i%3))
-    ax.plot(['Mesopic', 'Photopic'], csi[:, group], color=color, linewidth=.4)
+
+#    ax.plot([csi.min(), csi.max()], csi[:, group], color=color, linewidth=.4)
+#    ax.set_xlim([-.075, csi.max()+.075])
+#    ax.set_ylim([-.075, csi.max()+.075])
+#    ax.set_xticks([csi.min(), csi.max()])
+#    ax.set_xticklabels(['Mesopic', 'Photopic'])
+
+    ax.scatter(csi[0, :], csi[1, :], s=8, c='grey')
+    ax.scatter(csi[0, group], csi[1, group], s=8, c=color)
+
     plf.subplottext(['B', 'C', 'D', 'E', 'F'][i], ax, x=-.25)
-    ax.set_xlim([-.075, csi.max()+.075])
-    ax.set_ylim([-.075, csi.max()+.075])
-    ax.set_yticks([0, 1])
     ax.set_aspect('equal')
     plf.spineless(ax, 'tr')
 plt.subplots_adjust(hspace=.4, wspace=.4)
@@ -171,7 +172,7 @@ texplot.savefig('csichange')
 plt.show()
 
 np.savez('/home/ycan/Documents/thesis/analysis_auxillary_files/thesis_csiplotting.npz',
-         cells = cells,
+         cells=cells,
          include=include,
          colors=colors,
          colorcategories=colorcategories,
