@@ -12,6 +12,7 @@ import matplotlib.patches as mpatches
 import iofuncs as iof
 import plotfuncs as plf
 import analysis_scripts as asc
+from scipy import stats
 import texplot
 
 qualcutoff = 11
@@ -109,7 +110,7 @@ def allinds(**kwargs):
         bias = np.hstack((bias, bias_r))
         quals = np.hstack((quals, quals_r))
     return csi, colors, bias, quals, cells
-
+#%%
 colorcategories = ['mediumblue', 'crimson', 'darkorange', 'springgreen',
                    'deepskyblue']
 colorlabels = ['ON', 'OFF', 'ON-OFF',
@@ -171,9 +172,14 @@ texplot.savefig('csichange')
 
 plt.show()
 
+# Perform non-parametric paired test to test significance
+stat_test = stats.wilcoxon(csi[0, :], csi[1, :])
+print(f'Wilcoxon signed-rank test p-val: {stat_test[1]:7.2e}')
+
 np.savez('/home/ycan/Documents/thesis/analysis_auxillary_files/thesis_csiplotting.npz',
          cells=cells,
          include=include,
          colors=colors,
+         stat_test=stat_test,
          colorcategories=colorcategories,
          csi=csi)
