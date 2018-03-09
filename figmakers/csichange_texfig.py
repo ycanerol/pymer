@@ -121,6 +121,7 @@ x = [np.nanmin(csi), np.nanmax(csi)]
 include = np.all(quals > qualcutoff, axis=0)
 include = np.logical_and(include, ~np.any(np.isnan(bias), axis=0))
 include = np.logical_and(include, ~np.any(np.isnan(csi), axis=0))
+include = np.logical_and(include, texplot.exclude_cells(cells))
 
 quals = quals[:, include]
 csi = csi[:, include]

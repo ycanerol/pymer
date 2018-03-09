@@ -90,3 +90,30 @@ def savefig(name):
     [os.rename(savepath+i, maindir+i) for i in tomove]
     print('Moved following files to main directory: ')
     print(tomove)
+
+
+def exclude_cells(cells):
+    """
+    Accepts list of tuples containing cells in the format (date, clusterid)
+    Returns boolean array, that will exclude the cells indicated in the
+    list when applied to the list of tuples.
+
+    Usage with an already existing include array:
+    include = np.logical_and(include, texplot.exclude_cells(cells))
+    """
+    exclude_file = os.path.join(maindir, 'analysis_auxillary_files',
+                                'excluded_cells.txt')
+
+    with open(exclude_file, 'r') as f:
+        lines = [line.split(' #')[0] for line in f.readlines()
+                            if not line.startswith('#')]
+    lines = [tuple(line.split()) for line in lines if not len(line.split())==0]
+    exclude = []
+    for i, cell in enumerate(cells):
+        for j, line in enumerate(lines):
+            if np.all(lines[j] == cells[i]):
+                exclude.append(i)
+
+    indices_after_exclusion = [True if i not in exclude else False
+                               for i in range(len(cells))]
+    return indices_after_exclusion
