@@ -17,18 +17,23 @@ csi = data['csi']
 include = data['include']
 colors = data['colors']
 colorcategories = data['colorcategories']
+
 fig = texplot.texfig(.9, 1.2)
 axes = fig.subplots(len(colorcategories), 1, sharex=True)
+csichange = csi[1, :] - csi[0, :]
+
+bins = np.arange(-.2, .35+0.05, 0.05)
 for i, color in enumerate(colorcategories):
     group = [index for index, c in enumerate(colors) if c == color]
     ax = axes[i]
-    change = csi[1, group] - csi[0, group]
-    ax.hist(change, color=color, bins=np.linspace(-.8, .8, 30))
+    change = csichange[group]
+    ax.hist(change, color=color , bins=bins)
     ax.set_ylim([0, 10])
-    ax.set_xlim([-.2, .4])
     ax.set_yticks(np.linspace(0, 8, 3))
     ax.plot([0, 0], [0, 12], 'r--', alpha=.3)
+    plf.subplottext(['A', 'B', 'C', 'D', 'E'][i], ax, x=-.08)
     plf.spineless(ax)
+
 plt.subplots_adjust(hspace=.3)
 texplot.savefig('csihistogram_mp')
 plt.show()
