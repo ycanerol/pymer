@@ -21,7 +21,7 @@ from stripesurround import onedgauss
 
 toplot = [
         ('20180207', '03001', 'onbarsta'),
-        ('20180124', '02103', 'offbarsta'),
+        ('20180124', '17001', 'offbarsta'),
         ]
 
 rows = 2
