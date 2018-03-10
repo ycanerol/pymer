@@ -34,7 +34,7 @@ for i, (exp_name, clustertoplot, label) in enumerate(toplot):
     elif '20180118' in exp_name:
         stripeflicker = [7, 14]
 
-    fig = texplot.texfig(1.2, aspect=1.2)
+    fig = texplot.texfig(1, aspect=.8)
     axes = [fig.add_subplot(rows, columns, i+1) for i in range(rows*columns)]
 
     for j, stimnr in enumerate(stripeflicker):
@@ -70,7 +70,12 @@ for i, (exp_name, clustertoplot, label) in enumerate(toplot):
         popt = all_parameters[index]
 
         cut_time = int(100/(frame_duration*1000)/2)
-        fsize = int(700/(stx_w*px_size))
+        # Changed width from 700 micrometer to 400 to zoom in on the
+        # region of interest. This shifts where the fit is drawn,
+        # it's fixed when plotting.
+        fsize_original = int(700/(stx_w*px_size))
+        fsize = int(400/(stx_w*px_size))
+        fsize_diff = fsize_original - fsize
         t = np.arange(filter_length)*frame_duration*1000
         vscale = fsize * stx_w*px_size
 
@@ -79,7 +84,7 @@ for i, (exp_name, clustertoplot, label) in enumerate(toplot):
         ax1 = axes[2*j]
         plf.subplottext(['A', 'C'][j], ax1, x=-.4)
         plf.subplottext(['Mesopic', 'Photopic'][j],
-                        ax1, x=-.6, y=.5, rotation=90, va='center')
+                        ax1, x=-.5, y=.5, rotation=90, va='center')
         plf.stashow(sta, ax1, extent=[0, t[-1], -vscale, vscale],
                     cmap=texplot.cmap)
         ax1.set_xlabel('Time [ms]')
@@ -97,12 +102,12 @@ for i, (exp_name, clustertoplot, label) in enumerate(toplot):
         plf.spineless(ax2)
         ax2.set_yticks([])
         ax2.set_xticks([])
-        ax2.plot()
         ax2.plot(onoroff*fitv, -s, label='Data')
+        # Displace the center of both distributions according to the difference
+        popt = popt - np.array([0, 1, 0, 0, 1, 0])*fsize_diff*2
         ax2.plot(onedgauss(s, *popt[:3]), -s,  '--', label='Center')
         ax2.plot(-onedgauss(s, *popt[3:]), -s,  '--', label='Surround')
 
-#    plt.subplots_adjust(hspace = .2, wspace=0.2)
-#    plt.savefig(f'/home/ycan/Downloads/{label}.pdf')
+    plt.subplots_adjust(hspace = .3, wspace=.2)
     texplot.savefig(label)
     plt.show()
