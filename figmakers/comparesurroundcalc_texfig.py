@@ -12,13 +12,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import gaussfitter as gfit
 import iofuncs as iof
-import miscfuncs as mf
+import miscfuncs as msc
 import plotfuncs as plf
 import analysis_scripts as asc
 from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
-import texplot
 
-fig = texplot.texfig(1.2)
+import scalebars
+#import texplot
+
+#fig = texplot.texfig(1.2)
 
 spikecutoff=1000
 ratingcutoff=4
@@ -52,14 +54,6 @@ quals = data['quals'][-1, :]
 
 spikenrs = np.array([a.sum() for a in data['all_spiketimes']])
 
-#c1 = np.where(spikenrs > spikecutoff)[0]
-#c2 = np.where(clusters[:, 2] <= ratingcutoff)[0]
-#c3 = np.where(quals > staqualcutoff)[0]
-#
-#choose = [i for i in range(clusters.shape[0]) if ((i in c1) and
-#                                                  (i in c2) and
-#                                                  (i in c3))]
-
 choose = [33]
 clusters = clusters[choose]
 stas = list(np.array(stas)[choose])
@@ -75,13 +69,16 @@ f_size = int(700/(stx_h*px_size))
 
 del data
 
+rows, columns = 2, 2
+
+
 for i in range(clusters.shape[0]):
 
     sta_original = stas[i]
     max_i_original = max_inds[i]
 
     try:
-        sta, max_i = mf.cut_around_center(sta_original,
+        sta, max_i = msc.cut_around_center(sta_original,
                                           max_i_original, f_size)
     except ValueError:
         continue
@@ -111,31 +108,33 @@ for i in range(clusters.shape[0]):
     Zm[np.isinf(Zm)] = np.nan
     Zm = np.sqrt(Zm*-2)
 
-    ax = plt.subplot(1, 2, 1)
-    plf.subplottext('A', ax, x=0, y=1.3)
+    ax1 = plt.subplot(rows, columns, 1)
+    plf.subplottext('A', ax1)
 
     vmax = np.abs(fit_frame).max()
     vmin = -vmax
-    im = plf.stashow(fit_frame, ax, cmap=texplot.cmap)
-    ax.set_aspect('equal')
-    plf.spineless(ax)
-    ax.set_axis_off()
+    im = plf.stashow(fit_frame, ax1)
+    ax1.set_aspect('equal')
+    plf.spineless(ax1)
+    ax1.set_xticks([])
+    ax1.set_yticks([])
 
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', category=UserWarning)
         warnings.filterwarnings('ignore', '.*invalid value encountered*.')
-        ax.contour(Y, X, Zm, [inner_b, outer_b],
+        ax1.contour(Y, X, Zm, [inner_b, outer_b],
                    cmap=plf.RFcolormap(('C0', 'C1')))
 
     barsize = 100/(stx_h*px_size)
-    scalebar = AnchoredSizeBar(ax.transData,
-                               barsize, r'100 $\upmu$m',
+    scalebar = AnchoredSizeBar(ax1.transData,
+#                               barsize, r'100 $\upmu$m',
+                               barsize, r'100 µm',
                                'lower left',
                                pad=1,
                                color='k',
                                frameon=False,
                                size_vertical=.2)
-    ax.add_artist(scalebar)
+    ax1.add_artist(scalebar)
 
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore',
@@ -155,36 +154,70 @@ for i in range(clusters.shape[0]):
     sta_center_temporal = np.mean(sta_center, axis=(0, 1))
     sta_surround_temporal = np.mean(sta_surround, axis=(0, 1))
 
-    ax1 = plt.subplot(1, 2, 2)
-    plf.subplottext('B', ax1, x=-.25, y=1.023)
-    l1 = ax1.plot(t, sta_center_temporal,
-#                  label=r'Center\n(<{}$\upsigma$)'.format(inner_b),
+    ax2 = plt.subplot(rows, columns, 2)
+    plf.subplottext('B', ax2, x=-.25, y=1.1)
+    l1 = ax2.plot(t, sta_center_temporal,
                   color='C0')
     sct_max = np.max(np.abs(sta_center_temporal))
-#    ax1.set_ylim(-sct_max, sct_max)
-#    ax2 = ax1.twinx()
 
-    l2 = ax1.plot(t, sta_surround_temporal,
-#                  label=r'Surround\n({}$\upsigma$<x<{}$\upsigma$)'.format(inner_b, outer_b),
+    l2 = ax2.plot(t, sta_surround_temporal,
                   color='C1')
     sst_max = np.max(np.abs(sta_surround_temporal))
-#    ax2.set_ylim(-sst_max, sst_max)
-    plf.spineless(ax1)
-#    plf.spineless(ax2)
-#    ax1.tick_params('y', colors='C0')
-#    ax2.tick_params('y', colors='C1')
-    plt.xlabel('Time[ms]')
-    plt.axhline(0, color='k', alpha=.5, linestyle='dashed', linewidth=1)
+    plf.spineless(ax2)
 
-#    lines = l1+l2
-#    labels = [line.get_label() for line in lines]
-#    plt.legend(lines, labels, fontsize=7)
-#    plt.title('Temporal components')
-#    plt.suptitle(f'{exp_name}\n{stimname}\n{clusterids[i]}')
+    ax2.set_xlabel('Time[ms]')
+    ax2.axhline(0, color='k', alpha=.5, linestyle='dashed', linewidth=1)
 
-    plt.subplots_adjust(wspace=.5, top=.85)
+    data = iof.load(exp_dir, int(stim_nr)+1)
+    stripesta = np.array(data['stas'])[choose][0]
+    stripemax = np.array(data['max_inds'])[choose][0]
+    stx_w = stx_h
+    frame_duration = data['frame_duration']
+    fits = np.array(data['fits'])[choose]
+    onoroff = data['polarities'][choose]
 
-#    texplot.savefig('checkersurround')
 
+    cut_time = int(100/(frame_duration*1000)/2)
+    fsize_original = int(700/(stx_w*px_size))
+    fsize = int(400/(stx_w*px_size))
+    fsize_diff = fsize_original - fsize
+    t = np.arange(filter_length)*frame_duration*1000
+    vscale = fsize * stx_w*px_size
+
+    stripesta, stripemax_i = msc.cutstripe(stripesta, stripemax, fsize*2)
+
+    fitv = np.mean(stripesta[:, stripemax[1]-cut_time:stripemax[1]+cut_time+1],
+               axis=1)
+
+    s = np.arange(fitv.shape[0])
+
+    ax3 = plt.subplot(rows, columns, 3)
+    plf.stashow(stripesta, ax3)
+    plf.subplottext('C', ax3)
+
+    ax4 = plt.subplot(rows, columns, 4)
+    ax4.plot(onoroff*fitv, -s)
+    plf.subplottext('D', ax4, x=-.25, y=1.1)
+    plf.spineless(ax4)
+    ax4.axvline(0, color='k', alpha=.5, linestyle='dashed', linewidth=1)
+
+    time_set = 100 # milliseconds
+    dist_set = 100 # micrometers
+
+    barsize_time = time_set/(stx_h*px_size)
+    barsize_distance = dist_set/(stx_h*px_size)
+
+    scalebars.add_scalebar(ax3,
+                           matchx=False, sizex=barsize_time,
+                           labelx=f'{time_set} ms',
+                           matchy=False, sizey=-barsize_distance,
+                           labely=f'{dist_set} µm',
+                           barwidth=1.2,
+                           loc='lower right',
+                           sep=2,
+                           pad=0)
+
+    plt.subplots_adjust(wspace=.3, hspace=.35)
+#    texplot.savefig('comparesurroundcalc')
     plt.show()
     plt.close()
