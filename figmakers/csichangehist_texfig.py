@@ -22,12 +22,16 @@ colorcategories = data['colorcategories']
 fig = texplot.texfig(.9, 1.2)
 axes = fig.subplots(len(colorcategories), 1, sharex=True)
 csichange = csi[1, :] - csi[0, :]
+changes = []
+groups = []
 
 bins = np.arange(-.2, .35+0.05, 0.05)
 for i, color in enumerate(colorcategories):
     group = [index for index, c in enumerate(colors) if c == color]
     ax = axes[i]
     change = csichange[group]
+    groups.append(group)
+    changes.append(change)
     if i == 0:
         csichange_on = np.copy(change)
     elif i == 1:
@@ -40,7 +44,9 @@ for i, color in enumerate(colorcategories):
     plf.spineless(ax)
     print(i, stats.wilcoxon(group)[1])
 
+
 plt.subplots_adjust(hspace=.3)
+ax.set_xlabel(r'CSI$_{photopic}$ - CSI$_{mesopic}$')
 texplot.savefig('csihistogram_mp')
 plt.show()
 

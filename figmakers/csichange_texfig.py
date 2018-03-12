@@ -151,8 +151,11 @@ ax.set_xlabel('Center Surround Index at \\textbf{Mesopic} conditions')
 ax.set_ylabel('Center Surround Index at \\textbf{Photopic} conditions')
 ax.set_aspect('equal')
 
+groups = []
+
 for i, color in enumerate(colorcategories):
     group = [index for index, c in enumerate(colors) if c == color]
+    groups.append(group)
     ax = plt.subplot2grid((5,3), (3+int((np.round((i-1)/3))), i%3))
 
 #    ax.plot([csi.min(), csi.max()], csi[:, group], color=color, linewidth=.4)
@@ -175,11 +178,19 @@ plt.show()
 # Perform non-parametric paired test to test significance
 stat_test = stats.wilcoxon(csi[0, :], csi[1, :])
 print(f'Wilcoxon signed-rank test p-val: {stat_test[1]:7.2e}')
+for label, group in zip(colorlabels, groups):
+    stat_test_grp = stats.wilcoxon(csi[0, group], csi[1, group])
+    print(f'Wilcoxon p-val for {label:25s}: {stat_test_grp[1]:7.2e}')
+
+
 
 np.savez('/home/ycan/Documents/thesis/analysis_auxillary_files/thesis_csiplotting.npz',
          cells=cells,
+         bias=bias,
          include=include,
          colors=colors,
+         groups=groups,
          stat_test=stat_test,
          colorcategories=colorcategories,
+         colorlabels=colorlabels,
          csi=csi)

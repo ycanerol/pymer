@@ -18,9 +18,9 @@ import analysis_scripts as asc
 from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
 
 import scalebars
-#import texplot
+import texplot
 
-#fig = texplot.texfig(1.2)
+fig = texplot.texfig(1.2)
 
 spikecutoff=1000
 ratingcutoff=4
@@ -127,8 +127,8 @@ for i in range(clusters.shape[0]):
 
     barsize = 100/(stx_h*px_size)
     scalebar = AnchoredSizeBar(ax1.transData,
-#                               barsize, r'100 $\upmu$m',
-                               barsize, r'100 µm',
+                               barsize, r'100 $\upmu$m',
+#                               barsize, r'100 µm',
                                'lower left',
                                pad=1,
                                color='k',
@@ -159,6 +159,7 @@ for i in range(clusters.shape[0]):
     l1 = ax2.plot(t, sta_center_temporal,
                   color='C0')
     sct_max = np.max(np.abs(sta_center_temporal))
+    ax2.set_yticks([])
 
     l2 = ax2.plot(t, sta_surround_temporal,
                   color='C1')
@@ -201,6 +202,8 @@ for i in range(clusters.shape[0]):
     plf.spineless(ax4)
     ax4.axvline(0, color='k', alpha=.5, linestyle='dashed', linewidth=1)
 
+    ax4.set_axis_off()
+
     time_set = 100 # milliseconds
     dist_set = 100 # micrometers
 
@@ -211,13 +214,14 @@ for i in range(clusters.shape[0]):
                            matchx=False, sizex=barsize_time,
                            labelx=f'{time_set} ms',
                            matchy=False, sizey=-barsize_distance,
-                           labely=f'{dist_set} µm',
+#                           labely=f'{dist_set} µm',
+                           labely=fr'{dist_set} $\upmu$m',
                            barwidth=1.2,
                            loc='lower right',
                            sep=2,
                            pad=0)
 
     plt.subplots_adjust(wspace=.3, hspace=.35)
-#    texplot.savefig('comparesurroundcalc')
+    texplot.savefig('comparesurroundcalc')
     plt.show()
     plt.close()
