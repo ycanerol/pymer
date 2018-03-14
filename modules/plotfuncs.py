@@ -211,24 +211,24 @@ def drawonoff(ax, preframedur, stimdur, h=1, contrast=1):
     rect1 = mpl.patches.Rectangle((0, 1),
                                   width=preframedur/totaldur,
                                   height=h,
-                                  transform=ax.transAxes, color='k',
+                                  transform=ax.transAxes, facecolor='k',
                                   alpha=.5)
     rect2 = mpl.patches.Rectangle((preframedur/totaldur, 1),
                                   width=stimdur/totaldur,
                                   height=h,
-                                  transform=ax.transAxes, color='k',
+                                  transform=ax.transAxes, facecolor='k',
                                   alpha=.5*(1-contrast))
     rect3 = mpl.patches.Rectangle(((preframedur +
                                     stimdur)/totaldur, 1),
                                   width=preframedur/totaldur,
                                   height=h,
-                                  transform=ax.transAxes, color='k',
+                                  transform=ax.transAxes, facecolor='k',
                                   alpha=.5)
     rect4 = mpl.patches.Rectangle(((2*preframedur +
                                     stimdur)/totaldur, 1),
                                   width=stimdur/totaldur,
                                   height=h,
-                                  transform=ax.transAxes, color='k',
+                                  transform=ax.transAxes, facecolor='k',
                                   alpha=.5*(1+contrast))
     ax.add_patch(rect1)
     ax.add_patch(rect2)
