@@ -16,6 +16,7 @@ import miscfuncs as msc
 import plotfuncs as plf
 import analysis_scripts as asc
 from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
+from matplotlib.patches import Rectangle
 
 import scalebars
 import texplot
@@ -197,13 +198,14 @@ for i in range(clusters.shape[0]):
     plf.subplottext('C', ax3)
 
     ax4 = plt.subplot(rows, columns, 4)
-    ax4.plot(onoroff*fitv, -s)
+    ax4.plot(onoroff*fitv, -s, color='C2')
     plf.subplottext('D', ax4, x=-.25, y=1.1)
     plf.spineless(ax4)
     ax4.axvline(0, color='k', alpha=.5, linestyle='dashed', linewidth=1)
 
     ax4.set_axis_off()
 
+    # Add scalebar
     time_set = 100 # milliseconds
     dist_set = 100 # micrometers
 
@@ -220,6 +222,13 @@ for i in range(clusters.shape[0]):
                            loc='lower right',
                            sep=2,
                            pad=0)
+    # Add a box to show spatial component calculation
+    ax3.add_patch(Rectangle(
+                 (stripemax_i[-1]-cut_time, -0.375),
+                 cut_time*2, stripesta.shape[0]-0.25,
+                 linewidth=.75, linestyle='dashed',
+                 edgecolor='C2', facecolor='none'))
+
 
     plt.subplots_adjust(wspace=.3, hspace=.35)
     texplot.savefig('comparesurroundcalc')
