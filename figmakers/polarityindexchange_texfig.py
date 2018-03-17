@@ -51,7 +51,7 @@ for j, (exp_name, clustertoplot) in enumerate(toplot):
 
         plotind = [1, 3, 5, 7][i+2*j]
         ax = plt.subplot(4, 2, plotind)
-        ax.plot(t, fr, 'k')
+        ax.plot(t, fr, 'k', linewidth=.5)
         plf.spineless(ax)
         if cond == 'M':
             plf.drawonoff(ax, preframedur, stimdur, h=.1)
@@ -89,6 +89,5 @@ ax3.set_ylabel('Polarity Index')
 plf.spineless(ax3)
 
 plt.subplots_adjust(hspace=.4, wspace=.4)
-texplot.savefig('polarityindexchange')
-
+#texplot.savefig('polarityindexchange')
 plt.show()

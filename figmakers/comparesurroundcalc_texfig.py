@@ -120,11 +120,14 @@ for i in range(clusters.shape[0]):
     ax1.set_xticks([])
     ax1.set_yticks([])
 
+    checkercolors = ['black', 'orange']
+    print(checkercolors)
+
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', category=UserWarning)
         warnings.filterwarnings('ignore', '.*invalid value encountered*.')
         ax1.contour(Y, X, Zm, [inner_b, outer_b],
-                   cmap=plf.RFcolormap(('C0', 'C1')))
+                   cmap=plf.RFcolormap(checkercolors))
 
     barsize = 100/(stx_h*px_size)
     scalebar = AnchoredSizeBar(ax1.transData,
@@ -158,12 +161,12 @@ for i in range(clusters.shape[0]):
     ax2 = plt.subplot(rows, columns, 2)
     plf.subplottext('B', ax2, x=-.25, y=1.1)
     l1 = ax2.plot(t, sta_center_temporal,
-                  color='C0')
+                  color=checkercolors[0])
     sct_max = np.max(np.abs(sta_center_temporal))
     ax2.set_yticks([])
 
     l2 = ax2.plot(t, sta_surround_temporal,
-                  color='C1')
+                  color=checkercolors[1])
     sst_max = np.max(np.abs(sta_surround_temporal))
     plf.spineless(ax2)
 
