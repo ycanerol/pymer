@@ -14,7 +14,7 @@ import texplot
 
 import scalebars
 
-texplot.texfig(1.2, .6)
+texplot.texfig(1.3, 1)
 
 
 data = np.load('/home/ycan/Documents/thesis/'
@@ -25,6 +25,7 @@ groups = data['groups']
 bias = data['bias']
 csi = data['csi']
 colorcategories = data['colorcategories']
+colorlabels = data['colorlabels']
 
 
 toplot = [['20180124', '02001'], # Increasing bias
@@ -76,9 +77,8 @@ for j, (exp_name, clustertoplot) in enumerate(toplot):
         ax.set_yticks([])
         ax.set_ylim(0, 130)
         ax.set_xlim(0, t.max())
-#    plt.show()
 
-ax3 = plt.subplot(1, 2, 2)
+ax3 = plt.subplot(2, 2, 2)
 for color, group in zip(colorcategories, groups):
     ax3.plot(bias[:, group], color=color, linewidth=.4)
 #plt.axis('equal')
@@ -88,6 +88,15 @@ ax3.set_xticklabels(['Mesopic', 'Photopic'])
 ax3.set_ylabel('Polarity Index')
 plf.spineless(ax3)
 
+distrib = [len(group)/cells.shape[0] for group in groups]
+ax4 = plt.subplot(2, 2, 4)
+_, texts = ax4.pie(distrib, labels=colorlabels, colors=colorcategories,
+                      labeldistance=1.1)
+# Slightly shift the ON-OFF label to avoid overlap
+texts[2].set_horizontalalignment('center')
+plf.subplottext('D', ax4, x=-0.2, y=1.15)
+
+
 plt.subplots_adjust(hspace=.4, wspace=.4)
-#texplot.savefig('polarityindexchange')
+texplot.savefig('polarityindexchange')
 plt.show()
