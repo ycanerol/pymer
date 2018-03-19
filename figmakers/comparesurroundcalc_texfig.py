@@ -121,12 +121,11 @@ for i in range(clusters.shape[0]):
     ax1.set_yticks([])
 
     checkercolors = ['black', 'orange']
-    print(checkercolors)
 
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', category=UserWarning)
         warnings.filterwarnings('ignore', '.*invalid value encountered*.')
-        ax1.contour(Y, X, Zm, [inner_b, outer_b],
+        ax1.contour(Y, X, Zm, [inner_b, outer_b], linewidths=.5,
                    cmap=plf.RFcolormap(checkercolors))
 
     barsize = 100/(stx_h*px_size)
