@@ -91,7 +91,8 @@ plf.spineless(ax3)
 distrib = [len(group)/cells.shape[0] for group in groups]
 ax4 = plt.subplot(2, 2, 4)
 _, texts = ax4.pie(distrib, labels=colorlabels, colors=colorcategories,
-                      labeldistance=1.1)
+#                     radius=.6,
+                     labeldistance=1.1)
 # Slightly shift the ON-OFF label to avoid overlap
 texts[2].set_horizontalalignment('center')
 plf.subplottext('D', ax4, x=-0.2, y=1.15)
