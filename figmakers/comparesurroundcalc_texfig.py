@@ -17,6 +17,7 @@ import plotfuncs as plf
 import analysis_scripts as asc
 from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
 from matplotlib.patches import Rectangle
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
 import scalebars
 import texplot
@@ -231,6 +232,27 @@ for i in range(clusters.shape[0]):
                  linewidth=.75, linestyle='dashed',
                  edgecolor='C2', facecolor='none'))
 
+    # Draw small representation of the stimuli
+    # does not work when saving, only draws empty frames.
+    # see https://github.com/matplotlib/matplotlib/issues/10844
+    if False: # Flag to be able to quickly toggle
+        bwndim = 15
+        np.random.seed(0)
+        checker = np.random.randint(0, 2, bwndim*bwndim).reshape(bwndim,bwndim)
+        stripe = np.repeat(np.random.randint(0, 2, bwndim), bwndim)
+        stripe = stripe.reshape(bwndim,bwndim)
+
+        for smallstim, ax in zip([checker, stripe], [ax1, ax3]):
+            im = OffsetImage(smallstim, zoom=1.25, cmap='Greys')
+
+            ab = AnnotationBbox(im, [0, 0],
+                            xybox=(-30, 0.),
+                            xycoords='axes fraction',
+                            boxcoords="offset points",
+                            pad=0,
+                            box_alignment=(0, 0)
+                            )
+            ax.add_artist(ab)
 
     plt.subplots_adjust(wspace=.3, hspace=.35)
     texplot.savefig('comparesurroundcalc')
