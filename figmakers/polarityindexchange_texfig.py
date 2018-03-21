@@ -14,7 +14,7 @@ import texplot
 
 import scalebars
 
-texplot.texfig(1.3, 1)
+texplot.texfig(1.2, 1)
 
 
 data = np.load('/home/ycan/Documents/thesis/'
@@ -90,12 +90,25 @@ plf.spineless(ax3)
 
 distrib = [len(group)/cells.shape[0] for group in groups]
 ax4 = plt.subplot(2, 2, 4)
-_, texts = ax4.pie(distrib, labels=colorlabels, colors=colorcategories,
-#                     radius=.6,
+_, texts, ptexts = ax4.pie(distrib, labels=colorlabels, colors=colorcategories,
+                     autopct='%.1f%%',
+                     pctdistance=.7,
                      startangle=-60,
-                     labeldistance=1.15)
-# Slightly shift the ON-OFF label to avoid overlap
-[txt.set_horizontalalignment('right') for txt in texts[2:]]
+                     labeldistance=1.2)
+for i, txt in enumerate(ptexts):
+    textdict = {'color':'white',
+                'weight':'bold',
+                'size':6
+                }
+    if i == 3: textdict.update({'color':'dimgray'})
+    txt.update(textdict)
+#[txt.set_color('white') for txt in ptexts]
+#[txt.set_weight('bold') for txt in ptexts]
+# Slightly shift last three labels for aestetic improvement
+texts[2].set_horizontalalignment('right')
+texts[3].set_horizontalalignment('right')
+texts[3].set_x(-.58)
+texts[4].set_horizontalalignment('center')
 plf.subplottext('D', ax4, x=-0.2, y=1.15)
 
 
