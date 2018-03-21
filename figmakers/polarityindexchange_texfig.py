@@ -92,9 +92,10 @@ distrib = [len(group)/cells.shape[0] for group in groups]
 ax4 = plt.subplot(2, 2, 4)
 _, texts = ax4.pie(distrib, labels=colorlabels, colors=colorcategories,
 #                     radius=.6,
-                     labeldistance=1.1)
+                     startangle=-60,
+                     labeldistance=1.15)
 # Slightly shift the ON-OFF label to avoid overlap
-texts[2].set_horizontalalignment('center')
+[txt.set_horizontalalignment('right') for txt in texts[2:]]
 plf.subplottext('D', ax4, x=-0.2, y=1.15)
 
 
