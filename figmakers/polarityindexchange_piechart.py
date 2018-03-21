@@ -113,5 +113,5 @@ plf.subplottext('D', ax4, x=-0.2, y=1.15)
 
 
 plt.subplots_adjust(hspace=.4, wspace=.4)
-texplot.savefig('polarityindexchange')
+#texplot.savefig('polarityindexchange')
 plt.show()
