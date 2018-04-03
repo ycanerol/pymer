@@ -114,7 +114,7 @@ def allinds(**kwargs):
 colorcategories = ['mediumblue', 'crimson', 'darkorange', 'springgreen',
                    'deepskyblue']
 colorlabels = ['ON', 'OFF', 'ON-OFF',
-               'Increased polarity bias', 'Decreased polarity bias']
+               'Increased polarity index', 'Decreased polarity index']
 
 csi, colors, bias, quals, cells = allinds()
 
