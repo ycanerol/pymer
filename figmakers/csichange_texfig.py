@@ -139,13 +139,14 @@ patches = []
 for color, label in zip(colorcategories, colorlabels):
     patches.append(mpatches.Patch(color=color, label=label))
 
-fig = texplot.texfig(.85, aspect=1.85)
+fig = texplot.texfig(.93, aspect=1.85)
 
 ax = plt.subplot2grid((5, 3), (0, 0), colspan=3, rowspan=3)
-ax.plot(x, x, 'k--', alpha=.5)
-plf.subplottext('A', ax, x=-0.05)
+ax.plot(x, x, 'k--', alpha=.5, linewidth=.8)
+plf.subplottext('A', ax, x=-0.05, y=1.03)
 ax.scatter(csi[0, :], csi[1, :], **scatterkwargs)
 ax.legend(handles=patches, fontsize='xx-small')
+ax_lims = ax.get_xlim()
 
 ax.set_xlabel('Center Surround Index at \\textbf{Mesopic} conditions')
 ax.set_ylabel('Center Surround Index at \\textbf{Photopic} conditions')
@@ -158,14 +159,15 @@ for i, color in enumerate(colorcategories):
     groups.append(group)
     ax = plt.subplot2grid((5,3), (3+int((np.round((i-1)/3))), i%3))
 
-#    ax.plot([csi.min(), csi.max()], csi[:, group], color=color, linewidth=.4)
-#    ax.set_xlim([-.075, csi.max()+.075])
-#    ax.set_ylim([-.075, csi.max()+.075])
-#    ax.set_xticks([csi.min(), csi.max()])
-#    ax.set_xticklabels(['Mesopic', 'Photopic'])
+    ax.set_xlim(ax_lims)
+    ax.set_ylim(ax_lims)
+    tick_locs = [0, 0.2, 0.4]
+    ax.set_xticks(tick_locs)
+    ax.set_yticks(tick_locs)
 
-    ax.scatter(csi[0, :], csi[1, :], s=8, c='grey')
-    ax.scatter(csi[0, group], csi[1, group], s=8, c=color)
+    ax.scatter(csi[0, :], csi[1, :], s=6, c='grey')
+    ax.scatter(csi[0, group], csi[1, group], s=6, c=color, linewidths=.5)
+    ax.plot(x, x, 'k--', alpha=.5, linewidth=.5)
 
     plf.subplottext(['B', 'C', 'D', 'E', 'F'][i], ax, x=-.25)
     ax.set_aspect('equal')
