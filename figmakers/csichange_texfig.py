@@ -145,6 +145,13 @@ ax = plt.subplot2grid((5, 3), (0, 0), colspan=3, rowspan=3)
 ax.plot(x, x, 'k--', alpha=.5, linewidth=.8)
 plf.subplottext('A', ax, x=-0.05, y=1.03)
 ax.scatter(csi[0, :], csi[1, :], **scatterkwargs)
+
+# Mark the example cells with an asterisk
+asterixes = [(0.03443051,  0.19385925), # Example ON cell 20180207 03001
+         (0.03238909,  0.29553824)] # Example OFF cell 20180118 23102
+for asterix in asterixes:
+    ax.text(*asterix, '*', color='k')
+
 ax.legend(handles=patches, fontsize='xx-small')
 ax_lims = ax.get_xlim()
 
