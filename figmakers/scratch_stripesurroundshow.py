@@ -142,8 +142,8 @@ ax = plt.subplot(111)
 ax.scatter(csi_alts[0, :], csi_alts[1, :], c=colors, s=20, alpha=.8)
 ax.plot([0, csi_alts.max()], [0, csi_alts.max()])
 ax.set_aspect('equal')
-axis_lims = [-.03, 1.5]
-#axis_lims = None
+#axis_lims = [-.03, 1.5]
+axis_lims = None
 ax.set_xlim(axis_lims)
 ax.set_ylim(axis_lims)
 plt.show()
