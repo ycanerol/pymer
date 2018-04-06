@@ -139,7 +139,7 @@ patches = []
 for color, label in zip(colorcategories, colorlabels):
     patches.append(mpatches.Patch(color=color, label=label))
 
-fig = texplot.texfig(.93, aspect=1.85)
+fig = texplot.texfig(.90, aspect=1.85)
 
 ax = plt.subplot2grid((5, 3), (0, 0), colspan=3, rowspan=3)
 ax.plot(x, x, 'k--', alpha=.5, linewidth=.8)
@@ -193,13 +193,13 @@ for label, group in zip(colorlabels, groups):
 
 
 
-np.savez('/home/ycan/Documents/thesis/analysis_auxillary_files/thesis_csiplotting.npz',
-         cells=cells,
-         bias=bias,
-         include=include,
-         colors=colors,
-         groups=groups,
-         stat_test=stat_test,
-         colorcategories=colorcategories,
-         colorlabels=colorlabels,
-         csi=csi)
+#np.savez('/home/ycan/Documents/thesis/analysis_auxillary_files/thesis_csiplotting.npz',
+#         cells=cells,
+#         bias=bias,
+#         include=include,
+#         colors=colors,
+#         groups=groups,
+#         stat_test=stat_test,
+#         colorcategories=colorcategories,
+#         colorlabels=colorlabels,
+#         csi=csi)
