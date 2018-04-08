@@ -8,6 +8,8 @@ Created on Mon Mar 12 10:50:11 2018
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+
 import plotfuncs as plf
 import texplot
 
@@ -18,6 +20,7 @@ csi = data['csi']
 bias = data['bias']
 groups = data['groups']
 colorcategories = data['colorcategories']
+colorlabels=data['colorlabels']
 
 biaschange = bias[1, ] - bias[0, ]
 csichange = csi[1, ] - csi[0, ]
@@ -30,6 +33,12 @@ linekwargs = {'color':'k', 'alpha':.5, 'linestyle':'dashed', 'linewidth':1}
 fig = texplot.texfig(.85, aspect=1.85)
 
 ax = plt.subplot2grid((4, 3), (0, 0), colspan=3, rowspan=2)
+
+# Create an array for all the colors to use with plt.legend()
+patches = []
+for color, label in zip(colorcategories, colorlabels):
+    patches.append(mpatches.Patch(color=color, label=label))
+ax.legend(handles=patches, fontsize='xx-small')
 
 for group, color in zip(groups, colorcategories):
 
@@ -52,5 +61,5 @@ for i, (group, color) in enumerate(zip(groups, colorcategories)):
 
 #axes[-1].set_axis_off()
 plt.subplots_adjust(hspace=.45, wspace=.45)
-
-texplot.savefig('csichangevsbiaschange')
+#texplot.savefig('csichangevsbiaschange')
+plt.show()
