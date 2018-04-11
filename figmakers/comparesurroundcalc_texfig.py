@@ -233,10 +233,10 @@ for i in range(clusters.shape[0]):
                  edgecolor='C2', facecolor='none'))
 
     # Add small arrows to represent axis in the spatial component
-    plf.addarrowaxis(ax4,x=0, y=.1,
+    plf.addarrowaxis(ax4,x=-0.06, y=.1,
                      dx=.1, dy=.2,
-                     xtext='Sensitivity', ytext='Distance',
-                     xtextoffset=0.02, ytextoffset=0.045)
+                     xtext='STA contrast', ytext='Distance',
+                     xtextoffset=0.03, ytextoffset=0.045)
 
     # Draw small representation of the stimuli
     # does not work when saving, only draws empty frames.
