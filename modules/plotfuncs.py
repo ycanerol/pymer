@@ -286,3 +286,35 @@ def subplottext(text, axis, x=-.3, y=1.1, **kwargs):
                   'ha':'right'}
     textkwargs.update(kwargs)
     axis.text(x, y, text, **textkwargs)
+
+def addarrowaxis(ax, x=0.5, y=0.5, dx=.1, dy=.2, xtext='',
+                 ytext='', xtextoffset=0.02, ytextoffset=.032,
+                 fontsize='xx-small'):
+    """
+    Add small arrows to indicate axes.
+
+    ax:
+        matplotlib.Axes instance
+    x,y:
+        Common origin of the arrows, units are in fraction of the axis
+    dx, dy:
+        Length of the arrows
+    xtext, ytext:
+        Text to label the arrows with
+    xtextoffset, ytextoffset:
+        Distance of the text from the arrows, requires manual
+        adjustment
+    fontsize:
+        Font size of the text
+    """
+    arrowprops = dict(arrowstyle='<-', facecolor='black')
+    ax.annotate('', xy=(x, y),  xycoords='axes fraction',
+                xytext=(x+dx, y), textcoords='axes fraction',
+                arrowprops=arrowprops)
+    ax.annotate('', xy=(x, y),  xycoords='axes fraction',
+                xytext=(x, y+dy), textcoords='axes fraction',
+                arrowprops=arrowprops)
+    ax.text(x, y - xtextoffset, xtext, transform=ax.transAxes,
+        fontsize=fontsize, va='top')
+    ax.text(x - ytextoffset, y, ytext, rotation=90, transform=ax.transAxes,
+        fontsize=fontsize, ha='left', va='bottom')
