@@ -232,6 +232,12 @@ for i in range(clusters.shape[0]):
                  linewidth=.75, linestyle='dashed',
                  edgecolor='C2', facecolor='none'))
 
+    # Add small arrows to represent axis in the spatial component
+    plf.addarrowaxis(ax4,x=0, y=.1,
+                     dx=.1, dy=.2,
+                     xtext='Sensitivity', ytext='Distance',
+                     xtextoffset=0.02, ytextoffset=0.045)
+
     # Draw small representation of the stimuli
     # does not work when saving, only draws empty frames.
     # see https://github.com/matplotlib/matplotlib/issues/10844
