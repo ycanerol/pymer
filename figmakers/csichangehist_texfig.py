@@ -19,7 +19,7 @@ include = data['include']
 colors = data['colors']
 colorcategories = data['colorcategories']
 
-fig = texplot.texfig(.9, 1.2)
+fig = texplot.texfig(.9, .8)
 axes = fig.subplots(len(colorcategories), 1, sharex=True)
 csichange = csi[1, :] - csi[0, :]
 changes = []
