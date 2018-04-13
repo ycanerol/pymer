@@ -239,28 +239,36 @@ for i in range(clusters.shape[0]):
                      xtextoffset=0.03, ytextoffset=0.045)
 
     # Draw small representation of the stimuli
-    # does not work when saving, only draws empty frames.
-    # see https://github.com/matplotlib/matplotlib/issues/10844
-    if False: # Flag to be able to quickly toggle
-        bwndim = 15
+    bwndim = 10 # Stimuli dimensions
+    nr_frames = 5
+    offset = 0.01 # Offset for each frame for drawing them on top of each other
+
+    # Function to quickly adjust the spine color and width
+    def setspines(ax):
+        locs = ['top', 'left', 'bottom', 'right']
+        for loc in locs:
+            ax.spines[loc].set_color('maroon')
+            ax.spines[loc].set_linewidth(1)
+    # Define functions to generate the representative stimuli
+    def checkerstim():
+        return np.random.randint(0, 2, bwndim*bwndim).reshape(bwndim,bwndim)
+    def barstim():
+        return (np.repeat(np.random.randint(0, 2, bwndim),
+                          bwndim)).reshape(bwndim, bwndim)
+    # We first draw checker representation, then bar representation
+    # Since the bar should be further down, we offset it
+    for stim, baroffset in zip([checkerstim, barstim], [0, .45]):
         np.random.seed(0)
-        checker = np.random.randint(0, 2, bwndim*bwndim).reshape(bwndim,bwndim)
-        stripe = np.repeat(np.random.randint(0, 2, bwndim), bwndim)
-        stripe = stripe.reshape(bwndim,bwndim)
-
-        for smallstim, ax in zip([checker, stripe], [ax1, ax3]):
-            im = OffsetImage(smallstim, zoom=1.25, cmap='Greys')
-
-            ab = AnnotationBbox(im, [0, 0],
-                            xybox=(-30, 0.),
-                            xycoords='axes fraction',
-                            boxcoords="offset points",
-                            pad=0,
-                            box_alignment=(0, 0)
-                            )
-            ax.add_artist(ab)
+        for i in range(nr_frames):
+            d = i*offset # How much to offset each individual frame
+            # This is the trick to place the frames where you want
+            ax = fig.add_axes([.13-d, .7-d-baroffset, .06, .06])
+            ax.imshow(stim(), cmap='Greys')
+            plt.xticks([])
+            plt.yticks([])
+            setspines(ax)
 
     plt.subplots_adjust(wspace=.3, hspace=.35)
-    texplot.savefig('comparesurroundcalc')
+#    texplot.savefig('comparesurroundcalc')
     plt.show()
     plt.close()
