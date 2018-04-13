@@ -269,6 +269,6 @@ for i in range(clusters.shape[0]):
             setspines(ax)
 
     plt.subplots_adjust(wspace=.3, hspace=.35)
-#    texplot.savefig('comparesurroundcalc')
+    texplot.savefig('comparesurroundcalc')
     plt.show()
     plt.close()
