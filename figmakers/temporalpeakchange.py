@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import iofuncs as iof
 import plotfuncs as plf
 import analysis_scripts as asc
+from scipy import stats
 import texplot
 
 
@@ -37,23 +38,33 @@ maxts = maxts*.0167*1000    # Convert to milliseconds
 
 maxts_f = maxts[:, include]
 
-fig = texplot.texfig(.9, 1.2)
+fig = texplot.texfig(.9, .8)
 
 axes = fig.subplots(len(colorcategories)+1, 1, sharex=True)
 bins = np.arange(-200, 25+25, 25) # Arange does not include endpoint so 25+25
+changes = []
 for i, color in enumerate(colorcategories):
     group = [index for index, c in enumerate(colors) if c == color]
     ax = axes[i]
     change = maxts_f[1, group]-maxts_f[0, group]
+    changes.append(change)
     ax.hist(change, color=color, bins=bins)
     ax.set_ylim([0, 10])
     plf.subplottext(['A', 'B', 'C', 'D', 'E'][i], ax, x=-.08)
     plf.spineless(ax)
+    stat_test = stats.wilcoxon(change)
+    print(f'Wilcoxon p-val for {color:25s}:  {stat_test[1]:7.2e}')
 ax = axes[-1]
 ax.hist(maxts_f[1, :]-maxts_f[0, :], color= 'k', bins=bins)
 plf.subplottext('F', ax, x=-.08)
 plf.spineless(ax)
-ax.set_xlabel(r'Shift of temporal peak [ms]')
+ax.set_xlabel(r'TTP\textsubscript{photopic} - TTP\textsubscript{mesopic} [ms]')
 plt.subplots_adjust(hspace=.4)
 texplot.savefig('temporalpeakchangehistogram')
 plt.show()
+
+mannwu = stats.mannwhitneyu(changes[0], changes[1])
+print(f'Mann-Whitney-U test p-val for ON vs OFF categories:  {mannwu[1]:7.2e}')
+
+stats = stats.wilcoxon(maxts_f[1, :]-maxts_f[0, :])
+print(f'Wilcoxon p-val for the whole population: {stats[1]:7.2e}')
