@@ -1,8 +1,24 @@
 # rsurround
-Retina surround project for Master's in Gollisch lab
+Analysis and plotting code for my Master's project in Gollisch lab
 
-To use the custom functions, the link to the /modules/ folder needs
-to be added to the python site-packages folder.
+Folder paths to `modules/` and `external_libs/` should be added
+to your python path variable, so that the imports can work.
 
-echo "/home/ycan/Documents/scripts/modules" > "/home/ycan/paytin/lib/python3.4/site-packages/modules.pth"
-The first path is where the modules folder is, the second one is the location of your python site-packages (in this case it's in a virtual environment)
+One way would be adding a link to them in the site-packages:
+```
+echo "<path_to_main_dir>/modules" > "<python_install_loc>/lib/python<your_version>/site-packages/modules.pth"
+echo "<path_to_main_dir>/external_libs" > "<python_install_loc>/lib/python<your_version>/site-packages/external_libs.pth"
+
+```
+
+OR
+Add the following to the ~/.pythonrc
+```
+import sys
+sys.path.append('<path_to_main_dir>/modules')
+sys.path.append('<path_to_main_dir>/external_libs')
+```
+
+
+For now, all paths are hard-coded for my file system, so it might not
+work directly.
