@@ -20,5 +20,5 @@ sys.path.append('<path_to_main_dir>/external_libs')
 ```
 
 
-For now, all paths are hard-coded for my file system, so it might not
-work directly.
+For now, all paths are hard-coded for my file system, so to run the
+code requires fixing those first.
