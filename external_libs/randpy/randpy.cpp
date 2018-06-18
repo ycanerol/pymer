@@ -984,13 +984,16 @@ static const char __pyx_k_enumerate[] = "enumerate";
 static const char __pyx_k_IndexError[] = "IndexError";
 static const char __pyx_k_ValueError[] = "ValueError";
 static const char __pyx_k_randpy_pyx[] = "randpy.pyx";
+static const char __pyx_k_ranb_line_65[] = "ranb (line 65)";
 static const char __pyx_k_OverflowError[] = "OverflowError";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
+static const char __pyx_k_Generates_0_or_1_with_equal_pro[] = "\n    Generates 0 or 1 with equal probabilities. This is a wrapper for\n    the ran1 function in C, it's around five times faster than the\n    equivalent expression\n\n    >>> [0 if i<0.5 else 1 for i in ran1(seed, n)]\n\n    A negative number must be used as seed when initializing.\n    ";
 static const char __pyx_k_No_value_specified_for_struct_at[] = "No value specified for struct attribute 'idum'";
 static const char __pyx_k_No_value_specified_for_struct_at_2[] = "No value specified for struct attribute 'iy'";
 static const char __pyx_k_No_value_specified_for_struct_at_3[] = "No value specified for struct attribute 'iv'";
 static const char __pyx_k_No_value_specified_for_struct_at_4[] = "No value specified for struct attribute 'iset'";
 static const char __pyx_k_No_value_specified_for_struct_at_5[] = "No value specified for struct attribute 'gset'";
+static PyObject *__pyx_kp_u_Generates_0_or_1_with_equal_pro;
 static PyObject *__pyx_n_s_IndexError;
 static PyObject *__pyx_n_s_KeyError;
 static PyObject *__pyx_kp_s_No_value_specified_for_struct_at;
@@ -1014,6 +1017,7 @@ static PyObject *__pyx_n_s_main;
 static PyObject *__pyx_n_s_n;
 static PyObject *__pyx_n_s_ran1;
 static PyObject *__pyx_n_s_ranb;
+static PyObject *__pyx_kp_u_ranb_line_65;
 static PyObject *__pyx_n_s_randpy;
 static PyObject *__pyx_kp_s_randpy_pyx;
 static PyObject *__pyx_n_s_range;
@@ -1039,11 +1043,11 @@ static PyObject *__pyx_codeobj__7;
 static PyObject *__pyx_codeobj__9;
 static PyObject *__pyx_codeobj__11;
 
-/* "randpy.pyx":44
- * 	double c_gasdev "gasdev" (Seed& seed)
+/* "randpy.pyx":46
+ *     double c_gasdev "gasdev" (Seed& seed)
  * 
  * cpdef make_seed(seed):             # <<<<<<<<<<<<<<
- * 	cdef Seed c_seed
+ *     cdef Seed c_seed
  * 
  */
 
@@ -1059,69 +1063,69 @@ static PyObject *__pyx_f_6randpy_make_seed(PyObject *__pyx_v_seed, CYTHON_UNUSED
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("make_seed", 0);
 
-  /* "randpy.pyx":47
- * 	cdef Seed c_seed
+  /* "randpy.pyx":49
+ *     cdef Seed c_seed
  * 
- * 	if isinstance(seed, dict):             # <<<<<<<<<<<<<<
- * 		c_seed = seed
- * 	else:
+ *     if isinstance(seed, dict):             # <<<<<<<<<<<<<<
+ *         c_seed = seed
+ *     else:
  */
   __pyx_t_1 = PyDict_Check(__pyx_v_seed); 
   __pyx_t_2 = (__pyx_t_1 != 0);
   if (__pyx_t_2) {
 
-    /* "randpy.pyx":48
+    /* "randpy.pyx":50
  * 
- * 	if isinstance(seed, dict):
- * 		c_seed = seed             # <<<<<<<<<<<<<<
- * 	else:
- * 		c_seed.idum = seed
+ *     if isinstance(seed, dict):
+ *         c_seed = seed             # <<<<<<<<<<<<<<
+ *     else:
+ *         c_seed.idum = seed
  */
-    __pyx_t_3 = __pyx_convert__from_py_struct__Seed(__pyx_v_seed); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 48, __pyx_L1_error)
+    __pyx_t_3 = __pyx_convert__from_py_struct__Seed(__pyx_v_seed); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 50, __pyx_L1_error)
     __pyx_v_c_seed = __pyx_t_3;
 
-    /* "randpy.pyx":47
- * 	cdef Seed c_seed
+    /* "randpy.pyx":49
+ *     cdef Seed c_seed
  * 
- * 	if isinstance(seed, dict):             # <<<<<<<<<<<<<<
- * 		c_seed = seed
- * 	else:
+ *     if isinstance(seed, dict):             # <<<<<<<<<<<<<<
+ *         c_seed = seed
+ *     else:
  */
     goto __pyx_L3;
   }
 
-  /* "randpy.pyx":50
- * 		c_seed = seed
- * 	else:
- * 		c_seed.idum = seed             # <<<<<<<<<<<<<<
+  /* "randpy.pyx":52
+ *         c_seed = seed
+ *     else:
+ *         c_seed.idum = seed             # <<<<<<<<<<<<<<
  * 
- * 	return c_seed
+ *     return c_seed
  */
   /*else*/ {
-    __pyx_t_4 = __Pyx_PyInt_As_long(__pyx_v_seed); if (unlikely((__pyx_t_4 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 50, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyInt_As_long(__pyx_v_seed); if (unlikely((__pyx_t_4 == (long)-1) && PyErr_Occurred())) __PYX_ERR(0, 52, __pyx_L1_error)
     __pyx_v_c_seed.idum = __pyx_t_4;
   }
   __pyx_L3:;
 
-  /* "randpy.pyx":52
- * 		c_seed.idum = seed
+  /* "randpy.pyx":54
+ *         c_seed.idum = seed
  * 
- * 	return c_seed             # <<<<<<<<<<<<<<
+ *     return c_seed             # <<<<<<<<<<<<<<
  * 
  * def ran1(seed, n = 1):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_5 = __pyx_convert__to_py_struct__Seed(__pyx_v_c_seed); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 52, __pyx_L1_error)
+  __pyx_t_5 = __pyx_convert__to_py_struct__Seed(__pyx_v_c_seed); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 54, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_r = __pyx_t_5;
   __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "randpy.pyx":44
- * 	double c_gasdev "gasdev" (Seed& seed)
+  /* "randpy.pyx":46
+ *     double c_gasdev "gasdev" (Seed& seed)
  * 
  * cpdef make_seed(seed):             # <<<<<<<<<<<<<<
- * 	cdef Seed c_seed
+ *     cdef Seed c_seed
  * 
  */
 
@@ -1155,7 +1159,7 @@ static PyObject *__pyx_pf_6randpy_make_seed(CYTHON_UNUSED PyObject *__pyx_self, 
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("make_seed", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_f_6randpy_make_seed(__pyx_v_seed, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 44, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6randpy_make_seed(__pyx_v_seed, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 46, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -1172,17 +1176,18 @@ static PyObject *__pyx_pf_6randpy_make_seed(CYTHON_UNUSED PyObject *__pyx_self, 
   return __pyx_r;
 }
 
-/* "randpy.pyx":54
- * 	return c_seed
+/* "randpy.pyx":56
+ *     return c_seed
  * 
  * def ran1(seed, n = 1):             # <<<<<<<<<<<<<<
- * 	cdef Seed c_seed = make_seed(seed)
- * 	return (c_ran1_vec(c_seed, n), c_seed)
+ *     """
+ *     Generate a uniform random number in the range (0, 1).
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_6randpy_3ran1(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_6randpy_3ran1 = {"ran1", (PyCFunction)__pyx_pw_6randpy_3ran1, METH_VARARGS|METH_KEYWORDS, 0};
+static char __pyx_doc_6randpy_2ran1[] = "\n    Generate a uniform random number in the range (0, 1).\n\n    A negative number must be used as seed when initializing.\n    ";
+static PyMethodDef __pyx_mdef_6randpy_3ran1 = {"ran1", (PyCFunction)__pyx_pw_6randpy_3ran1, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6randpy_2ran1};
 static PyObject *__pyx_pw_6randpy_3ran1(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_seed = 0;
   PyObject *__pyx_v_n = 0;
@@ -1217,7 +1222,7 @@ static PyObject *__pyx_pw_6randpy_3ran1(PyObject *__pyx_self, PyObject *__pyx_ar
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "ran1") < 0)) __PYX_ERR(0, 54, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "ran1") < 0)) __PYX_ERR(0, 56, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -1233,7 +1238,7 @@ static PyObject *__pyx_pw_6randpy_3ran1(PyObject *__pyx_self, PyObject *__pyx_ar
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("ran1", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 54, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("ran1", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 56, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("randpy.ran1", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -1257,33 +1262,33 @@ static PyObject *__pyx_pf_6randpy_2ran1(CYTHON_UNUSED PyObject *__pyx_self, PyOb
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("ran1", 0);
 
-  /* "randpy.pyx":55
- * 
- * def ran1(seed, n = 1):
- * 	cdef Seed c_seed = make_seed(seed)             # <<<<<<<<<<<<<<
- * 	return (c_ran1_vec(c_seed, n), c_seed)
+  /* "randpy.pyx":62
+ *     A negative number must be used as seed when initializing.
+ *     """
+ *     cdef Seed c_seed = make_seed(seed)             # <<<<<<<<<<<<<<
+ *     return (c_ran1_vec(c_seed, n), c_seed)
  * 
  */
-  __pyx_t_1 = __pyx_f_6randpy_make_seed(__pyx_v_seed, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 55, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6randpy_make_seed(__pyx_v_seed, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 62, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __pyx_convert__from_py_struct__Seed(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 55, __pyx_L1_error)
+  __pyx_t_2 = __pyx_convert__from_py_struct__Seed(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 62, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_c_seed = __pyx_t_2;
 
-  /* "randpy.pyx":56
- * def ran1(seed, n = 1):
- * 	cdef Seed c_seed = make_seed(seed)
- * 	return (c_ran1_vec(c_seed, n), c_seed)             # <<<<<<<<<<<<<<
+  /* "randpy.pyx":63
+ *     """
+ *     cdef Seed c_seed = make_seed(seed)
+ *     return (c_ran1_vec(c_seed, n), c_seed)             # <<<<<<<<<<<<<<
  * 
  * def ranb(seed, n = 1):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_3 = __Pyx_PyInt_As_unsigned_int(__pyx_v_n); if (unlikely((__pyx_t_3 == (unsigned int)-1) && PyErr_Occurred())) __PYX_ERR(0, 56, __pyx_L1_error)
-  __pyx_t_1 = ran1_vec(__pyx_v_c_seed, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_As_unsigned_int(__pyx_v_n); if (unlikely((__pyx_t_3 == (unsigned int)-1) && PyErr_Occurred())) __PYX_ERR(0, 63, __pyx_L1_error)
+  __pyx_t_1 = ran1_vec(__pyx_v_c_seed, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 63, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __pyx_convert__to_py_struct__Seed(__pyx_v_c_seed); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __pyx_t_4 = __pyx_convert__to_py_struct__Seed(__pyx_v_c_seed); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 63, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 56, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 63, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_1);
@@ -1295,12 +1300,12 @@ static PyObject *__pyx_pf_6randpy_2ran1(CYTHON_UNUSED PyObject *__pyx_self, PyOb
   __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "randpy.pyx":54
- * 	return c_seed
+  /* "randpy.pyx":56
+ *     return c_seed
  * 
  * def ran1(seed, n = 1):             # <<<<<<<<<<<<<<
- * 	cdef Seed c_seed = make_seed(seed)
- * 	return (c_ran1_vec(c_seed, n), c_seed)
+ *     """
+ *     Generate a uniform random number in the range (0, 1).
  */
 
   /* function exit code */
@@ -1316,17 +1321,18 @@ static PyObject *__pyx_pf_6randpy_2ran1(CYTHON_UNUSED PyObject *__pyx_self, PyOb
   return __pyx_r;
 }
 
-/* "randpy.pyx":58
- * 	return (c_ran1_vec(c_seed, n), c_seed)
+/* "randpy.pyx":65
+ *     return (c_ran1_vec(c_seed, n), c_seed)
  * 
  * def ranb(seed, n = 1):             # <<<<<<<<<<<<<<
- * 	cdef Seed c_seed = make_seed(seed)
- * 	return (c_ranb_vec(c_seed, n), c_seed)
+ *     """
+ *     Generates 0 or 1 with equal probabilities. This is a wrapper for
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_6randpy_5ranb(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_6randpy_5ranb = {"ranb", (PyCFunction)__pyx_pw_6randpy_5ranb, METH_VARARGS|METH_KEYWORDS, 0};
+static char __pyx_doc_6randpy_4ranb[] = "\n    Generates 0 or 1 with equal probabilities. This is a wrapper for\n    the ran1 function in C, it's around five times faster than the\n    equivalent expression\n\n    >>> [0 if i<0.5 else 1 for i in ran1(seed, n)]\n\n    A negative number must be used as seed when initializing.\n    ";
+static PyMethodDef __pyx_mdef_6randpy_5ranb = {"ranb", (PyCFunction)__pyx_pw_6randpy_5ranb, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6randpy_4ranb};
 static PyObject *__pyx_pw_6randpy_5ranb(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_seed = 0;
   PyObject *__pyx_v_n = 0;
@@ -1361,7 +1367,7 @@ static PyObject *__pyx_pw_6randpy_5ranb(PyObject *__pyx_self, PyObject *__pyx_ar
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "ranb") < 0)) __PYX_ERR(0, 58, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "ranb") < 0)) __PYX_ERR(0, 65, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -1377,7 +1383,7 @@ static PyObject *__pyx_pw_6randpy_5ranb(PyObject *__pyx_self, PyObject *__pyx_ar
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("ranb", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 58, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("ranb", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 65, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("randpy.ranb", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -1401,33 +1407,33 @@ static PyObject *__pyx_pf_6randpy_4ranb(CYTHON_UNUSED PyObject *__pyx_self, PyOb
   PyObject *__pyx_t_5 = NULL;
   __Pyx_RefNannySetupContext("ranb", 0);
 
-  /* "randpy.pyx":59
- * 
- * def ranb(seed, n = 1):
- * 	cdef Seed c_seed = make_seed(seed)             # <<<<<<<<<<<<<<
- * 	return (c_ranb_vec(c_seed, n), c_seed)
+  /* "randpy.pyx":75
+ *     A negative number must be used as seed when initializing.
+ *     """
+ *     cdef Seed c_seed = make_seed(seed)             # <<<<<<<<<<<<<<
+ *     return (c_ranb_vec(c_seed, n), c_seed)
  * 
  */
-  __pyx_t_1 = __pyx_f_6randpy_make_seed(__pyx_v_seed, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 59, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6randpy_make_seed(__pyx_v_seed, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 75, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __pyx_convert__from_py_struct__Seed(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 59, __pyx_L1_error)
+  __pyx_t_2 = __pyx_convert__from_py_struct__Seed(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 75, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_c_seed = __pyx_t_2;
 
-  /* "randpy.pyx":60
- * def ranb(seed, n = 1):
- * 	cdef Seed c_seed = make_seed(seed)
- * 	return (c_ranb_vec(c_seed, n), c_seed)             # <<<<<<<<<<<<<<
+  /* "randpy.pyx":76
+ *     """
+ *     cdef Seed c_seed = make_seed(seed)
+ *     return (c_ranb_vec(c_seed, n), c_seed)             # <<<<<<<<<<<<<<
  * 
  * def gasdev(seed, n = 1):
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_3 = __Pyx_PyInt_As_unsigned_int(__pyx_v_n); if (unlikely((__pyx_t_3 == (unsigned int)-1) && PyErr_Occurred())) __PYX_ERR(0, 60, __pyx_L1_error)
-  __pyx_t_1 = ranb_vec(__pyx_v_c_seed, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 60, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyInt_As_unsigned_int(__pyx_v_n); if (unlikely((__pyx_t_3 == (unsigned int)-1) && PyErr_Occurred())) __PYX_ERR(0, 76, __pyx_L1_error)
+  __pyx_t_1 = ranb_vec(__pyx_v_c_seed, __pyx_t_3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 76, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = __pyx_convert__to_py_struct__Seed(__pyx_v_c_seed); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 60, __pyx_L1_error)
+  __pyx_t_4 = __pyx_convert__to_py_struct__Seed(__pyx_v_c_seed); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 76, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
-  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 60, __pyx_L1_error)
+  __pyx_t_5 = PyTuple_New(2); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 76, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_5, 0, __pyx_t_1);
@@ -1439,12 +1445,12 @@ static PyObject *__pyx_pf_6randpy_4ranb(CYTHON_UNUSED PyObject *__pyx_self, PyOb
   __pyx_t_5 = 0;
   goto __pyx_L0;
 
-  /* "randpy.pyx":58
- * 	return (c_ran1_vec(c_seed, n), c_seed)
+  /* "randpy.pyx":65
+ *     return (c_ran1_vec(c_seed, n), c_seed)
  * 
  * def ranb(seed, n = 1):             # <<<<<<<<<<<<<<
- * 	cdef Seed c_seed = make_seed(seed)
- * 	return (c_ranb_vec(c_seed, n), c_seed)
+ *     """
+ *     Generates 0 or 1 with equal probabilities. This is a wrapper for
  */
 
   /* function exit code */
@@ -1460,17 +1466,18 @@ static PyObject *__pyx_pf_6randpy_4ranb(CYTHON_UNUSED PyObject *__pyx_self, PyOb
   return __pyx_r;
 }
 
-/* "randpy.pyx":62
- * 	return (c_ranb_vec(c_seed, n), c_seed)
+/* "randpy.pyx":78
+ *     return (c_ranb_vec(c_seed, n), c_seed)
  * 
  * def gasdev(seed, n = 1):             # <<<<<<<<<<<<<<
- * 	cdef Seed c_seed = make_seed(seed)
- * 
+ *     """
+ *     Generate a random number from a Gaussian distribution with a
  */
 
 /* Python wrapper */
 static PyObject *__pyx_pw_6randpy_7gasdev(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds); /*proto*/
-static PyMethodDef __pyx_mdef_6randpy_7gasdev = {"gasdev", (PyCFunction)__pyx_pw_6randpy_7gasdev, METH_VARARGS|METH_KEYWORDS, 0};
+static char __pyx_doc_6randpy_6gasdev[] = "\n    Generate a random number from a Gaussian distribution with a\n    mean of 0 and standard deviation of 1.\n\n    A negative number must be used as seed when initializing.\n    ";
+static PyMethodDef __pyx_mdef_6randpy_7gasdev = {"gasdev", (PyCFunction)__pyx_pw_6randpy_7gasdev, METH_VARARGS|METH_KEYWORDS, __pyx_doc_6randpy_6gasdev};
 static PyObject *__pyx_pw_6randpy_7gasdev(PyObject *__pyx_self, PyObject *__pyx_args, PyObject *__pyx_kwds) {
   PyObject *__pyx_v_seed = 0;
   PyObject *__pyx_v_n = 0;
@@ -1505,7 +1512,7 @@ static PyObject *__pyx_pw_6randpy_7gasdev(PyObject *__pyx_self, PyObject *__pyx_
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "gasdev") < 0)) __PYX_ERR(0, 62, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "gasdev") < 0)) __PYX_ERR(0, 78, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -1521,7 +1528,7 @@ static PyObject *__pyx_pw_6randpy_7gasdev(PyObject *__pyx_self, PyObject *__pyx_
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("gasdev", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 62, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("gasdev", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 78, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("randpy.gasdev", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -1549,55 +1556,55 @@ static PyObject *__pyx_pf_6randpy_6gasdev(CYTHON_UNUSED PyObject *__pyx_self, Py
   PyObject *(*__pyx_t_7)(PyObject *);
   __Pyx_RefNannySetupContext("gasdev", 0);
 
-  /* "randpy.pyx":63
+  /* "randpy.pyx":85
+ *     A negative number must be used as seed when initializing.
+ *     """
+ *     cdef Seed c_seed = make_seed(seed)             # <<<<<<<<<<<<<<
  * 
- * def gasdev(seed, n = 1):
- * 	cdef Seed c_seed = make_seed(seed)             # <<<<<<<<<<<<<<
- * 
- * 	if n > 1:
+ *     if n > 1:
  */
-  __pyx_t_1 = __pyx_f_6randpy_make_seed(__pyx_v_seed, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 63, __pyx_L1_error)
+  __pyx_t_1 = __pyx_f_6randpy_make_seed(__pyx_v_seed, 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 85, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_2 = __pyx_convert__from_py_struct__Seed(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 63, __pyx_L1_error)
+  __pyx_t_2 = __pyx_convert__from_py_struct__Seed(__pyx_t_1); if (unlikely(PyErr_Occurred())) __PYX_ERR(0, 85, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __pyx_v_c_seed = __pyx_t_2;
 
-  /* "randpy.pyx":65
- * 	cdef Seed c_seed = make_seed(seed)
+  /* "randpy.pyx":87
+ *     cdef Seed c_seed = make_seed(seed)
  * 
- * 	if n > 1:             # <<<<<<<<<<<<<<
- * 		res = [c_gasdev(c_seed) for x in xrange(n)]
- * 	else:
+ *     if n > 1:             # <<<<<<<<<<<<<<
+ *         res = [c_gasdev(c_seed) for x in xrange(n)]
+ *     else:
  */
-  __pyx_t_1 = PyObject_RichCompare(__pyx_v_n, __pyx_int_1, Py_GT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 65, __pyx_L1_error)
-  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 65, __pyx_L1_error)
+  __pyx_t_1 = PyObject_RichCompare(__pyx_v_n, __pyx_int_1, Py_GT); __Pyx_XGOTREF(__pyx_t_1); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 87, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_IsTrue(__pyx_t_1); if (unlikely(__pyx_t_3 < 0)) __PYX_ERR(0, 87, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   if (__pyx_t_3) {
 
-    /* "randpy.pyx":66
+    /* "randpy.pyx":88
  * 
- * 	if n > 1:
- * 		res = [c_gasdev(c_seed) for x in xrange(n)]             # <<<<<<<<<<<<<<
- * 	else:
- * 		res = c_gasdev(c_seed)
+ *     if n > 1:
+ *         res = [c_gasdev(c_seed) for x in xrange(n)]             # <<<<<<<<<<<<<<
+ *     else:
+ *         res = c_gasdev(c_seed)
  */
-    __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 66, __pyx_L1_error)
+    __pyx_t_1 = PyList_New(0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 88, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 66, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(1); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 88, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_INCREF(__pyx_v_n);
     __Pyx_GIVEREF(__pyx_v_n);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_v_n);
-    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_xrange, __pyx_t_4, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 66, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_Call(__pyx_builtin_xrange, __pyx_t_4, NULL); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 88, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_5);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     if (likely(PyList_CheckExact(__pyx_t_5)) || PyTuple_CheckExact(__pyx_t_5)) {
       __pyx_t_4 = __pyx_t_5; __Pyx_INCREF(__pyx_t_4); __pyx_t_6 = 0;
       __pyx_t_7 = NULL;
     } else {
-      __pyx_t_6 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 66, __pyx_L1_error)
+      __pyx_t_6 = -1; __pyx_t_4 = PyObject_GetIter(__pyx_t_5); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 88, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
-      __pyx_t_7 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 66, __pyx_L1_error)
+      __pyx_t_7 = Py_TYPE(__pyx_t_4)->tp_iternext; if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 88, __pyx_L1_error)
     }
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     for (;;) {
@@ -1605,17 +1612,17 @@ static PyObject *__pyx_pf_6randpy_6gasdev(CYTHON_UNUSED PyObject *__pyx_self, Py
         if (likely(PyList_CheckExact(__pyx_t_4))) {
           if (__pyx_t_6 >= PyList_GET_SIZE(__pyx_t_4)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_5 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_6); __Pyx_INCREF(__pyx_t_5); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 66, __pyx_L1_error)
+          __pyx_t_5 = PyList_GET_ITEM(__pyx_t_4, __pyx_t_6); __Pyx_INCREF(__pyx_t_5); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 88, __pyx_L1_error)
           #else
-          __pyx_t_5 = PySequence_ITEM(__pyx_t_4, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 66, __pyx_L1_error)
+          __pyx_t_5 = PySequence_ITEM(__pyx_t_4, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 88, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
           #endif
         } else {
           if (__pyx_t_6 >= PyTuple_GET_SIZE(__pyx_t_4)) break;
           #if CYTHON_ASSUME_SAFE_MACROS && !CYTHON_AVOID_BORROWED_REFS
-          __pyx_t_5 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_6); __Pyx_INCREF(__pyx_t_5); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 66, __pyx_L1_error)
+          __pyx_t_5 = PyTuple_GET_ITEM(__pyx_t_4, __pyx_t_6); __Pyx_INCREF(__pyx_t_5); __pyx_t_6++; if (unlikely(0 < 0)) __PYX_ERR(0, 88, __pyx_L1_error)
           #else
-          __pyx_t_5 = PySequence_ITEM(__pyx_t_4, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 66, __pyx_L1_error)
+          __pyx_t_5 = PySequence_ITEM(__pyx_t_4, __pyx_t_6); __pyx_t_6++; if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 88, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_5);
           #endif
         }
@@ -1625,7 +1632,7 @@ static PyObject *__pyx_pf_6randpy_6gasdev(CYTHON_UNUSED PyObject *__pyx_self, Py
           PyObject* exc_type = PyErr_Occurred();
           if (exc_type) {
             if (likely(exc_type == PyExc_StopIteration || PyErr_GivenExceptionMatches(exc_type, PyExc_StopIteration))) PyErr_Clear();
-            else __PYX_ERR(0, 66, __pyx_L1_error)
+            else __PYX_ERR(0, 88, __pyx_L1_error)
           }
           break;
         }
@@ -1633,49 +1640,48 @@ static PyObject *__pyx_pf_6randpy_6gasdev(CYTHON_UNUSED PyObject *__pyx_self, Py
       }
       __Pyx_XDECREF_SET(__pyx_v_x, __pyx_t_5);
       __pyx_t_5 = 0;
-      __pyx_t_5 = PyFloat_FromDouble(gasdev(__pyx_v_c_seed)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 66, __pyx_L1_error)
+      __pyx_t_5 = PyFloat_FromDouble(gasdev(__pyx_v_c_seed)); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 88, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_5);
-      if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_5))) __PYX_ERR(0, 66, __pyx_L1_error)
+      if (unlikely(__Pyx_ListComp_Append(__pyx_t_1, (PyObject*)__pyx_t_5))) __PYX_ERR(0, 88, __pyx_L1_error)
       __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     }
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __pyx_v_res = __pyx_t_1;
     __pyx_t_1 = 0;
 
-    /* "randpy.pyx":65
- * 	cdef Seed c_seed = make_seed(seed)
+    /* "randpy.pyx":87
+ *     cdef Seed c_seed = make_seed(seed)
  * 
- * 	if n > 1:             # <<<<<<<<<<<<<<
- * 		res = [c_gasdev(c_seed) for x in xrange(n)]
- * 	else:
+ *     if n > 1:             # <<<<<<<<<<<<<<
+ *         res = [c_gasdev(c_seed) for x in xrange(n)]
+ *     else:
  */
     goto __pyx_L3;
   }
 
-  /* "randpy.pyx":68
- * 		res = [c_gasdev(c_seed) for x in xrange(n)]
- * 	else:
- * 		res = c_gasdev(c_seed)             # <<<<<<<<<<<<<<
- * 
- * 	return (res, c_seed)
+  /* "randpy.pyx":90
+ *         res = [c_gasdev(c_seed) for x in xrange(n)]
+ *     else:
+ *         res = c_gasdev(c_seed)             # <<<<<<<<<<<<<<
+ *     return (res, c_seed)
  */
   /*else*/ {
-    __pyx_t_1 = PyFloat_FromDouble(gasdev(__pyx_v_c_seed)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 68, __pyx_L1_error)
+    __pyx_t_1 = PyFloat_FromDouble(gasdev(__pyx_v_c_seed)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 90, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __pyx_v_res = __pyx_t_1;
     __pyx_t_1 = 0;
   }
   __pyx_L3:;
 
-  /* "randpy.pyx":70
- * 		res = c_gasdev(c_seed)
- * 
- * 	return (res, c_seed)             # <<<<<<<<<<<<<<
+  /* "randpy.pyx":91
+ *     else:
+ *         res = c_gasdev(c_seed)
+ *     return (res, c_seed)             # <<<<<<<<<<<<<<
  */
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __pyx_convert__to_py_struct__Seed(__pyx_v_c_seed); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 70, __pyx_L1_error)
+  __pyx_t_1 = __pyx_convert__to_py_struct__Seed(__pyx_v_c_seed); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 91, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 70, __pyx_L1_error)
+  __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 91, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_INCREF(__pyx_v_res);
   __Pyx_GIVEREF(__pyx_v_res);
@@ -1687,12 +1693,12 @@ static PyObject *__pyx_pf_6randpy_6gasdev(CYTHON_UNUSED PyObject *__pyx_self, Py
   __pyx_t_4 = 0;
   goto __pyx_L0;
 
-  /* "randpy.pyx":62
- * 	return (c_ranb_vec(c_seed, n), c_seed)
+  /* "randpy.pyx":78
+ *     return (c_ranb_vec(c_seed, n), c_seed)
  * 
  * def gasdev(seed, n = 1):             # <<<<<<<<<<<<<<
- * 	cdef Seed c_seed = make_seed(seed)
- * 
+ *     """
+ *     Generate a random number from a Gaussian distribution with a
  */
 
   /* function exit code */
@@ -2878,6 +2884,7 @@ static struct PyModuleDef __pyx_moduledef = {
 #endif
 
 static __Pyx_StringTabEntry __pyx_string_tab[] = {
+  {&__pyx_kp_u_Generates_0_or_1_with_equal_pro, __pyx_k_Generates_0_or_1_with_equal_pro, sizeof(__pyx_k_Generates_0_or_1_with_equal_pro), 0, 1, 0, 0},
   {&__pyx_n_s_IndexError, __pyx_k_IndexError, sizeof(__pyx_k_IndexError), 0, 0, 1, 1},
   {&__pyx_n_s_KeyError, __pyx_k_KeyError, sizeof(__pyx_k_KeyError), 0, 0, 1, 1},
   {&__pyx_kp_s_No_value_specified_for_struct_at, __pyx_k_No_value_specified_for_struct_at, sizeof(__pyx_k_No_value_specified_for_struct_at), 0, 0, 1, 0},
@@ -2901,6 +2908,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_n, __pyx_k_n, sizeof(__pyx_k_n), 0, 0, 1, 1},
   {&__pyx_n_s_ran1, __pyx_k_ran1, sizeof(__pyx_k_ran1), 0, 0, 1, 1},
   {&__pyx_n_s_ranb, __pyx_k_ranb, sizeof(__pyx_k_ranb), 0, 0, 1, 1},
+  {&__pyx_kp_u_ranb_line_65, __pyx_k_ranb_line_65, sizeof(__pyx_k_ranb_line_65), 0, 1, 0, 0},
   {&__pyx_n_s_randpy, __pyx_k_randpy, sizeof(__pyx_k_randpy), 0, 0, 1, 1},
   {&__pyx_kp_s_randpy_pyx, __pyx_k_randpy_pyx, sizeof(__pyx_k_randpy_pyx), 0, 0, 1, 0},
   {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
@@ -2913,9 +2921,9 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
 };
 static int __Pyx_InitCachedBuiltins(void) {
   #if PY_MAJOR_VERSION >= 3
-  __pyx_builtin_xrange = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_xrange) __PYX_ERR(0, 66, __pyx_L1_error)
+  __pyx_builtin_xrange = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_xrange) __PYX_ERR(0, 88, __pyx_L1_error)
   #else
-  __pyx_builtin_xrange = __Pyx_GetBuiltinName(__pyx_n_s_xrange); if (!__pyx_builtin_xrange) __PYX_ERR(0, 66, __pyx_L1_error)
+  __pyx_builtin_xrange = __Pyx_GetBuiltinName(__pyx_n_s_xrange); if (!__pyx_builtin_xrange) __PYX_ERR(0, 88, __pyx_L1_error)
   #endif
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 81, __pyx_L1_error)
   __pyx_builtin_OverflowError = __Pyx_GetBuiltinName(__pyx_n_s_OverflowError); if (!__pyx_builtin_OverflowError) __PYX_ERR(1, 81, __pyx_L1_error)
@@ -2988,41 +2996,41 @@ static int __Pyx_InitCachedConstants(void) {
   __Pyx_GOTREF(__pyx_tuple__5);
   __Pyx_GIVEREF(__pyx_tuple__5);
 
-  /* "randpy.pyx":54
- * 	return c_seed
+  /* "randpy.pyx":56
+ *     return c_seed
  * 
  * def ran1(seed, n = 1):             # <<<<<<<<<<<<<<
- * 	cdef Seed c_seed = make_seed(seed)
- * 	return (c_ran1_vec(c_seed, n), c_seed)
+ *     """
+ *     Generate a uniform random number in the range (0, 1).
  */
-  __pyx_tuple__6 = PyTuple_Pack(3, __pyx_n_s_seed, __pyx_n_s_n, __pyx_n_s_c_seed); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __pyx_tuple__6 = PyTuple_Pack(3, __pyx_n_s_seed, __pyx_n_s_n, __pyx_n_s_c_seed); if (unlikely(!__pyx_tuple__6)) __PYX_ERR(0, 56, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__6);
   __Pyx_GIVEREF(__pyx_tuple__6);
-  __pyx_codeobj__7 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__6, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_randpy_pyx, __pyx_n_s_ran1, 54, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__7)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __pyx_codeobj__7 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__6, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_randpy_pyx, __pyx_n_s_ran1, 56, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__7)) __PYX_ERR(0, 56, __pyx_L1_error)
 
-  /* "randpy.pyx":58
- * 	return (c_ran1_vec(c_seed, n), c_seed)
+  /* "randpy.pyx":65
+ *     return (c_ran1_vec(c_seed, n), c_seed)
  * 
  * def ranb(seed, n = 1):             # <<<<<<<<<<<<<<
- * 	cdef Seed c_seed = make_seed(seed)
- * 	return (c_ranb_vec(c_seed, n), c_seed)
+ *     """
+ *     Generates 0 or 1 with equal probabilities. This is a wrapper for
  */
-  __pyx_tuple__8 = PyTuple_Pack(3, __pyx_n_s_seed, __pyx_n_s_n, __pyx_n_s_c_seed); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __pyx_tuple__8 = PyTuple_Pack(3, __pyx_n_s_seed, __pyx_n_s_n, __pyx_n_s_c_seed); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 65, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__8);
   __Pyx_GIVEREF(__pyx_tuple__8);
-  __pyx_codeobj__9 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__8, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_randpy_pyx, __pyx_n_s_ranb, 58, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__9)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __pyx_codeobj__9 = (PyObject*)__Pyx_PyCode_New(2, 0, 3, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__8, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_randpy_pyx, __pyx_n_s_ranb, 65, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__9)) __PYX_ERR(0, 65, __pyx_L1_error)
 
-  /* "randpy.pyx":62
- * 	return (c_ranb_vec(c_seed, n), c_seed)
+  /* "randpy.pyx":78
+ *     return (c_ranb_vec(c_seed, n), c_seed)
  * 
  * def gasdev(seed, n = 1):             # <<<<<<<<<<<<<<
- * 	cdef Seed c_seed = make_seed(seed)
- * 
+ *     """
+ *     Generate a random number from a Gaussian distribution with a
  */
-  __pyx_tuple__10 = PyTuple_Pack(5, __pyx_n_s_seed, __pyx_n_s_n, __pyx_n_s_c_seed, __pyx_n_s_res, __pyx_n_s_x); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 62, __pyx_L1_error)
+  __pyx_tuple__10 = PyTuple_Pack(5, __pyx_n_s_seed, __pyx_n_s_n, __pyx_n_s_c_seed, __pyx_n_s_res, __pyx_n_s_x); if (unlikely(!__pyx_tuple__10)) __PYX_ERR(0, 78, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__10);
   __Pyx_GIVEREF(__pyx_tuple__10);
-  __pyx_codeobj__11 = (PyObject*)__Pyx_PyCode_New(2, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_randpy_pyx, __pyx_n_s_gasdev, 62, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) __PYX_ERR(0, 62, __pyx_L1_error)
+  __pyx_codeobj__11 = (PyObject*)__Pyx_PyCode_New(2, 0, 5, 0, 0, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__10, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_randpy_pyx, __pyx_n_s_gasdev, 78, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__11)) __PYX_ERR(0, 78, __pyx_L1_error)
   __Pyx_RefNannyFinishContext();
   return 0;
   __pyx_L1_error:;
@@ -3131,40 +3139,40 @@ PyMODINIT_FUNC PyInit_randpy(void)
   if (__Pyx_patch_abc() < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   #endif
 
-  /* "randpy.pyx":54
- * 	return c_seed
+  /* "randpy.pyx":56
+ *     return c_seed
  * 
  * def ran1(seed, n = 1):             # <<<<<<<<<<<<<<
- * 	cdef Seed c_seed = make_seed(seed)
- * 	return (c_ran1_vec(c_seed, n), c_seed)
+ *     """
+ *     Generate a uniform random number in the range (0, 1).
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6randpy_3ran1, NULL, __pyx_n_s_randpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 54, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6randpy_3ran1, NULL, __pyx_n_s_randpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 56, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ran1, __pyx_t_1) < 0) __PYX_ERR(0, 54, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ran1, __pyx_t_1) < 0) __PYX_ERR(0, 56, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "randpy.pyx":58
- * 	return (c_ran1_vec(c_seed, n), c_seed)
+  /* "randpy.pyx":65
+ *     return (c_ran1_vec(c_seed, n), c_seed)
  * 
  * def ranb(seed, n = 1):             # <<<<<<<<<<<<<<
- * 	cdef Seed c_seed = make_seed(seed)
- * 	return (c_ranb_vec(c_seed, n), c_seed)
+ *     """
+ *     Generates 0 or 1 with equal probabilities. This is a wrapper for
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6randpy_5ranb, NULL, __pyx_n_s_randpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 58, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6randpy_5ranb, NULL, __pyx_n_s_randpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 65, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ranb, __pyx_t_1) < 0) __PYX_ERR(0, 58, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_ranb, __pyx_t_1) < 0) __PYX_ERR(0, 65, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "randpy.pyx":62
- * 	return (c_ranb_vec(c_seed, n), c_seed)
+  /* "randpy.pyx":78
+ *     return (c_ranb_vec(c_seed, n), c_seed)
  * 
  * def gasdev(seed, n = 1):             # <<<<<<<<<<<<<<
- * 	cdef Seed c_seed = make_seed(seed)
- * 
+ *     """
+ *     Generate a random number from a Gaussian distribution with a
  */
-  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6randpy_7gasdev, NULL, __pyx_n_s_randpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 62, __pyx_L1_error)
+  __pyx_t_1 = PyCFunction_NewEx(&__pyx_mdef_6randpy_7gasdev, NULL, __pyx_n_s_randpy); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 78, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (PyDict_SetItem(__pyx_d, __pyx_n_s_gasdev, __pyx_t_1) < 0) __PYX_ERR(0, 62, __pyx_L1_error)
+  if (PyDict_SetItem(__pyx_d, __pyx_n_s_gasdev, __pyx_t_1) < 0) __PYX_ERR(0, 78, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
   /* "randpy.pyx":1
@@ -3174,6 +3182,7 @@ PyMODINIT_FUNC PyInit_randpy(void)
  */
   __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
+  if (PyDict_SetItem(__pyx_t_1, __pyx_kp_u_ranb_line_65, __pyx_kp_u_Generates_0_or_1_with_equal_pro) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   if (PyDict_SetItem(__pyx_d, __pyx_n_s_test, __pyx_t_1) < 0) __PYX_ERR(0, 1, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
