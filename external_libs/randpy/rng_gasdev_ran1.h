@@ -6,7 +6,8 @@
  * All rights reserved.
  *
  */
- // Modified by Fernando Rozenblit in 2017 from the ran1 and gasdev mex files by Christian Mendl
+ // Modified by Fernando Rozenblit in 2017 from the ran1 and
+ // gasdev mex files by Christian Mendl
 
 const long NTAB = 32;
 

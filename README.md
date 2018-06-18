@@ -18,7 +18,8 @@ import sys
 sys.path.append('<path_to_main_dir>/modules')
 sys.path.append('<path_to_main_dir>/external_libs')
 ```
-
+The random number generator should be setup by running the setup.py file in
+external_libs/randpy as described in the readme file there.
 
 For now, all paths are hard-coded for my file system, so to run the
 code requires fixing those first.
