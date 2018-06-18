@@ -13,12 +13,20 @@
 # (random_number, seed)  = randpy.ran1(seed)
 # (random_numbers, seed) = randpy.ran1(seed, n)
 #
+# (random_number, seed)  = randpy.ranb(seed)
+# (random_numbers, seed) = randpy.ranb(seed, n)
+#
+#
 #
 #  Note: seed can be either a negative integer or a dictionary returned by the randpy functions
 #
 #  For Windows and Python 2.7, you need to install Visual Studio 2008 (or the Visual Studio C++ Tools for Python 2.7)
 #
 #  (Fernando Rozenblit, 2017)
+#
+#
+#  Introduced ranb and improved performance.
+#  (Sören Zapp, 2018)
 
 cdef extern from "rng_gasdev_ran1.h":
 	struct Seed:
@@ -29,7 +37,8 @@ cdef extern from "rng_gasdev_ran1.h":
 		double gset
 
 cdef extern from "rng_gasdev_ran1.cpp":
-	double c_ran1 "ran1" (Seed& seed)
+	list c_ran1_vec "ran1_vec" (Seed& seed, unsigned int num)
+	list c_ranb_vec "ranb_vec" (Seed& seed, unsigned int num)
 	double c_gasdev "gasdev" (Seed& seed)
 
 cpdef make_seed(seed):
@@ -44,13 +53,11 @@ cpdef make_seed(seed):
 
 def ran1(seed, n = 1):
 	cdef Seed c_seed = make_seed(seed)
+	return (c_ran1_vec(c_seed, n), c_seed)
 
-	if n > 1:
-		res = [c_ran1(c_seed) for x in xrange(n)]
-	else:
-		res = c_ran1(c_seed)
-
-	return (res, c_seed)
+def ranb(seed, n = 1):
+	cdef Seed c_seed = make_seed(seed)
+	return (c_ranb_vec(c_seed, n), c_seed)
 
 def gasdev(seed, n = 1):
 	cdef Seed c_seed = make_seed(seed)
