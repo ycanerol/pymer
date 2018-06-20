@@ -85,8 +85,7 @@ def fffanalyzer(exp_name, stimnrs):
             covars.append(np.zeros((filter_length, filter_length)))
 
         if bw:
-            randnrs, seed = randpy.ran1(seed, total_frames)
-            randnrs = [1 if i > .5 else -1 for i in randnrs]
+            randnrs, seed = randpy.ranb(seed, total_frames)
         else:
             randnrs, seed = randpy.gasdev(seed, total_frames)
 

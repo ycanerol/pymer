@@ -94,8 +94,7 @@ def stripeflickeranalysis(exp_name, stim_nrs):
         stas.append(np.zeros((sy, filter_length)))
 
         if bw:
-            randnrs, seed = randpy.ran1(seed, sy*total_frames)
-            randnrs = [1 if i > .5 else -1 for i in randnrs]
+            randnrs, seed = randpy.ranb(seed, sy*total_frames)
         else:
             randnrs, seed = randpy.gasdev(seed, sy*total_frames)
 
