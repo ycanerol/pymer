@@ -99,6 +99,12 @@ def stripeflickeranalysis(exp_name, stim_nrs):
             randnrs, seed = randpy.gasdev(seed, sy*total_frames)
 
         stimulus = np.reshape(randnrs, (sy, total_frames), order='F')
+
+        if bw:
+            # Since ranb returns zeros and ones, we need to convert the zeros
+            # into -1s.
+            stimulus = stimulus * 2 - 1
+
         del randnrs
 
         for k in range(filter_length, total_frames-filter_length+1):

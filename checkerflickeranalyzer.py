@@ -179,7 +179,8 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
 
     for i in range(nrofchunks):
         randnrs, seed = randpy.ranb(seed, chunksize)
-        stimulus = np.reshape(randnrs, (sx, sy, chunklength), order='F')
+        # Reshape and change 0's to -1's
+        stimulus = np.reshape(randnrs, (sx, sy, chunklength), order='F')*2-1
         del randnrs
         # Range of indices we are interested in for the current chunk
         if (i+1)*chunklength < total_frames:
