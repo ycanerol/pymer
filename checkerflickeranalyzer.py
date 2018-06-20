@@ -93,6 +93,16 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
 
     nblinks = parameters['Nblinks']
     try:
+        bw = parameters['blackwhite']
+    except KeyError:
+        bw = False
+
+    # Gaussian stimuli are not supported yet, we need to ensure we
+    # have a black and white stimulus
+    if bw is not True:
+        raise ValueError('Gaussian stimuli are not supported yet!')
+
+    try:
         seed = parameters['seed']
     except KeyError:
         seed = -10000
