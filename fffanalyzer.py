@@ -85,12 +85,13 @@ def fffanalyzer(exp_name, stimnrs):
             covars.append(np.zeros((filter_length, filter_length)))
 
         if bw:
-            randnrs, seed = randpy.ran1(seed, total_frames)
-            randnrs = [1 if i > .5 else -1 for i in randnrs]
+            randnrs, seed = randpy.ranb(seed, total_frames)
+            # Since ranb returns zeros and ones, we need to convert the zeros
+            # into -1s.
+            stimulus = np.array(randnrs) * 2 - 1
         else:
             randnrs, seed = randpy.gasdev(seed, total_frames)
-
-        stimulus = np.array(randnrs)
+            stimulus = np.array(randnrs)
 
         for k in range(filter_length, total_frames-filter_length+1):
             stim_small = stimulus[k-filter_length+1:k+1][::-1]
