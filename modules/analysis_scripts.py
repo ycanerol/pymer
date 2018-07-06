@@ -187,16 +187,15 @@ def saveframetimes(exp_name, forceextraction=False, **kwargs):
 
 
 def extractframetimes(exp_name, stimnr, threshold=75,
-                      sampling_rate=10000, plotting=False,
-                      time_offset=25, zeroADvalue=32768,
-                      microvoltsperADunit=25625/2048):
+                      plotting=False, time_offset=25,
+                      zeroADvalue=32768):
     """
     Extract frame timings from the triggered signal recorded alongside the
     MEA data.
 
-    Typically the timing data is in the file <stimulusnr>_253.bin. It comes in
-    pulses; onset and offset of the pulse denotes different things depending
-    on the stimulus code.
+    Typically the timing data is in the file /<stimulus_nr>_<253 or 61>.bin.
+    It comes in pulses; onset and offset of the pulse denotes different
+    things depending on the stimulus code.
 
     The most typical case is that pulse onset corresponds to when a frame comes
     on screen, and the pulse is turned off at the next frame (even if the
@@ -204,8 +203,9 @@ def extractframetimes(exp_name, stimnr, threshold=75,
     will be 1000 ms/refresh rate; which is ~16.6 ms for 60 Hz refresh rate.
     For these type of stimuli, using only pulse onsets is sufficient.
 
-    For some types of stimuli, the pulse offset is also important, for
-    these cases pulse onsets and offsets need to be used together.
+    For some types of stimuli (e.g. 1 blinks), the pulse offset is also
+    important, for these cases pulse onsets and offsets need to be
+    used together.
 
     There is also a delay between the pulse and the frame actually being
     displayed, which should be accounted for. The delay is 25 ms for setup
@@ -216,26 +216,21 @@ def extractframetimes(exp_name, stimnr, threshold=75,
         exp_dir:
             Experiment name.
         stimnr:
-            Number of the stimulus, to find /<stimulus_nr>_253.bin for the
-            stimulus of interest.
+            Number of the stimulus, to find the analog channel for pulses
+            for the stimulus of interest.
         threshold:
             The threshold in milivolts for the trigger signal. Default is
             75 mV.
-        sampling_rate:
-            Sampling rate of the recording in Hz.
         plotting:
             Whether to plot the whole trace and signal on-offsets. Slow for
             long recordings and frequent pulses (e.g. checkerflicker). Default
             is False.
         time_offset:
-            The delay between the pulse generation and the disply actually
+            The delay between the pulse generation and the display actually
             updating. Default is 25 ms.
         zeroADvalue:
             The zero point of the analog digital conversion. Copied directly
             from frametimings10.m by Norma(?). Default is 32768.
-        microvoltsperADunit:
-            Conversion factor between the readout and voltage. Resulting
-            conversion result is in milivolts. Default is 25625/2048.
 
 
     Returns:
@@ -252,8 +247,31 @@ def extractframetimes(exp_name, stimnr, threshold=75,
     import struct
 
     exp_dir = iof.exp_dir_fixer(exp_name)
+
+    # Check the type of array used, this will affect the relevant
+    # parameters for extraction.
+    # microvoltsperADunit was defined empirically from inspecting the
+    # pulse traces from different setups.
+    _, metadata = read_ods(exp_dir)
+    if metadata['MEA'] == 252:
+        binfname = '_253.bin'
+        microvoltsperADunit = 2066/244
+    elif metadata['MEA'] == 60:
+        binfname = '_61.bin'
+        microvoltsperADunit = 30984/386
+    else:
+        raise ValueError('Unknown MEA type.')
+
+    sampling_rate = metadata['sampling_freq']
+
+    if sampling_rate not in [10000, 25000]:
+        # Sanity check, sampling frequency could be mistyped.
+        raise ValueError('Sampling frequency of the recording is not '
+                         'in the ODS file is not one of the expected values! '
+                         'Check for missing zeros in sampling_freq.')
+
     filepath = os.path.join(exp_dir, 'RawChannels',
-                            str(stimnr)+'_253.bin')
+                            str(stimnr)+binfname)
 
     with open(filepath, mode='rb') as file:  # b is important -> binary
         file_content = file.read()
@@ -302,7 +320,8 @@ def extractframetimes(exp_name, stimnr, threshold=75,
         # Plot the whole voltage trace
         plt.figure(figsize=(10, 10))
         plt.plot(time, voltage)
-        plt.show()
+        plt.plot(time[onsets], voltage[onsets], 'gx')
+        plt.plot(time[offsets], voltage[offsets], 'rx')
 
         # Put all stimulus onset and offsets on top of each other
         # This part takes very long time for long recordings
