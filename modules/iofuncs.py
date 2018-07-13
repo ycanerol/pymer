@@ -38,13 +38,13 @@ def exp_dir_fixer(exp_name):
 
     """
     exp_dir = str(exp_name)
-    if not os.path.isdir(exp_dir):
-        exp_dir = os.path.join('/home/ycan/Documents/data/',
-                               exp_name)
+    for s in ['', 'Erol_']:
+        exp_name = s + exp_name
         if not os.path.isdir(exp_dir):
-            if exp_name[0] == '2':
-                exp_dir = '/home/ycan/Documents/data/Erol_'+exp_name
+            exp_dir = os.path.join('/home/ycan/Documents/data/',
+                                   exp_name)
             if not os.path.isdir(exp_dir):
+
                 files = glob.glob(exp_dir+'*')
 
                 if len(files) > 1:
@@ -53,11 +53,14 @@ def exp_dir_fixer(exp_name):
                                      ' pattern: {}\n {}'.format(exp_name,
                                                                 files))
                 elif len(files) == 0:
+                    if exp_name[0] == '2':
+                        continue
                     raise ValueError('No folders matching'
                                      ' pattern: {}'.format(exp_dir))
                 else:
                     exp_dir = files[0]
     return exp_dir
+
 
 
 def loadh5(path):
