@@ -53,12 +53,11 @@ def read_ods(exp_name, cutoff=4, defaultpath=True):
 
     First version: 2017-11-21 by Yunus
     """
-    exp_dir = iof.exp_dir_fixer(exp_name)
     if defaultpath:
+        exp_dir = iof.exp_dir_fixer(exp_name)
         filepath = exp_dir + '/spike_sorting.ods'
     else:
-        filepath = exp_dir
-
+        filepath = exp_name
     import pyexcel_ods as pyxo
     clusters = pyxo.get_data(filepath,
                              start_row=4, row_limit=400,
@@ -66,7 +65,15 @@ def read_ods(exp_name, cutoff=4, defaultpath=True):
     metadata = pyxo.get_data(filepath,
                              start_row=0, row_limit=2,
                              start_column=0, column_limit=25)
-    clusters = np.array(clusters['Sheet1'])
+
+    clusters = clusters['Sheet1']
+    # Check for trailing empty elements
+    # Iterate backwards because we are removing stuff
+    for i in range(len(clusters)):
+        el = clusters[len(clusters)-i-1]
+        if len(el)==0:
+            clusters.remove([])
+    clusters = np.array(clusters)
     # Get rid of unneeded columns using numpy advanced indexing
     try:
         clusters = clusters[:, [0, 4, 5]]
