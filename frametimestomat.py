@@ -19,6 +19,9 @@ def savenpztomat(exp_name, savedir=None):
     """
     exp_dir = iof.exp_dir_fixer(exp_name)
 
+    _, metadata = asc.read_ods(exp_dir)
+    monitor_delay = metadata['monitor_delay(s)']
+
     for i in range(1, 100):
         print(i)
         try:
@@ -29,8 +32,8 @@ def savenpztomat(exp_name, savedir=None):
             else:
                 raise
         # Convert to milliseconds b/c that is the convertion in MATLAB scripts
-        ft_on = ft_on*1000
-        ft_off = ft_off*1000
+        ft_on = (ft_on - monitor_delay)*1000
+        ft_off = (ft_off - monitor_delay)*1000
 
         stimname = iof.getstimname(exp_dir, i)
 
@@ -42,5 +45,3 @@ def savenpztomat(exp_name, savedir=None):
                          {'ftimes':ft_on,
                           'ftimes_offsets':ft_off},
                          appendmat=True)
-
-savenpztomat('20180710')

@@ -194,8 +194,7 @@ def saveframetimes(exp_name, forceextraction=False, **kwargs):
 
 
 def extractframetimes(exp_name, stimnr, threshold=75,
-                      plotting=False, time_offset=25,
-                      zeroADvalue=32768):
+                      plotting=False, zeroADvalue=32768):
     """
     Extract frame timings from the triggered signal recorded alongside the
     MEA data.
@@ -215,8 +214,7 @@ def extractframetimes(exp_name, stimnr, threshold=75,
     used together.
 
     There is also a delay between the pulse and the frame actually being
-    displayed, which should be accounted for. The delay is 25 ms for setup
-    Bilbo.
+    displayed, which should be accounted for. This is read from the ODS file.
 
     Parameters:
     ----------
@@ -232,9 +230,6 @@ def extractframetimes(exp_name, stimnr, threshold=75,
             Whether to plot the whole trace and signal on-offsets. Slow for
             long recordings and frequent pulses (e.g. checkerflicker). Default
             is False.
-        time_offset:
-            The delay between the pulse generation and the display actually
-            updating. Default is 25 ms.
         zeroADvalue:
             The zero point of the analog digital conversion. Copied directly
             from frametimings10.m by Norma(?). Default is 32768.
@@ -269,6 +264,8 @@ def extractframetimes(exp_name, stimnr, threshold=75,
     else:
         raise ValueError('Unknown MEA type.')
 
+    monitor_delay = metadata['monitor_delay(s)']
+
     sampling_rate = metadata['sampling_freq']
 
     if sampling_rate not in [10000, 25000]:
@@ -294,7 +291,7 @@ def extractframetimes(exp_name, stimnr, threshold=75,
     voltage = voltage - voltage[voltage < threshold].mean()
 
     time = np.arange(length) / (sampling_rate * 1e-3)  # In miliseconds
-    time = time + time_offset  # Correct for the time delay
+    time = time + monitor_delay # Correct for the time delay
 
     def thr_cros(array, threshold):
         size = array.shape[0]
