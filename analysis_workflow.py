@@ -10,6 +10,7 @@ import analysis_scripts as asc
 import datetime
 from spontanalyzer import spontanalyzer
 from fffanalyzer import fffanalyzer
+from allfff import allfff
 from onoffstepsanalyzer import onoffstepsanalyzer
 from checkerflickeranalyzer import checkerflickeranalyzer
 from plot_checker_stas import plot_checker_stas
@@ -42,6 +43,7 @@ asc.saveframetimes(exp_name)
 spontanalyzer(exp_name, spontaneous)
 
 fffanalyzer(exp_name, fullfieldflicker)
+allfff(exp_name, fullfieldflicker)
 
 onoffstepsanalyzer(exp_name, onoffsteps)
 allonoff(exp_name, onoffsteps)
