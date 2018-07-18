@@ -21,7 +21,8 @@ import numpy as np
 # kept in list_of_lists.
 
 list_of_lists = ['stas', 'max_inds', 'all_frs', 'all_parameters', 'fits']
-
+root_experiment_dir = '/media/ycan/datadrive/data/'
+valid_prefixes = ['Erol_']
 
 def exp_dir_fixer(exp_name):
     """
@@ -29,19 +30,19 @@ def exp_dir_fixer(exp_name):
     a full path it will be returned as is.
 
     Following are some valid inputs:
-        Erol_20171122_fe_re_fp
+        <valid_prefix>_20171122_fe_re_fp
         20171122_fe_re_fp
         20171122_f
         20171122
     They all will be turned into the same full path:
-        /home/ycan/Documents/data/Erol_20171122_252MEA_fr_re_fp
+        <root_experiment_dir>/<prefix>_20171122_252MEA_fr_re_fp
 
     """
     exp_dir = str(exp_name)
-    for s in ['', 'Erol_']:
+    for s in [''] + valid_prefixes:
         exp_name = s + exp_name
         if not os.path.isdir(exp_dir):
-            exp_dir = os.path.join('/home/ycan/Documents/data/',
+            exp_dir = os.path.join(root_experiment_dir,
                                    exp_name)
             if not os.path.isdir(exp_dir):
 
