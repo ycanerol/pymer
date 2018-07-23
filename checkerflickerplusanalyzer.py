@@ -204,6 +204,10 @@ def checkerflickerplusanalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     mask = runfreezemask(total_frames, runfr, frofr, refresh_rate)
     repeated_spiketimes = all_spiketimes[:, ~mask]
     run_spiketimes = all_spiketimes[:, mask]
+
+    # We need to cut down the total_frames by the same amount
+    # as spiketimes
+    total_run_frames = run_spiketimes.shape[1]
     # To be able to use the same code as checkerflicker analyzer,
     # convert to list again.
     run_spiketimes = list(run_spiketimes)
@@ -216,7 +220,7 @@ def checkerflickerplusanalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     chunklength = int(desired_chunk_size/(sx*sy))
 
     chunksize = chunklength*sx*sy
-    nrofchunks = int(np.ceil(total_frames/chunklength))
+    nrofchunks = int(np.ceil(total_run_frames/chunklength))
 
     print(f'\nAnalyzing {stimname}.\nTotal chunks: {nrofchunks}')
 
@@ -233,12 +237,12 @@ def checkerflickerplusanalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
         del randnrs
 
         # Range of indices we are interested in for the current chunk
-        if (i+1)*chunklength < total_frames:
+        if (i+1)*chunklength < total_run_frames:
             chunkind = slice(i*chunklength, (i+1)*chunklength)
             chunkend = chunklength
         else:
             chunkind = slice(i*chunklength, None)
-            chunkend = total_frames - i*chunklength
+            chunkend = total_run_frames - i*chunklength
 
         for k in range(filter_length, chunkend-filter_length+1):
             stim_small = stimulus[:, :, k-filter_length+1:k+1][:, :, ::-1]
@@ -286,10 +290,10 @@ def checkerflickerplusanalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
         os.makedirs(savepath, exist_ok=True)
     savepath = os.path.join(savepath, savefname)
 
-    keystosave = ['clusters', 'frametimings',
+    keystosave = ['clusters', 'frametimings', 'mask',
                   'repeated_spiketimes', 'run_spiketimes',
                   'frame_duration', 'max_inds', 'nblinks', 'stas',
-                  'stx_h', 'stx_w', 'total_frames', 'sx', 'sy',
+                  'stx_h', 'stx_w', 'total_run_frames', 'sx', 'sy',
                   'filter_length', 'stimname', 'exp_name', 'spikenrs',
                   'clusterstoanalyze', 'frametimingsfraction', 'cutoff',
                   'quals', 'nrofchunks', 'chunklength']
