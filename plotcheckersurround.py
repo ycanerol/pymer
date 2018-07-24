@@ -70,7 +70,7 @@ def plotcheckersurround(exp_name, stim_nr, filename=None, spikecutoff=1000,
     filter_length = data['filter_length']
     quals = data['quals'][-1, :]
 
-    spikenrs = np.array([a.sum() for a in data['all_spiketimes']])
+    spikenrs = data['spikenrs']
 
     c1 = np.where(spikenrs > spikecutoff)[0]
     c2 = np.where(clusters[:, 2] <= ratingcutoff)[0]

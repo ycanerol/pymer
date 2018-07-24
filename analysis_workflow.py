@@ -20,6 +20,7 @@ from stripeflickeranalysis import stripeflickeranalysis
 from plotstripestas import plotstripestas
 from allonoff import allonoff
 from stripesurround import stripesurround
+from checkerflickerplusanalyzer import checkerflickerplusanalyzer
 
 # Attempt to read from stdin
 try:
@@ -36,6 +37,8 @@ fullfieldflicker = sorted_stimuli['fff']
 onoffsteps = sorted_stimuli['onoffsteps']
 checkerflicker = sorted_stimuli['checkerflicker']
 stripeflicker = sorted_stimuli['stripeflicker']
+checkerflickerplus = sorted_stimuli['frozennoise'] + sorted_stimuli['checkerflickerplusmovie']
+
 
 asc.saveframetimes(exp_name)
 
@@ -58,6 +61,10 @@ for i in checkerflicker:
     plot_checker_stas(exp_name, i)
     plotcheckersurround(exp_name, i)
     plotcheckersvd(exp_name, i)
+
+for i in checkerflickerplus:
+    checkerflickerplusanalyzer(exp_name, i)
+
 
 end_time = datetime.datetime.now().strftime('%A %X')
 print(f'Analysis completed on {end_time}')
