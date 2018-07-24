@@ -23,25 +23,37 @@ import numpy as np
 
 list_of_lists = ['stas', 'max_inds', 'all_frs', 'all_parameters', 'fits']
 
-# Read paths from configuration file
-cfilename = 'config.json'
 
-if not os.path.isfile(cfilename):
-    cdict = {'root_experiment_dir': '',
-             'valid_prefixes': []}
-    with open(cfilename, 'w') as cfile:
-        json.dump(cdict, cfile, indent=4)
+def readconfig(cfilename='config.json'):
+    """
+    Read configuration from file. If the file does not exist, created with
+    empty entries.
 
-with open(cfilename, 'r') as cfile:
-    try:
-        cdict = json.load(cfile)
-    except json.JSONDecodeError as je:
-        raise AttributeError('Error while reading the configuration file '
-                             '\'{}\':\n{}'.format(os.path.realpath(cfile.name),
-                                                  str(je)))
+    Parameters:
+    -----------
+    cfilename:
+        Relative path to the configuration file.
 
-root_experiment_dir = cdict['root_experiment_dir']
-valid_prefixes = cdict['valid_prefixes']
+    Returns:
+    --------
+    cdict:
+        Dictionary holding configuration key-value pairs.
+    """
+    if not os.path.isfile(cfilename):
+        cdict = {'root_experiment_dir': '',
+                 'valid_prefixes': []}
+        with open(cfilename, 'w') as cfile:
+            json.dump(cdict, cfile, indent=4)
+
+    with open(cfilename, 'r') as cfile:
+        try:
+            cdict = json.load(cfile)
+        except json.JSONDecodeError as je:
+            raise AttributeError('Error while reading the '
+                                 'configuration file \'{}\':'
+                                 '\n{}'.format(os.path.realpath(cfile.name),
+                                                      str(je)))
+    return cdict
 
 
 def exp_dir_fixer(exp_name):
@@ -58,11 +70,12 @@ def exp_dir_fixer(exp_name):
         <root_experiment_dir>/<prefix>_20171122_252MEA_fr_re_fp
 
     """
+    cfg = readconfig()
     exp_dir = str(exp_name)
-    for s in [''] + valid_prefixes:
+    for s in [''] + cfg['valid_prefixes']:
         exp_name = s + exp_name
         if not os.path.isdir(exp_dir):
-            exp_dir = os.path.join(root_experiment_dir,
+            exp_dir = os.path.join(cfg['root_experiment_dir'],
                                    exp_name)
             if not os.path.isdir(exp_dir):
 
