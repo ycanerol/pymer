@@ -8,6 +8,7 @@ Created on Fri Jan  5 16:55:33 2018
 Functions related to reading/writing files.
 """
 
+import json
 import os
 import glob
 import numpy as np
@@ -21,8 +22,27 @@ import numpy as np
 # kept in list_of_lists.
 
 list_of_lists = ['stas', 'max_inds', 'all_frs', 'all_parameters', 'fits']
-root_experiment_dir = '/media/ycan/datadrive/data/'
-valid_prefixes = ['Erol_']
+
+# Read paths from configuration file
+cfilename = 'config.json'
+
+if not os.path.isfile(cfilename):
+    cdict = {'root_experiment_dir': '',
+             'valid_prefixes': []}
+    with open(cfilename, 'w') as cfile:
+        json.dump(cdict, cfile, indent=4)
+
+with open(cfilename, 'r') as cfile:
+    try:
+        cdict = json.load(cfile)
+    except json.JSONDecodeError as je:
+        raise AttributeError('Error while reading the configuration file '
+                             '\'{}\':\n{}'.format(os.path.realpath(cfile.name),
+                                                  str(je)))
+
+root_experiment_dir = cdict['root_experiment_dir']
+valid_prefixes = cdict['valid_prefixes']
+
 
 def exp_dir_fixer(exp_name):
     """
