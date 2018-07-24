@@ -9,9 +9,10 @@ Collection of analysis functions
 """
 import os
 import glob
+import struct
+import warnings
 import numpy as np
 import iofuncs as iof
-import warnings
 
 def read_ods(exp_name, cutoff=4, defaultpath=True):
     """
@@ -71,7 +72,7 @@ def read_ods(exp_name, cutoff=4, defaultpath=True):
     # Iterate backwards because we are removing stuff
     for i in range(len(clusters)):
         el = clusters[len(clusters)-i-1]
-        if len(el)==0:
+        if len(el) == 0:
             clusters.remove([])
     clusters = np.array(clusters)
     # Get rid of unneeded columns using numpy advanced indexing
@@ -246,7 +247,6 @@ def extractframetimes(exp_name, stimnr, threshold=75,
             particular stimulus requires it.
 
     """
-    import struct
 
     exp_dir = iof.exp_dir_fixer(exp_name)
 
@@ -277,43 +277,24 @@ def extractframetimes(exp_name, stimnr, threshold=75,
     filepath = os.path.join(exp_dir, 'RawChannels',
                             str(stimnr)+binfname)
 
-    with open(filepath, mode='rb') as file:  # b is important -> binary
-        file_content = file.read()
+    file_content = read_binaryfile(filepath)
 
-    # The header contains the length of the recording as a unsigned 32 bit int
-    length = struct.unpack('I', file_content[:4])[0]
-    # The rest of the binary data is the voltage trace, as unsigned 16 bit int
-    voltage_raw = np.array(struct.unpack('H'*length, file_content[16:]))
+    length, voltage_raw = parse_binary(file_content)
 
-    # Convert units to microvolts, using constants from Norma(?)'s script
-    voltage = (voltage_raw - zeroADvalue) / microvoltsperADunit
+    voltage = convert_bin2voltage(voltage_raw, zeroADvalue=zeroADvalue,
+                                  microvoltsperADunit=microvoltsperADunit)
+
     # Set the baseline value to zero
     voltage = voltage - voltage[voltage < threshold].mean()
 
     time = np.arange(length) / (sampling_rate * 1e-3)  # In miliseconds
     time = time + monitor_delay # Correct for the time delay
 
-    def thr_cros(array, threshold):
-        size = array.shape[0]
-        oncross = np.array([False]*size)
-        offcross = np.array([False]*size)
-        for i in range(size-1):
-            if array[i-1] < threshold and array[i] > threshold:
-                oncross[i] = True
-            if array[i-1] > threshold and array[i] < threshold:
-                offcross[i] = True
-        # If a pulse is interrupted at the end, it will cause a bug
-        # that the first element in offcross is True (due to negative
-        # index referring to the end.)
-        # This fixes that issue.
-        offcross[0] = False
-        return oncross, offcross
-
     print('Total recording time: {:6.1f} seconds'
           ' (= {:3.1f} minutes)'.format(length/sampling_rate,
                                         (length/sampling_rate)/60))
 
-    onsets, offsets = thr_cros(voltage, threshold)
+    onsets, offsets = detect_threshold_crossing(voltage, threshold)
     if onsets.sum() != offsets.sum():
         print('Number of pulse onset and offsets are not equal!'
               'The last pulse probably was interrupted. Last pulse'
@@ -346,6 +327,63 @@ def extractframetimes(exp_name, stimnr, threshold=75,
     frametimings_off = time[offsets]/1000
 
     return frametimings_on, frametimings_off
+
+
+def read_binaryfile(filepath):
+    """
+    Reads and returns the contents of a binary file.
+
+    Helper function for extractframetimes but also usable on its own.
+    """
+    with open(filepath, 'rb') as file:
+        file_content = file.read()
+    return file_content
+
+
+def parse_binary(file_content):
+    """
+    Parses the binary file returned by read_binaryfile by separating
+    into length and voltage trace parts.
+
+    Helper function for extractframetimes but also usable on its own.
+    """
+    # The header contains the length of the recording as a unsigned 32 bit int
+    length = struct.unpack('I', file_content[:4])[0]
+    # The rest of the binary data is the voltage trace, as unsigned 16 bit int
+    voltage_raw = np.array(struct.unpack('H'*length, file_content[16:]))
+
+    return length, voltage_raw
+
+
+def convert_bin2voltage(voltage_raw, zeroADvalue=32768,
+                        microvoltsperADunit=2066/244):
+    """
+    Converts raw voltage data in binary format into units of microvolts.
+
+    Helper function for extractframetimes but also usable on its own.
+    """
+    voltage = (voltage_raw - zeroADvalue) / microvoltsperADunit
+    return voltage
+
+def detect_threshold_crossing(array, threshold):
+    """
+    Find threshold crossings in a given array. This is a helper function
+    for extract channels.
+    """
+    size = array.shape[0]
+    oncross = np.array([False]*size)
+    offcross = np.array([False]*size)
+    for i in range(size-1):
+        if array[i-1] < threshold and array[i] > threshold:
+            oncross[i] = True
+        if array[i-1] > threshold and array[i] < threshold:
+            offcross[i] = True
+    # If a pulse is interrupted at the end, it will cause a bug
+    # that the first element in offcross is True (due to negative
+    # index referring to the end.)
+    # This fixes that issue.
+    offcross[0] = False
+    return oncross, offcross
 
 
 def read_raster(exp_name, stimnr, channel, cluster, defaultpath=True):
@@ -554,7 +592,7 @@ def ft_nblinks(exp_dir, stimulusnr, nblinks, refresh_rate):
     # nblinks values.
     if nblinks in [1, 3]:
         ft_on, ft_off = readframetimes(exp_dir, stimulusnr,
-                                           returnoffsets=True)
+                                       returnoffsets=True)
         # Initialize empty array twice the size of one of them, assign
         # value from on or off to every other element.
         frametimings = np.empty(ft_on.shape[0]*2, dtype=float)
