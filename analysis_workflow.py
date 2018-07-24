@@ -64,6 +64,9 @@ for i in checkerflicker:
 
 for i in checkerflickerplus:
     checkerflickerplusanalyzer(exp_name, i)
+    plot_checker_stas(exp_name, i)
+    plotcheckersurround(exp_name, i)
+    plotcheckersvd(exp_name, i)
 
 
 end_time = datetime.datetime.now().strftime('%A %X')
