@@ -71,6 +71,8 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     scr_width = metadata['screen_width']
     scr_height = metadata['screen_height']
 
+    refresh_rate = metadata['refresh_rate']
+
     parameters = asc.read_parameters(exp_dir, stimulusnr)
 
     stx_h = parameters['stixelheight']
@@ -117,32 +119,8 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     else:
         raise ValueError('sx and sy must be integers')
 
-    # If the frame rate of the checkerflicker stimulus is 16 ms, (i.e.
-    # Nblinks is set to 1), frame timings should be handled differently
-    # because the state of the pulse can only be changed when a new
-    # frame is delivered. For this reason, the offsets of the pulses
-    # also denote a frame change as well as onsets.
-    if nblinks == 1:
-        ft_on, ft_off = asc.readframetimes(exp_dir, stimulusnr,
-                                           returnoffsets=True)
-        # Initialize empty array twice the size of one of them, assign
-        # value from on or off to every other element.
-        frametimings = np.empty(ft_on.shape[0]*2, dtype=float)
-        frametimings[::2] = ft_on
-        frametimings[1::2] = ft_off
-        # Set filter length so that temporal filter is ~600 ms. The unit
-        # here is number of frames.
-        filter_length = 40
-    elif nblinks == 2:
-        frametimings = asc.readframetimes(exp_dir, stimulusnr)
-        filter_length = 20
-    elif nblinks == 4:
-        frametimings = asc.readframetimes(exp_dir, stimulusnr)
-        # There are two pulses per frame
-        frametimings = frametimings[::2]
-        filter_length = 10
-    else:
-        raise ValueError('nblinks is expected to be 1, 2 or 4.')
+    filter_length, frametimings = asc.ft_nblinks(exp_dir, stimulusnr,
+                                                 nblinks, refresh_rate)
 
     savefname = str(stimulusnr)+'_data'
 

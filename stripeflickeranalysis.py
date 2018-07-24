@@ -30,6 +30,8 @@ def stripeflickeranalysis(exp_name, stim_nrs):
         scr_width = metadata['screen_width']
         px_size = metadata['pixel_size(um)']
 
+        refresh_rate = metadata['refresh_rate']
+
         stx_w = parameters['stixelwidth']
         stx_h = parameters['stixelheight']
 
@@ -53,22 +55,8 @@ def stripeflickeranalysis(exp_name, stim_nrs):
         except KeyError:
             seed = -10000
 
-        if nblinks == 1:
-            ft_on, ft_off = asc.readframetimes(exp_dir, stim_nr,
-                                               returnoffsets=True)
-            # Initialize empty array twice the size of one of them, assign
-            # value from on or off to every other element.
-            frametimings = np.empty(ft_on.shape[0]*2, dtype=float)
-            frametimings[::2] = ft_on
-            frametimings[1::2] = ft_off
-            # Set filter length so that temporal filter is ~600 ms.
-            # The unit here is number of frames.
-            filter_length = 40
-        elif nblinks == 2:
-            frametimings = asc.readframetimes(exp_dir, stim_nr)
-            filter_length = 20
-        else:
-            raise ValueError('Unexpected value for nblinks.')
+        filter_length, frametimings = asc.ft_nblinks(exp_dir, stim_nr,
+                                                     nblinks, refresh_rate)
 
         # Omit everything that happens before the first 10 seconds
         cut_time = 10

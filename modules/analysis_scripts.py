@@ -529,3 +529,50 @@ def stimulisorter(exp_name):
                 toadd = sorted_stimuli[stimname]
                 toadd = toadd.append(stimnr)
     return sorted_stimuli
+
+
+def ft_nblinks(exp_dir, stimulusnr, nblinks, refresh_rate):
+    """
+    Return the appropriate frametimings array depending on the stimulus
+    update frequency.
+    Parameters
+        nblinks :
+            Number of screen frames for each stimulus frame, as defined
+            in stimulator program.
+        refresh_rate :
+            Update frequency of the screen that is used. Typically 60Hz.
+    Returns
+        filter_length:
+            Appropriate length of the temporal filter length for STA
+        frametimings :
+            Array containing timepoints in seconds where the stimulus
+            frame was updated.
+
+    """
+
+    # Both onsets and offsets are required in the case of odd numbered
+    # nblinks values.
+    if nblinks in [1, 3]:
+        ft_on, ft_off = readframetimes(exp_dir, stimulusnr,
+                                           returnoffsets=True)
+        # Initialize empty array twice the size of one of them, assign
+        # value from on or off to every other element.
+        frametimings = np.empty(ft_on.shape[0]*2, dtype=float)
+        frametimings[::2] = ft_on
+        frametimings[1::2] = ft_off
+
+        if nblinks == 3:
+            frametimings = frametimings[::3]
+
+    elif nblinks in [2, 4]:
+        frametimings = readframetimes(exp_dir, stimulusnr)
+        if nblinks == 4:
+            # There are two pulses per frame
+            frametimings = frametimings[::2]
+    else:
+        raise ValueError(f'Unexpected value for nblinks: {nblinks}')
+    # Set the filter length to ~600 ms, this is typically the longest
+    # temporal filter one needs. The exact number is chosen to have a
+    # round filter_length for nblinks= 1, 2, 4
+    filter_length = np.int(np.round(.666*refresh_rate/nblinks))
+    return filter_length, frametimings
