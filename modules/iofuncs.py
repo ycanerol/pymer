@@ -34,6 +34,15 @@ def readconfig():
     cdict:
         Dictionary holding configuration key-value pairs.
 
+    Raises:
+    -------
+    FileNotFoundError:
+        If configuration file is not found.
+    RuntimeError:
+        If configuration file is empty.
+    AttributeError:
+        If configuration file contains syntax errors.
+
     Notes:
     ------
     The JSON configuration file should contain a dict with the following keys:
@@ -42,8 +51,12 @@ def readconfig():
     """
     cfilename='config.json'
     if not os.path.isfile(cfilename):
+        cdict = {'root_experiment_dir': None,
+                 'valid_prefixes': []}
+        with open(cfilename, 'w') as cfile:
+            json.dump(cdict, cfile, indent=4)
         raise FileNotFoundError('Configuration file not found. '
-                                'Expected location '
+                                'Empty file created in '
                                 '\'{}\''.format(os.path.realpath(cfilename)))
     elif os.stat(cfilename).st_size <= 0:
         raise RuntimeError('Configuration file may not be empty')
@@ -74,6 +87,9 @@ def exp_dir_fixer(exp_name):
 
     """
     cfg = readconfig()
+    if 'root_experiment_dir' not in cfg or cfg['root_experiment_dir'] is None:
+        raise ValueError('Invalid root experiment directory')
+
     exp_dir = str(exp_name)
     for s in [''] + cfg['valid_prefixes']:
         exp_name = s + exp_name
