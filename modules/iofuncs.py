@@ -24,26 +24,29 @@ import numpy as np
 list_of_lists = ['stas', 'max_inds', 'all_frs', 'all_parameters', 'fits']
 
 
-def readconfig(cfilename='config.json'):
+def readconfig():
     """
     Read configuration from file. If the file does not exist, created with
     empty entries.
-
-    Parameters:
-    -----------
-    cfilename:
-        Relative path to the configuration file.
 
     Returns:
     --------
     cdict:
         Dictionary holding configuration key-value pairs.
+
+    Notes:
+    ------
+    The JSON configuration file should contain a dict with the following keys:
+        root_experiment_dir: string
+        valid_prefixes: list of strings
     """
+    cfilename='config.json'
     if not os.path.isfile(cfilename):
-        cdict = {'root_experiment_dir': '',
-                 'valid_prefixes': []}
-        with open(cfilename, 'w') as cfile:
-            json.dump(cdict, cfile, indent=4)
+        raise FileNotFoundError('Configuration file not found. '
+                                'Expected location '
+                                '\'{}\''.format(os.path.realpath(cfilename)))
+    elif os.stat(cfilename).st_size <= 0:
+        raise RuntimeError('Configuration file may not be empty')
 
     with open(cfilename, 'r') as cfile:
         try:
