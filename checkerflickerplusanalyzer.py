@@ -21,8 +21,8 @@ import plotfuncs as plf
 def runfreezemask(total_frames, runfr, frofr, refresh_rate):
     mask = np.array([], dtype='bool')
     nr_required = np.ceil(total_frames
-                          /refresh_rate
-                          /((runfr+frofr)/refresh_rate))
+                          / refresh_rate
+                          / ((runfr+frofr)/refresh_rate))
     nr_required = np.int(nr_required)
     for i in range(nr_required):
         for bo, j in zip([True, False], [runfr, frofr]):
@@ -32,7 +32,7 @@ def runfreezemask(total_frames, runfr, frofr, refresh_rate):
 
 
 def checkerflickerplusanalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
-                           frametimingsfraction=None, cutoff=4):
+                               frametimingsfraction=None, cutoff=4):
     """
     Analyzes checkerflicker-like data, typically interspersed
     stimuli in between chunks of checkerflicker.
@@ -97,10 +97,7 @@ def checkerflickerplusanalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     marginkeys = ['tmargin', 'bmargin', 'rmargin', 'lmargin']
     margins = []
     for key in marginkeys:
-        try:
-            margins.append(parameters[key])
-        except KeyError:
-            margins.append(0)
+        margins.append(asc.parameter_dict_get(parameters, key, 0))
 
     # Subtract bottom and top from vertical dimension; left and right
     # from horizontal dimension
@@ -108,21 +105,14 @@ def checkerflickerplusanalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     scr_height = scr_height-sum(margins[:2])
 
     nblinks = parameters['Nblinks']
-    try:
-        bw = parameters['blackwhite']
-    except KeyError:
-        bw = False
+    bw = asc.parameter_dict_get(parameters, 'blackwhite', False)
 
     # Gaussian stimuli are not supported yet, we need to ensure we
     # have a black and white stimulus
     if bw is not True:
         raise ValueError('Gaussian stimuli are not supported yet!')
 
-    try:
-        seed = parameters['seed']
-    except KeyError:
-        seed = -1000
-
+    seed = asc.parameter_dict_get(parameters, 'seed', -1000)
 
     sx, sy = scr_height/stx_h, scr_width/stx_w
 
@@ -137,15 +127,13 @@ def checkerflickerplusanalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     filter_length, frametimings = asc.ft_nblinks(exp_dir, stimulusnr,
                                                  nblinks, refresh_rate)
 
-    if parameters['stimulus_type'] in ['FrozenNoise', 'checkerflickerplusmovie']:
+    if parameters['stimulus_type'] in ['FrozenNoise',
+                                       'checkerflickerplusmovie']:
         runfr = parameters['RunningFrames']
         frofr = parameters['FrozenFrames']
         # To generate the frozen noise, a second seed is used.
         # The default value of this is -10000 as per StimulateOpenGL
-        try:
-            secondseed = parameters['secondseed']
-        except KeyError:
-            secondseed = -10000
+        secondseed = asc.parameter_dict_get(parameters, 'secondseed', -10000)
 
     savefname = str(stimulusnr)+'_data'
 
@@ -187,7 +175,6 @@ def checkerflickerplusanalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     # To be able to use the same code as checkerflicker analyzer,
     # convert to list again.
     run_spiketimes = list(run_spiketimes)
-
 
     # Empirically determined to be best for 32GB RAM
     desired_chunk_size = 21600000

@@ -614,3 +614,14 @@ def ft_nblinks(exp_dir, stimulusnr, nblinks, refresh_rate):
     # round filter_length for nblinks= 1, 2, 4
     filter_length = np.int(np.round(.666*refresh_rate/nblinks))
     return filter_length, frametimings
+
+
+def parameter_dict_get(dictionary, key, defaultvalue):
+    """
+    This function is used for parsing information from stimulus
+    parameter files.
+    """
+    try:
+        return dictionary[key]
+    except KeyError:
+        return defaultvalue

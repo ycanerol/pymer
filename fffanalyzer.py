@@ -40,15 +40,6 @@ def fffanalyzer(exp_name, stimnrs):
             raise ValueError('Make sure the stimulus is full field flicker.')
 
         nblinks = parameters['Nblinks']
-        try:
-            bw = parameters['blackwhite']
-        except KeyError:
-            bw = False
-
-        try:
-            seed = parameters['seed']
-        except KeyError:
-            seed = -10000
 
         if nblinks == 1:
             ft_on, ft_off = asc.readframetimes(exp_dir, stimnr,
@@ -66,6 +57,11 @@ def fffanalyzer(exp_name, stimnrs):
             filter_length = 20
         else:
             raise ValueError('Unexpected value for nblinks.')
+
+        bw = asc.parameter_dict_get(parameters, 'blackwhite', False)
+
+        seed = asc.parameter_dict_get(parameters, 'seed', -10000)
+
 
         frame_duration = np.average(np.ediff1d(frametimings))
         total_frames = frametimings.shape[0]
