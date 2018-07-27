@@ -280,7 +280,7 @@ def checkerflickerplusanalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
 
     np.savez(savepath, **datadict)
 
-    t = (np.arange(nrofchunks)*chunklength*frame_duration)/60
+    t = (np.arange(nrofchunks)*chunklength*frame_duration)/refresh_rate
     qmax = np.max(quals, axis=0)
     qualsn = quals/qmax[np.newaxis, :]
 

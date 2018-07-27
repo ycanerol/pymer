@@ -38,16 +38,19 @@ def onoffstepsanalyzer(exp_name, stim_nrs):
 
         stimname = iof.getstimname(exp_dir, stim_nr)
 
-        clusters, _ = asc.read_ods(exp_dir, cutoff=4)
+        clusters, metadata = asc.read_ods(exp_dir, cutoff=4)
 
         clusterids = plf.clusters_to_ids(clusters)
 
         parameters = asc.read_parameters(exp_dir, stim_nr)
 
-        # Divide by 60 to convert from number of frames to seconds
-        stim_duration = parameters['Nframes']/60
+        refresh_rate = metadata['refresh_rate']
+
+        # Divide by the refresh rate to convert from number of
+        # frames to seconds
+        stim_duration = parameters['Nframes']/refresh_rate
         try:
-            preframe_duration = parameters['preframes']/60
+            preframe_duration = parameters['preframes']/refresh_rate
         except KeyError:
             preframe_duration = 0
 
