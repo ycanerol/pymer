@@ -147,6 +147,34 @@ def checkerflickerplusanalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
         except KeyError:
             secondseed = -10000
 
+        if parameters['stimulus_type'] == 'checkerflickerplusmovie':
+            mblinks = parameters['Nblinksmovie']
+            # TODO: Retrivee the number of frames from parameters['path']
+            moviefr = 307
+            noiselen = (runfr+frofr) * nblinks
+            movielen = moviefr * mblinks
+            triallen = noiselen + movielen
+
+            ft_on, ft_off = asc.readframetimes(exp_dir, stimulusnr,
+                                               returnoffsets=True)
+            frametimings = np.empty(ft_on.shape[0]*2, dtype=float)
+            frametimings[::2] = ft_on
+            frametimings[1::2] = ft_off
+
+            import math
+            ntrials = math.floor(frametimings.size/triallen)
+            trials = np.zeros((ntrials, runfr + frofr + moviefr))
+            for t in range(ntrials):
+                frange = frametimings[t*triallen:(t+1)*triallen]
+                trials[t, :runfr+frofr] = frange[:noiselen][::nblinks]
+                trials[t, runfr+frofr:] = frange[noiselen:][::mblinks]
+            frametimings = trials.ravel()
+
+            filter_length = np.int(np.round(.666*refresh_rate/nblinks))
+
+            # Add frozen movie to frozen noise (for masking)
+            frofr += moviefr
+
     savefname = str(stimulusnr)+'_data'
 
     if clusterstoanalyze:
