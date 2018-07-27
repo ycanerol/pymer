@@ -8,6 +8,7 @@ Created on Fri Jan  5 16:55:33 2018
 Functions related to reading/writing files.
 """
 
+import json
 import os
 import glob
 import numpy as np
@@ -21,8 +22,55 @@ import numpy as np
 # kept in list_of_lists.
 
 list_of_lists = ['stas', 'max_inds', 'all_frs', 'all_parameters', 'fits']
-root_experiment_dir = '/media/ycan/datadrive/data/'
-valid_prefixes = ['Erol_']
+
+
+def readconfig():
+    """
+    Read configuration from file. If the file does not exist, created with
+    empty entries.
+
+    Returns:
+    --------
+    cdict:
+        Dictionary holding configuration key-value pairs.
+
+    Raises:
+    -------
+    FileNotFoundError:
+        If configuration file is not found.
+    RuntimeError:
+        If configuration file is empty.
+    AttributeError:
+        If configuration file contains syntax errors.
+
+    Notes:
+    ------
+    The JSON configuration file should contain a dict with the following keys:
+        root_experiment_dir: string
+        valid_prefixes: list of strings
+    """
+    cfilename='config.json'
+    if not os.path.isfile(cfilename):
+        cdict = {'root_experiment_dir': None,
+                 'valid_prefixes': []}
+        with open(cfilename, 'w') as cfile:
+            json.dump(cdict, cfile, indent=4)
+        raise FileNotFoundError('Configuration file not found. '
+                                'Empty file created in '
+                                '\'{}\''.format(os.path.realpath(cfilename)))
+    elif os.stat(cfilename).st_size <= 0:
+        raise RuntimeError('Configuration file may not be empty')
+
+    with open(cfilename, 'r') as cfile:
+        try:
+            cdict = json.load(cfile)
+        except json.JSONDecodeError as je:
+            raise AttributeError('Error while reading the '
+                                 'configuration file \'{}\':'
+                                 '\n{}'.format(os.path.realpath(cfile.name),
+                                                      str(je)))
+    return cdict
+
 
 def exp_dir_fixer(exp_name):
     """
@@ -38,11 +86,15 @@ def exp_dir_fixer(exp_name):
         <root_experiment_dir>/<prefix>_20171122_252MEA_fr_re_fp
 
     """
+    cfg = readconfig()
+    if 'root_experiment_dir' not in cfg or cfg['root_experiment_dir'] is None:
+        raise ValueError('Invalid root experiment directory')
+
     exp_dir = str(exp_name)
-    for s in [''] + valid_prefixes:
+    for s in [''] + cfg['valid_prefixes']:
         exp_name = s + exp_name
         if not os.path.isdir(exp_dir):
-            exp_dir = os.path.join(root_experiment_dir,
+            exp_dir = os.path.join(cfg['root_experiment_dir'],
                                    exp_name)
             if not os.path.isdir(exp_dir):
 
