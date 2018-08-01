@@ -30,42 +30,25 @@ def fffanalyzer(exp_name, stimnrs):
 
         stimname = iof.getstimname(exp_name, stimnr)
 
-        clusters, _ = asc.read_ods(exp_dir)
+        clusters, metadata = asc.read_ods(exp_dir)
 
         parameters = asc.read_parameters(exp_dir, stimnr)
 
         clusterids = plf.clusters_to_ids(clusters)
 
+        refresh_rate = metadata['refresh_rate']
+
         if parameters['stixelheight'] < 600 or parameters['stixelwidth'] < 800:
             raise ValueError('Make sure the stimulus is full field flicker.')
 
         nblinks = parameters['Nblinks']
-        try:
-            bw = parameters['blackwhite']
-        except KeyError:
-            bw = False
 
-        try:
-            seed = parameters['seed']
-        except KeyError:
-            seed = -10000
+        bw = asc.parameter_dict_get(parameters, 'blackwhite', False)
 
-        if nblinks == 1:
-            ft_on, ft_off = asc.readframetimes(exp_dir, stimnr,
-                                               returnoffsets=True)
-            # Initialize empty array twice the size of one of them, assign
-            # value from on or off to every other element.
-            frametimings = np.empty(ft_on.shape[0]*2, dtype=float)
-            frametimings[::2] = ft_on
-            frametimings[1::2] = ft_off
-            # Set filter length so that temporal filter is ~600 ms. The unit
-            # here is number of frames.
-            filter_length = 40
-        elif nblinks == 2:
-            frametimings = asc.readframetimes(exp_dir, stimnr)
-            filter_length = 20
-        else:
-            raise ValueError('Unexpected value for nblinks.')
+        seed = asc.parameter_dict_get(parameters, 'seed', -10000)
+
+        filter_length, frametimings = asc.ft_nblinks(exp_dir, stimnr,
+                                                     nblinks, refresh_rate)
 
         frame_duration = np.average(np.ediff1d(frametimings))
         total_frames = frametimings.shape[0]

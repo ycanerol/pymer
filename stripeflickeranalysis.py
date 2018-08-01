@@ -45,15 +45,10 @@ def stripeflickeranalysis(exp_name, stim_nrs):
             raise ValueError('sy is not an integer')
 
         nblinks = parameters['Nblinks']
-        try:
-            bw = parameters['blackwhite']
-        except KeyError:
-            bw = False
 
-        try:
-            seed = parameters['seed']
-        except KeyError:
-            seed = -10000
+        bw = asc.parameter_dict_get(parameters, 'blackwhite', False)
+
+        seed = asc.parameter_dict_get(parameters, 'seed', -10000)
 
         filter_length, frametimings = asc.ft_nblinks(exp_dir, stim_nr,
                                                      nblinks, refresh_rate)

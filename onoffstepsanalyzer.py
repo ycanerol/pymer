@@ -49,10 +49,9 @@ def onoffstepsanalyzer(exp_name, stim_nrs):
         # Divide by the refresh rate to convert from number of
         # frames to seconds
         stim_duration = parameters['Nframes']/refresh_rate
-        try:
-            preframe_duration = parameters['preframes']/refresh_rate
-        except KeyError:
-            preframe_duration = 0
+
+        preframe_duration = asc.parameter_dict_get(parameters, 'preframes',
+                                                   0)/refresh_rate
 
         contrast = parameters['contrast']
 
