@@ -636,12 +636,14 @@ def ft_nblinks(exp_dir, stimulusnr, nblinks, refresh_rate):
     return filter_length, frametimings
 
 
-def parameter_dict_get(dictionary, key, defaultvalue):
+def parameter_dict_get(dictionary, key, defaultvalue=None):
     """
     This function is used for parsing information from stimulus
     parameter files.
     """
     try:
         return dictionary[key]
-    except KeyError:
+    except KeyError as e:
+        if defaultvalue is None:
+            raise e
         return defaultvalue
