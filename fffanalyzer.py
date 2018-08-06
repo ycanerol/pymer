@@ -30,7 +30,7 @@ def fffanalyzer(exp_name, stimnrs):
 
         stimname = iof.getstimname(exp_name, stimnr)
 
-        clusters, metadata = asc.read_ods(exp_dir)
+        clusters, metadata = asc.read_spikesheet(exp_dir)
 
         parameters = asc.read_parameters(exp_dir, stimnr)
 

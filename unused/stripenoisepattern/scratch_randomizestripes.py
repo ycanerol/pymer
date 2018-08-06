@@ -59,7 +59,7 @@ def randomizestripes(label, exp_name='20180124', stim_nrs=6):
     for stim_nr in stim_nrs:
         stimname = iof.getstimname(exp_name, stim_nr)
 
-        clusters, metadata = asc.read_ods(exp_dir)
+        clusters, metadata = asc.read_spikesheet(exp_dir)
 
         parameters = asc.read_parameters(exp_dir, stim_nr)
 

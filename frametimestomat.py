@@ -19,7 +19,7 @@ def savenpztomat(exp_name, savedir=None):
     """
     exp_dir = iof.exp_dir_fixer(exp_name)
 
-    _, metadata = asc.read_ods(exp_dir)
+    _, metadata = asc.read_spikesheet(exp_dir)
     monitor_delay = metadata['monitor_delay(s)']
 
     for i in range(1, 100):

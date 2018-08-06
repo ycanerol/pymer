@@ -22,7 +22,7 @@ colors = data['colors']
 colorcategories = data['colorcategories']
 maxts = np.empty([2, 1])
 for i, exp_name in enumerate(['20180118', '20180124', '20180207']):
-    clusterids = plf.clusters_to_ids(asc.read_ods(exp_name)[0])
+    clusterids = plf.clusters_to_ids(asc.read_spikesheet(exp_name)[0])
     cells.extend([(exp_name, cl_id) for cl_id in clusterids])
     if '20180124' in exp_name or '20180207' in exp_name:
         stripeflicker = [6, 12]

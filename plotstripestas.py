@@ -19,7 +19,7 @@ def plotstripestas(exp_name, stim_nrs):
     """
     exp_dir = iof.exp_dir_fixer(exp_name)
 
-    _, metadata = asc.read_ods(exp_dir)
+    _, metadata = asc.read_spikesheet(exp_dir)
     px_size = metadata['pixel_size(um)']
 
     if isinstance(stim_nrs, int):

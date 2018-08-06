@@ -18,7 +18,7 @@ index = 25
 fit_frame = stas[index][:, :, max_inds[index][2]]
 
 exp_dir = '/home/ycan/Documents/data/Erol_20171122_252MEA_fr_re_fp'
-_, parameters = asc.read_ods(exp_dir)
+_, parameters = asc.read_spikesheet(exp_dir)
 px_size = parameters['pixel_size(um)']
 
 ax = plt.subplot(111)

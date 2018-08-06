@@ -25,7 +25,7 @@ def plotcheckersvd(expname, stimnr, filename=None):
         filename = str(filename)
 
     exp_dir = iof.exp_dir_fixer(expname)
-    _, metadata = asc.read_ods(exp_dir)
+    _, metadata = asc.read_spikesheet(exp_dir)
     px_size = metadata['pixel_size(um)']
 
     if not filename:

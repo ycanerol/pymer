@@ -39,7 +39,7 @@ if isinstance(stimnrs, int):
 for stimnr in stimnrs:
     data = iof.load(exp_name, stimnr)
 
-    _, metadata = asc.read_ods(exp_dir)
+    _, metadata = asc.read_spikesheet(exp_dir)
     px_size = metadata['pixel_size(um)']
 
     clusters = data['clusters']
