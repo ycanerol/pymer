@@ -21,6 +21,7 @@ from plotstripestas import plotstripestas
 from allonoff import allonoff
 from stripesurround import stripesurround
 from checkerflickerplusanalyzer import checkerflickerplusanalyzer
+from OMSpatchesanalyzer import OMSpatchesanalyzer
 
 # Attempt to read from stdin
 try:
@@ -38,7 +39,7 @@ onoffsteps = sorted_stimuli['onoffsteps']
 checkerflicker = sorted_stimuli['checkerflicker']
 stripeflicker = sorted_stimuli['stripeflicker']
 checkerflickerplus = sorted_stimuli['frozennoise'] + sorted_stimuli['checkerflickerplusmovie']
-
+OMSpatches =  sorted_stimuli['OMSpatches']
 
 asc.saveframetimes(exp_name)
 
@@ -54,6 +55,8 @@ allonoff(exp_name, onoffsteps)
 stripeflickeranalysis(exp_name, stripeflicker)
 plotstripestas(exp_name, stripeflicker)
 stripesurround(exp_name, stripeflicker)
+
+OMSpatchesanalyzer(exp_name, OMSpatches)
 
 # %%
 for i in checkerflicker:
