@@ -24,6 +24,8 @@ def plotstripestas(exp_name, stim_nrs):
 
     if isinstance(stim_nrs, int):
         stim_nrs = [stim_nrs]
+    elif len(stim_nrs) == 0:
+        return
 
     for stim_nr in stim_nrs:
         data = iof.load(exp_name, stim_nr)

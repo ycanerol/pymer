@@ -34,6 +34,8 @@ def stripesurround(exp_name, stimnrs):
 
     if isinstance(stimnrs, int):
         stimnrs = [stimnrs]
+    elif len(stimnrs) == 0:
+        return
 
     for stimnr in stimnrs:
         data = iof.load(exp_name, stimnr)

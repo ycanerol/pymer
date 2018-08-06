@@ -21,11 +21,10 @@ def OMSpatchesanalyzer(exp_name, stim_nrs):
 
     exp_name = os.path.split(exp_dir)[-1]
 
-    if len(stim_nrs) == 0:
-        return
-
     if isinstance(stim_nrs, int):
         stim_nrs = [stim_nrs]
+    elif len(stim_nrs) == 0:
+        return
 
     clusters, metadata = asc.read_ods(exp_dir, cutoff=4)
     clusterids = plf.clusters_to_ids(clusters)
