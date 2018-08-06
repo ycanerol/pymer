@@ -127,7 +127,7 @@ def read_spikesheet(exp_name, cutoff=4, defaultpath=True):
     # Filter according to quality cutoff
     clusters = clusters[clusters[:, 2] <= cutoff]
 
-    return metadata, clusters
+    return clusters, metadata
 
 
 def readframetimes(exp_name, stimnr, returnoffsets=False):
