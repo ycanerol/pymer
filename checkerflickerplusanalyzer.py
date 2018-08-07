@@ -16,6 +16,7 @@ import iofuncs as iof
 import miscfuncs as msc
 import matplotlib.pyplot as plt
 import plotfuncs as plf
+from pathlib import PureWindowsPath
 
 
 def runfreezemask(total_frames, runfr, frofr, refresh_rate):
@@ -137,8 +138,16 @@ def checkerflickerplusanalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
 
         if parameters['stimulus_type'] == 'checkerflickerplusmovie':
             mblinks = parameters['Nblinksmovie']
-            # TODO: Retrivee the number of frames from parameters['path']
-            moviefr = 307
+            # Retrivee the number of frames (files) from parameters['path']
+            ipath = PureWindowsPath(parameters['path']).as_posix()
+            cfg = iof.readconfig()
+            repldict = asc.parameter_dict_get(cfg, 'stimuli_path_replace', {})
+            for needle, repl in repldict.items():
+                ipath = ipath.replace(needle, repl)
+            ipath = os.path.normpath(ipath)  # Windows compatiblity
+            moviefr = len([name for name in os.listdir(ipath)
+                           if os.path.isfile(os.path.join(ipath, name))
+                           and name.lower().endswith('.raw')])
             noiselen = (runfr+frofr) * nblinks
             movielen = moviefr * mblinks
             triallen = noiselen + movielen
