@@ -242,7 +242,7 @@ def drawonoff(ax, preframedur, stimdur, h=1, contrast=1):
     ax.set_xlim(0, totaldur)
 
 
-def stashow(sta, ax, cbar=True, **kwargs):
+def stashow(sta, ax=None, cbar=True, **kwargs):
     """
     Plot STA in a nice way with proper colormap and colorbar.
 
@@ -276,6 +276,9 @@ def stashow(sta, ax, cbar=True, **kwargs):
             cbarkw.update({key:kwargs[key]})
         else:
             raise ValueError(f'Unknown kwarg: {key}')
+
+    if ax is None:
+        ax = plt.gca()
 
     im = ax.imshow(sta, **imshowkw)
     spineless(ax)
