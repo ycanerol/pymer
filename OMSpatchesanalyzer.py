@@ -99,7 +99,7 @@ def OMSpatchesanalyzer(exp_name, stim_nrs):
 
             rastermat = np.vstack((localspikes[i, :, :], globalspikes[i, :, :]))
             ax1.matshow(rastermat, cmap='Greys')
-            ax1.axhline(ntrials, color='r', lw=.1)
+            ax1.axhline(ntrials-1, color='r', lw=.1)
             ax1.plot([0, 0], [ntrials, 0])
             ax1.plot([0, 0], [ntrials*2, ntrials])
             ax1.set_xticks([])
@@ -142,15 +142,16 @@ def OMSpatchesanalyzer(exp_name, stim_nrs):
         pop_plot_savepath = os.path.split(savepath)[0]
         pop_plot_savepath = os.path.join(pop_plot_savepath, 'all_omsi.svg')
 
+    plt.figure(figsize=(5, 2*len(stim_nrs)))
     ax2 = plt.subplot(111)
     for j, stim_nr in enumerate(stim_nrs):
         np.random.seed(j)
-        ax2.scatter(all_omsi[:, j], j + np.random.random(omsi.shape)/10)
+        ax2.scatter(all_omsi[:, j], j + (np.random.random(omsi.shape)-.5)/1.1)
     np.random.seed()
     ax2.set_yticks(np.arange(len(stim_nrs)))
     ax2.set_yticklabels(stimnames, fontsize='xx-small', rotation='45')
     ax2.set_xlabel('Object-motion sensitivity index')
     ax2.set_title(f'{exp_name}\nDistribution of OMSI')
     plf.spineless(ax2, 'tr')
-    plt.savefig(pop_plot_savepath)
+    plt.savefig(pop_plot_savepath, bbox_inches='tight')
     plt.show()
