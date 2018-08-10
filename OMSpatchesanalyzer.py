@@ -27,7 +27,7 @@ def OMSpatchesanalyzer(exp_name, stim_nrs):
     elif len(stim_nrs) == 0:
         return
 
-    clusters, metadata = asc.read_ods(exp_dir, cutoff=4)
+    clusters, metadata = asc.read_spikesheet(exp_dir, cutoff=4)
     clusterids = plf.clusters_to_ids(clusters)
     all_omsi = np.empty((clusters.shape[0], len(stim_nrs)))
     stimnames = []
