@@ -62,7 +62,7 @@ stimname = iof.getstimname(exp_name, stimulusnr)
 
 exp_name = os.path.split(exp_dir)[-1]
 
-clusters, metadata = asc.read_ods(exp_dir, cutoff=cutoff)
+clusters, metadata = asc.read_spikesheet(exp_dir, cutoff=cutoff)
 
 scr_width = metadata['screen_width']
 scr_height = metadata['screen_height']

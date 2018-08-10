@@ -14,6 +14,6 @@ class Experiment:
 
     def __init__(self, exp_path):
         self.exp_path = exp_path
-        self.ods_extracted = asc.read_ods(exp_path)
+        self.ods_extracted = asc.read_spikesheet(exp_path)
 
 c = Cell('', '', '')

@@ -68,7 +68,7 @@ def checkerflickerplusanalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
 
     exp_name = os.path.split(exp_dir)[-1]
 
-    clusters, metadata = asc.read_ods(exp_dir, cutoff=cutoff)
+    clusters, metadata = asc.read_spikesheet(exp_dir, cutoff=cutoff)
 
     # Check that the inputs are as expected.
     if clusterstoanalyze:

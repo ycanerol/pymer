@@ -27,7 +27,7 @@ stim_fnames = sum(stim_fnames, [])  # Hacky solution to convert list of lists
 stim_names = [s.split('.mcd')[0] for s in stim_fnames]
 stim_nrs = [s.split('_')[0] for s in stim_names]
 
-clusters, _ = asc.read_ods(experiment_dir, cutoff=3)
+clusters, _ = asc.read_spikesheet(experiment_dir, cutoff=3)
 
 total_spikes = np.empty([len(stim_fnames), len(clusters[:, 0])])
 total_time = 0

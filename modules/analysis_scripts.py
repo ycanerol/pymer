@@ -12,102 +12,122 @@ import glob
 import struct
 import warnings
 import numpy as np
+import pyexcel
 import iofuncs as iof
 
-def read_ods(exp_name, cutoff=4, defaultpath=True):
+
+def read_spikesheet(exp_name, cutoff=4, defaultpath=True):
     """
-    Read metadata and cluster information from .ods file (manually
-    created during spike sorting), return good clusters.
+    Read metadata and cluster information from spike sorting file
+    (manually created during spike sorting), return good clusters.
 
     Parameters:
     -----------
-        exp_name:
-            Experiment name for the directory that contains the
-            .ods file. The function looks for /spike_sorting.ods
-            under this directory.
-        cutoff:
-            Worst rating that is wanted for the analysis. Default
-            is 4. The source of this value is manual rating of each
-            cluster.
-        defaultpath:
-            Whether to add '/spike_sorting.ods' to find the file. If False,
-            the full path to .ods should be supplied in exp_dir.
+    exp_name:
+        Experiment name for the directory that contains the
+        .xlsx or .ods file. Possible file names may be set in
+        the configuration file. Fallback/default name is
+        'spike_sorting.[ods|xlsx]'.
+    cutoff:
+        Worst rating that is tolerated for analysis. Default
+        is 4. The source of this value is manual rating of each
+        cluster.
+    defaultpath:
+        Whether to iterate over all possible file names in exp_dir.
+        If False, the full path to the file should be supplied
+        in exp_name.
 
     Returns:
     --------
-        clusters:
-            Channel number, cluster number and rating of those
-            clusters that match the cutoff criteria in a numpy array.
+    clusters:
+        Channel number, cluster number and rating of those
+        clusters that match the cutoff criteria in a numpy array.
+    metadata:
+        Information about the experiment in a dictionary.
 
-        metadata:
-            Information about the experiment in a dictionary.
+    Raises:
+    -------
+    FileNotFoundError:
+        If no spike sorting file can be located.
+    ValueError:
+        If the spike sorting file containes incomplete information.
 
     Notes:
     ------
-    The script assumes adherence to the defined cell location for
-    metadata and cluster information. If changed weird errors might
-    come up.
-
-    An accompanying read-only template .ods file is also created.
-
-    Empty cells in the .ods file are likely to cause problems.
-
-    First version: 2017-11-21 by Yunus
+    The script assumes adherence to defined cell locations for
+    metadata and cluster information. If changed undefined behavior
+    may occur.
     """
     if defaultpath:
         exp_dir = iof.exp_dir_fixer(exp_name)
-        filepath = exp_dir + '/spike_sorting.ods'
+        cfg = iof.readconfig()
+        filenames = parameter_dict_get(cfg, 'spike_sorting_filenames',
+                                       'spike_sorting')
+        if type(filenames) is not list:
+            filenames = [filenames]
+        for filename in filenames:
+            filepath = os.path.join(exp_dir, filename)
+            if os.path.isfile(filepath + '.ods'):
+                filepath += '.ods'
+                meta_keys = [0, 0, 1, 25]
+                meta_vals = [1, 0, 2, 25]
+                cluster_chnl = [4, 0, 400, 1]
+                cluster_cltr = [4, 4, 400, 5]
+                cluster_rtng = [4, 5, 400, 6]
+                break
+            elif os.path.isfile(filepath + '.xlsx'):
+                filepath += '.xlsx'
+                meta_keys = [4, 1, 18, 2]
+                meta_vals = [4, 5, 18, 6]
+                cluster_chnl = [44, 1, 400, 2]
+                cluster_cltr = [44, 5, 400, 6]
+                cluster_rtng = [44, 6, 400, 7]
+                break
+        else:
+            raise FileNotFoundError('Spike sorting file (ods/xlsx) not found.')
     else:
         filepath = exp_name
-    import pyexcel_ods as pyxo
-    clusters = pyxo.get_data(filepath,
-                             start_row=4, row_limit=400,
-                             start_column=0, column_limit=6)
-    metadata = pyxo.get_data(filepath,
-                             start_row=0, row_limit=2,
-                             start_column=0, column_limit=25)
 
-    clusters = clusters['Sheet1']
-    # Check for trailing empty elements
-    # Iterate backwards because we are removing stuff
-    for i in range(len(clusters)):
-        el = clusters[len(clusters)-i-1]
-        if len(el) == 0:
-            clusters.remove([])
-    clusters = np.array(clusters)
-    # Get rid of unneeded columns using numpy advanced indexing
-    try:
-        clusters = clusters[:, [0, 4, 5]]
-    except IndexError:
-        # This happens when np.array() cannot convert clusters into an np.array
-        # containing strings; instead it returns an object array which cannot
-        # be indexed this way.
-        # If you're getting this error, check that there wasn't any ratings
-        # columns that are left blank.
-        raise ValueError('.ods file is missing information! Check that '
-                         'all clusters have a rating!')
+    sheet = np.array(pyexcel.get_array(file_name=filepath, sheets=[0]))
+
+    meta_keys = sheet[meta_keys[0]:meta_keys[2], meta_keys[1]:meta_keys[3]]
+    meta_vals = sheet[meta_vals[0]:meta_vals[2], meta_vals[1]:meta_vals[3]]
+    metadata = dict(zip(meta_keys.ravel(), meta_vals.ravel()))
+
+    # Concatenate cluster information
+    clusters = sheet[cluster_chnl[0]:cluster_chnl[2],
+                     cluster_chnl[1]:cluster_chnl[3]]
+    cl = np.argmin(clusters.shape)
+    clusters = np.append(clusters,
+                         sheet[cluster_cltr[0]:cluster_cltr[2],
+                               cluster_cltr[1]:cluster_cltr[3]],
+                         axis=cl)
+    clusters = np.append(clusters,
+                         sheet[cluster_rtng[0]:cluster_rtng[2],
+                               cluster_rtng[1]:cluster_rtng[3]],
+                         axis=cl)
+    if cl != 1:
+        clusters = clusters.T
+    clusters = clusters[np.any(clusters != [['', '', '']], axis=1)]
+
     # The channels with multiple clusters have an empty line after the first
     # line. Fill the empty lines using the first line of each channel.
-    for i in range(len(clusters[:, 0])):
-        if clusters[i, 0] != '':
-            nr = clusters[i, 0]
+    for i, c in enumerate(clusters[:, 0]):
+        if c != '':
+            nr = c
         else:
             clusters[i, 0] = nr
+
+    if '' in clusters:
+        rowcol = (np.where(clusters == '')[1-cl][0]+1 + cluster_chnl[1-cl])
+        raise ValueError('Spike sorting file is missing information in '
+                         '{} {}.'.format(['column', 'row'][cl], rowcol))
     clusters = clusters.astype(int)
 
     # Filter according to quality cutoff
     clusters = clusters[clusters[:, 2] <= cutoff]
 
-    metadata = np.array(metadata['Sheet1'])
-    if len(metadata[0]) == len(metadata[1])+1:
-        # Handle edge case if the last cell of second row is empty.
-        metadata[1].append('')
-
-    metadata_dict = {}
-    for i in range(len(metadata[0])):
-        metadata_dict[metadata[0][i]] = metadata[1][i]
-
-    return clusters, metadata_dict
+    return clusters, metadata
 
 
 def readframetimes(exp_name, stimnr, returnoffsets=False):
@@ -152,7 +172,8 @@ def readframetimes(exp_name, stimnr, returnoffsets=False):
         return frametimings_on
 
 
-def saveframetimes(exp_name, forceextraction=False, **kwargs):
+def saveframetimes(exp_name, forceextraction=False, start=None, end=None,
+                   **kwargs):
     """
     Save all frametiming data for one experiment.
 
@@ -165,8 +186,12 @@ def saveframetimes(exp_name, forceextraction=False, **kwargs):
             Experiment name.
     """
     exp_dir = iof.exp_dir_fixer(exp_name)
+    if start is None:
+        start =1
+    if end is None:
+        end=100
 
-    for i in range(1, 100):
+    for i in range(start, end):
         alreadyextracted = True
         # If we have already extracted the frametimes, no need to do it twice.
         try:
@@ -254,7 +279,7 @@ def extractframetimes(exp_name, stimnr, threshold=75,
     # parameters for extraction.
     # microvoltsperADunit was defined empirically from inspecting the
     # pulse traces from different setups.
-    _, metadata = read_ods(exp_dir)
+    _, metadata = read_spikesheet(exp_dir)
     if metadata['MEA'] == 252:
         binfname = '_253.bin'
         microvoltsperADunit = 2066/244
@@ -616,12 +641,14 @@ def ft_nblinks(exp_dir, stimulusnr, nblinks, refresh_rate):
     return filter_length, frametimings
 
 
-def parameter_dict_get(dictionary, key, defaultvalue):
+def parameter_dict_get(dictionary, key, defaultvalue=None):
     """
     This function is used for parsing information from stimulus
     parameter files.
     """
     try:
         return dictionary[key]
-    except KeyError:
+    except KeyError as e:
+        if defaultvalue is None:
+            raise e
         return defaultvalue

@@ -11,12 +11,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def spineless(ax, which='trlb'):
+def spineless(axes, which='trlb'):
     """
     Set the spine visibility quickly in matplotlib.
 
     Parameters:
-        ax: The axis object returned by e.g. plt.subplot()
+        ax: List of axis objects returned by e.g. plt.subplot()
         which: List of spines to turn off.
 
     Example usage:
@@ -25,10 +25,15 @@ def spineless(ax, which='trlb'):
     spineless(ax, which='trlb')
     plt.show()
     """
-    if which.find('t') is not -1: ax.spines['top'].set_visible(False)
-    if which.find('r') is not -1: ax.spines['right'].set_visible(False)
-    if which.find('l') is not -1: ax.spines['left'].set_visible(False)
-    if which.find('b') is not -1: ax.spines['bottom'].set_visible(False)
+    # Check whether a single axes object is given
+    if isinstance(axes, mpl.axes.Axes):
+        axes = [axes]
+
+    for ax in axes:
+        if which.find('t') is not -1: ax.spines['top'].set_visible(False)
+        if which.find('r') is not -1: ax.spines['right'].set_visible(False)
+        if which.find('l') is not -1: ax.spines['left'].set_visible(False)
+        if which.find('b') is not -1: ax.spines['bottom'].set_visible(False)
 
 
 def savefigmkdir(path, **kwargs):
@@ -237,7 +242,7 @@ def drawonoff(ax, preframedur, stimdur, h=1, contrast=1):
     ax.set_xlim(0, totaldur)
 
 
-def stashow(sta, ax, cbar=True, **kwargs):
+def stashow(sta, ax=None, cbar=True, **kwargs):
     """
     Plot STA in a nice way with proper colormap and colorbar.
 
@@ -271,6 +276,9 @@ def stashow(sta, ax, cbar=True, **kwargs):
             cbarkw.update({key:kwargs[key]})
         else:
             raise ValueError(f'Unknown kwarg: {key}')
+
+    if ax is None:
+        ax = plt.gca()
 
     im = ax.imshow(sta, **imshowkw)
     spineless(ax)

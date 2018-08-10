@@ -33,7 +33,7 @@ exp_dir = iof.exp_dir_fixer(exp_name)
 data = iof.load(exp_name, stripes[0])
 
 
-_, metadata = asc.read_ods(exp_dir)
+_, metadata = asc.read_spikesheet(exp_dir)
 px_size = metadata['pixel_size(um)']
 exp_name = data['exp_name']
 stx_w = data['stx_w']

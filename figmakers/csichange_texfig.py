@@ -35,7 +35,7 @@ def csindexchange(exp_name, onoffcutoff=.5, qualcutoff=qualcutoff):
 
     exp_dir = iof.exp_dir_fixer(exp_name)
     exp_name = os.path.split(exp_dir)[-1]
-    clusternr = asc.read_ods(exp_name)[0].shape[0]
+    clusternr = asc.read_spikesheet(exp_name)[0].shape[0]
 
     # Collect all CS indices, on-off indices and quality scores
     csinds = np.zeros((2, clusternr))
@@ -102,7 +102,7 @@ def allinds(**kwargs):
     quals = np.empty([2, 0])
     cells = []
     for exp in ['20180118', '20180124', '20180207']:
-        clusterids = plf.clusters_to_ids(asc.read_ods(exp)[0])
+        clusterids = plf.clusters_to_ids(asc.read_spikesheet(exp)[0])
         cells.extend([(exp, cl_id) for cl_id in clusterids])
         csi_r, colors_r, bias_r, quals_r = csindexchange(exp, **kwargs)
         csi = np.hstack((csi, csi_r))
