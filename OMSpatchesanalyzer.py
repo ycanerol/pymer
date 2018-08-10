@@ -8,6 +8,7 @@ Created on Wed Aug  1 18:13:17 2018
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 import analysis_scripts as asc
 import plotfuncs as plf
 import iofuncs as iof
@@ -45,7 +46,7 @@ def OMSpatchesanalyzer(exp_name, stim_nrs):
         stim_duration = asc.parameter_dict_get(parameters, 'stimFrames',
                                                1400)
         # The duration in the parameters refers to the total duration of both
-        # epochs. We divide by two to get the length of a single stim_durations
+        # epochs. We divide by two to get the length of a single stim_duration
         stim_duration = int(stim_duration/2)
         prefr_duration = asc.parameter_dict_get(parameters, 'preFrames',
                                                 100)
@@ -55,7 +56,6 @@ def OMSpatchesanalyzer(exp_name, stim_nrs):
         # ntrials is the number of trials containing both
         ntrials = np.rint((frametimings.shape[0] / (stim_duration+1)))/2
         ntrials = ntrials.astype(int)
-#        ntrials = int((frametimings.shape[0] / (stim_duration+1))/2)
         frametimings_rs = frametimings[:ntrials*2*(stim_duration+1)]
         frametimings_rs = frametimings_rs.reshape((ntrials*2, stim_duration+1))
 
@@ -85,27 +85,45 @@ def OMSpatchesanalyzer(exp_name, stim_nrs):
         # seem to be very different from the rest.
         omsi = (fr_d - fr_c) / (fr_d + fr_c)
 
+        # Create a time array for plotting
+        time = np.linspace(0, stim_duration*2/refresh_rate, num=stim_duration)
+
         savepath = os.path.join(exp_dir, 'data_analysis', stimname)
         if not os.path.isdir(savepath):
             os.makedirs(savepath, exist_ok=True)
 
         for i, cluster in enumerate(clusters):
-            ax = plt.subplot(111)
-            ax.plot(response_local[i, :], label='Local')
-            ax.plot(response_global[i, :], label='Global')
-            ax.set_title(f'{exp_name}\n{stimname}\n'
+            gs = gridspec.GridSpec(2, 1)
+            ax1 = plt.subplot(gs[0])
+            ax2 = plt.subplot(gs[1])
+
+            rastermat = np.vstack((localspikes[i, :, :], globalspikes[i, :, :]))
+            ax1.matshow(rastermat, cmap='Greys')
+            ax1.axhline(ntrials, color='r', lw=.1)
+            ax1.plot([0, 0], [ntrials, 0])
+            ax1.plot([0, 0], [ntrials*2, ntrials])
+            ax1.set_xticks([])
+            ax1.set_yticks([])
+            plf.spineless(ax1)
+
+            ax2.plot(time, response_local[i, :], label='Local')
+            ax2.plot(time, response_global[i, :], label='Global')
+            ax2.set_xlabel('Time [s]')
+            ax2.set_ylabel('Average firing rate [au]')
+            ax2.set_xlim([time.min(), time.max()])
+            plf.spineless(ax2, 'tr')
+            ax2.legend(fontsize='x-small')
+
+            plt.suptitle(f'{exp_name}\n{stimname}\n'
                          f'{clusterids[i]} OMSI: {omsi[i]:4.2f}')
-            ax.set_xlabel('Time [ms]')
-            ax.set_ylabel('Average firing rate [au]')
-            plf.spineless(ax, 'tr')
+            plt.tight_layout()
             plt.savefig(os.path.join(savepath, clusterids[i]+'.svg'),
                         bbox_inches='tight')
-            ax.legend(fontsize='x-small')
             plt.close()
-
         keystosave = ['nblinks', 'refresh_rate', 'stim_duration',
                       'prefr_duration', 'ntrials', 'response_local',
-                      'response_global', 'fr_d', 'fr_c', 'omsi']
+                      'response_global', 'fr_d', 'fr_c', 'omsi',
+                      'clusters']
         datadict = {}
 
         for key in keystosave:
