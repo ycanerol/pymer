@@ -152,7 +152,8 @@ def readframetimes(exp_name, stimnr, returnoffsets=False):
         return frametimings_on
 
 
-def saveframetimes(exp_name, forceextraction=False, **kwargs):
+def saveframetimes(exp_name, forceextraction=False, start=None, end=None,
+                   **kwargs):
     """
     Save all frametiming data for one experiment.
 
@@ -165,8 +166,12 @@ def saveframetimes(exp_name, forceextraction=False, **kwargs):
             Experiment name.
     """
     exp_dir = iof.exp_dir_fixer(exp_name)
+    if start is None:
+        start =1
+    if end is None:
+        end=100
 
-    for i in range(1, 100):
+    for i in range(start, end):
         alreadyextracted = True
         # If we have already extracted the frametimes, no need to do it twice.
         try:
