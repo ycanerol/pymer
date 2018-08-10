@@ -31,7 +31,7 @@ def plot_checker_stas(exp_name, stim_nr, filename=None):
     if filename:
         filename = str(filename)
 
-    _, metadata = asc.read_ods(exp_dir)
+    _, metadata = asc.read_spikesheet(exp_dir)
     px_size = metadata['pixel_size(um)']
 
     if not filename:

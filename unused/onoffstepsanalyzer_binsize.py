@@ -46,7 +46,7 @@ def onoffstepsanalyzer(exp_name, stim_nrs, tstep=.01):
 
         stimname = iof.getstimname(exp_dir, stim_nr)
 
-        clusters, _ = asc.read_ods(exp_dir, cutoff=4)
+        clusters, _ = asc.read_spikesheet(exp_dir, cutoff=4)
 
         clusterids = plf.clusters_to_ids(clusters)
 
