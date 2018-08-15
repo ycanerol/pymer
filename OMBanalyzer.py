@@ -108,6 +108,7 @@ def OMBanalyzer(exp_name, stimnr, nr_bins=20):
     stas = np.zeros((clusters.shape[0], 2, filter_length))
     stc_x = np.zeros((clusters.shape[0], filter_length, filter_length))
     stc_y = np.zeros((clusters.shape[0], filter_length, filter_length))
+    t = np.arange(filter_length)*1000/refresh_rate*nblinks
     for k in range(filter_length, ntotal-filter_length+1):
         x_mini = xsteps[k-filter_length+1:k+1][::-1]
         y_mini = ysteps[k-filter_length+1:k+1][::-1]
@@ -175,32 +176,34 @@ def OMBanalyzer(exp_name, stimnr, nr_bins=20):
         stax = stas[i, 0, :]
         stay = stas[i, 1, :]
         ax1 = plt.subplot(211)
-        ax1.plot(stax, label=r'$STA_{X}$')
-        ax1.plot(stay, label=r'$STA_{Y}$')
-        ax1.plot(eigvecs_x[i, :, -1], label='Eigenvector_X 0')
-        ax1.plot(eigvecs_y[i, :, -1], label='Eigenvector_Y 0')
-        plt.legend(fontsize='xx-small')
+        ax1.plot(t, stax, label=r'STA$_{\rm X}$')
+        ax1.plot(t, stay, label=r'STA$_{\rm Y}$')
+        ax1.plot(t, eigvecs_x[i, :, -1], label='Eigenvector_X 0')
+        ax1.plot(t, eigvecs_y[i, :, -1], label='Eigenvector_Y 0')
+        plt.legend(fontsize='x-small')
 
-        ax2 = plt.subplot(425)
-        ax3 = plt.subplot(427)
+        ax2 = plt.subplot(4, 4, 9)
+        ax3 = plt.subplot(4, 4, 13)
         ax2.set_yticks([])
-        ax2.set_xticks([])
+        ax2.set_xticklabels([])
         ax3.set_yticks([])
-        ax2.set_ylabel('Eigenvalues X')
+        ax2.set_title('Eigenvalues', size='small')
         ax2.plot(eigvals_x[i, :], 'o', markerfacecolor='C0', markersize=4,
                  markeredgewidth=0)
         ax3.plot(eigvals_y[i, :], 'o', markerfacecolor='C1', markersize=4,
                  markeredgewidth=0)
-        plf.spineless([ax1, ax2, ax3], 'tr')
-        ax4 = plt.subplot(224, projection='polar')
-        # Calculating based on the last eigenvector
-        magx = eigvecs_x[i, :, -1].sum()
-        magy = eigvecs_y[i, :, -1].sum()
-        # Convert to polar coordinates using np.arctan2
-        r = np.sqrt(magx**2 + magy**2)
-        theta = np.arctan2(magy, magx)
-        ax4.plot([0, theta], [0, r])
+        ax4 = plt.subplot(2, 3, 5)
+        ax4.plot(bins_x[i, :], spikecount_x[i, :])
+        ax4.plot(bins_y[i, :], spikecount_y[i, :])
+        ax4.set_title('Nonlinearities', size='small')
+        plf.spineless([ax1, ax2, ax3, ax4], 'tr')
+        ax5 = plt.subplot(2, 3, 6, projection='polar')
+        ax5.plot(theta, r, color='k', alpha=.3)
+        ax5.plot(theta[2*i:2*i+2], r[2*i:2*i+2], lw=3)
+        ax5.set_xticklabels(['0', '', '', '', '180', '', '270', ''])
+        ax5.set_title('Vector sum of X and Y STCs', size='small')
         plt.suptitle(f'{exp_name}\n{stimname}\n{clusterids[i]}')
+        plt.subplots_adjust(hspace=.4)
         plt.savefig(os.path.join(savepath, clusterids[i]+'.svg'),
                     bbox_inches='tight')
         plt.close()
