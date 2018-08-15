@@ -55,6 +55,21 @@ def OMBanalyzer(exp_name, stimnr):
 
     ntotal = int(stimframes / nblinks)
 
+    clusters, metadata = asc.read_spikesheet(exp_name)
+
+    refresh_rate = metadata['refresh_rate']
+    filter_length, frametimings = asc.ft_nblinks(exp_name, stimnr, nblinks,
+                                                refresh_rate)
+
+    if ntotal+1 != frametimings.shape[0]:
+        print(f'For {exp_name}\nstimulus {stimname} :\n'
+              f'Number of frames specified in the parameters file ({ntotal}'
+              f' frames) and frametimings ({frametimings.shape[0]}) do not'
+              ' agree!'
+              ' The stimulus was possibly interrupted during recording.'
+              ' ntotal is changed to match actual frametimings.')
+        ntotal = frametimings.shape[0]-1
+
     # Generate the numbers to be used for reconstructing the motion
     # ObjectsMovingBackground.cpp line 174, steps are generated in an alternating
     # fashion. We can generate all of the numbers at once (total lengths is
@@ -66,9 +81,6 @@ def OMBanalyzer(exp_name, stimnr):
     xsteps = randnrs[::2]
     ysteps = randnrs[1::2]
 
-    clusters, metadata = asc.read_spikesheet(exp_name)
-    filter_length, frametimings = asc.ft_nblinks(exp_name, stimnr, nblinks,
-                                                 metadata['refresh_rate'])
     clusterids = plf.clusters_to_ids(clusters)
 
     all_spikes = np.empty((clusters.shape[0], ntotal))
