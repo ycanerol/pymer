@@ -8,6 +8,7 @@ Created on Tue Aug  7 14:54:08 2018
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.stats.mstats import mquantiles
 
 from randpy import randpy
 import analysis_scripts as asc
@@ -25,16 +26,29 @@ def calc_covar(stim_small):
     return covar
 
 
-def OMBanalyzer(exp_name, stimnr):
+def q_nlt_recovery(spikes, generator, nr_bins=20):
+    """
+    Calculate nonlinearities from
+    """
+    # Define the quantiles we want to use for binning.
+    # endpoint and [1:] are used to exclude outermost bins because
+    # sometimes they cause bugs (e.g. nonlinearity is zero for some cells)
+    quantiles = np.linspace(0, 1, nr_bins+1, endpoint=False)[1:]
+    quantile_bins = mquantiles(generator, prob=quantiles)
+    bindices = np.digitize(generator, quantile_bins)
+    # Returns which bin each should go
+    spikecount_in_bins = np.array([])
+    for i in range(nr_bins):  # Sorts values into bins
+        spikecount_in_bins = np.append(spikecount_in_bins,
+                                       (np.average(spikes[np.where
+                                                          (bindices == i)])))
+    return quantile_bins, spikecount_in_bins
+
+
+def OMBanalyzer(exp_name, stimnr, nr_bins=20):
     """
     Analyze responses to object moving background stimulus.
     """
-
-    # TODO
-    # The stimulus computer sometimes crashes before finishing the stimulus,
-    # this case should be handled (e.g. exp_name: '20180712*eye1', stimnr:10)
-    # TODO
-    # Calculate nonlinearities
     # TODO
     # Add iteration over multiple stimuli
 
@@ -71,10 +85,11 @@ def OMBanalyzer(exp_name, stimnr):
         ntotal = frametimings.shape[0]-1
 
     # Generate the numbers to be used for reconstructing the motion
-    # ObjectsMovingBackground.cpp line 174, steps are generated in an alternating
-    # fashion. We can generate all of the numbers at once (total lengths is
-    # defined by stimFrames) and then assign to x and y directions.
-    # Although there is more stuff around line 538
+    # ObjectsMovingBackground.cpp line 174, steps are generated in an
+    # alternating fashion. We can generate all of the numbers at once
+    # (total lengths is defined by stimFrames) and then assign
+    # to x and y directions. Although there is more
+    # stuff around line 538
     randnrs, seed = randpy.gasdev(seed, ntotal*2)
     randnrs = np.array(randnrs)*stepsize
 
@@ -108,6 +123,13 @@ def OMBanalyzer(exp_name, stimnr):
     eigvals_y = np.zeros((clusters.shape[0], filter_length))
     eigvecs_x = np.zeros((clusters.shape[0], filter_length, filter_length))
     eigvecs_y = np.zeros((clusters.shape[0], filter_length, filter_length))
+
+    bins_x = np.zeros((clusters.shape[0], nr_bins))
+    bins_y = np.zeros((clusters.shape[0], nr_bins))
+    spikecount_x = np.zeros(bins_x.shape)
+    spikecount_y = np.zeros(bins_x.shape)
+    generators_x = np.zeros(all_spikes.shape)
+    generators_y = np.zeros(all_spikes.shape)
     # Normalize STAs and STCs with respect to spike numbers
     for i in range(clusters.shape[0]):
         totalspikes = all_spikes.sum(axis=1)[i]
@@ -117,9 +139,37 @@ def OMBanalyzer(exp_name, stimnr):
         eigvals_x[i, :], eigvecs_x[i, :, :] = np.linalg.eigh(stc_x[i, :, :])
         eigvals_y[i, :], eigvecs_y[i, :, :] = np.linalg.eigh(stc_y[i, :, :])
 
+        # Calculate the generator signals and nonlinearities
+        generators_x[i, :] = np.convolve(eigvecs_x[i, :, -1], xsteps,
+                                  mode='full')[:-filter_length+1]
+        generators_y[i, :] = np.convolve(eigvecs_y[i, :, -1], ysteps,
+                                  mode='full')[:-filter_length+1]
+        bins_x[i, :], spikecount_x[i, :] = q_nlt_recovery(all_spikes[i, :],
+                                                         generators_x[i, :],
+                                                         nr_bins)
+        bins_y[i, :], spikecount_y[i, :] = q_nlt_recovery(all_spikes[i, :],
+                                                         generators_y[i, :],
+                                                         nr_bins)
     savepath = os.path.join(exp_dir, 'data_analysis', stimname)
     if not os.path.isdir(savepath):
         os.makedirs(savepath, exist_ok=True)
+
+    # Calculated based on last eigenvector
+    magx = eigvecs_x[:, :, -1].sum(axis=1)
+    magy = eigvecs_y[:, :, -1].sum(axis=1)
+    r_ = np.sqrt(magx**2 + magy**2)
+    theta_ = np.arctan2(magy, magx)
+    # To draw the vectors starting from origin, insert zeros every other element
+    r = np.zeros(r_.shape[0]*2)
+    theta = np.zeros(theta_.shape[0]*2)
+    r[1::2] = r_
+    theta[1::2] = theta_
+    plt.polar(theta, r)
+    plt.gca().set_xticks(np.pi/180 * np.array([0, 90, 180, 270]))
+    plt.title(f'Population plot for motion STAs\n{exp_name}')
+    plt.savefig(os.path.join(savepath, 'population.svg'))
+    plt.show()
+    plt.close()
 
     for i in range(stas.shape[0]):
         stax = stas[i, 0, :]
@@ -155,28 +205,14 @@ def OMBanalyzer(exp_name, stimnr):
                     bbox_inches='tight')
         plt.close()
 
-    # Calculated based on last eigenvector
-    magx = eigvecs_x[:, :, -1].sum(axis=1)
-    magy = eigvecs_y[:, :, -1].sum(axis=1)
-    r_ = np.sqrt(magx**2 + magy**2)
-    theta_ = np.arctan2(magy, magx)
-    # Draw the vectors starting from origin
-    r = np.zeros(r_.shape[0]*2)
-    theta = np.zeros(theta_.shape[0]*2)
-    r[::2] = r_
-    theta[::2] = theta_
-    plt.polar(theta, r)
-    plt.title(f'Population plot for motion STAs\n{exp_name}')
-    plt.savefig(os.path.join(savepath, 'population.svg'))
-    plt.show()
-    plt.close()
-
     keystosave = ['nblinks', 'all_spikes', 'clusters',
                   'eigvals_x', 'eigvals_y',
                   'eigvecs_x', 'eigvecs_y',
                   'filter_length', 'magx', 'magy',
                   'ntotal', 'r', 'theta', 'stas',
-                  'stc_x', 'stc_y']
+                  'stc_x', 'stc_y', 'bins_x', 'bins_y', 'nr_bins',
+                  'spikecount_x','spikecount_y',
+                  'generators_x', 'generators_y']
     datadict = {}
 
     for key in keystosave:
