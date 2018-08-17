@@ -45,7 +45,7 @@ def q_nlt_recovery(spikes, generator, nr_bins=20):
     return quantile_bins, spikecount_in_bins
 
 
-def OMBanalyzer(exp_name, stimnr, nr_bins=20):
+def OMBanalyzer(exp_name, stimnr, plotall=False, nr_bins=20):
     """
     Analyze responses to object moving background stimulus.
     """
@@ -169,7 +169,8 @@ def OMBanalyzer(exp_name, stimnr, nr_bins=20):
     plt.gca().set_xticks(np.pi/180 * np.array([0, 90, 180, 270]))
     plt.title(f'Population plot for motion STAs\n{exp_name}')
     plt.savefig(os.path.join(savepath, 'population.svg'))
-    plt.show()
+    if plotall:
+        plt.show()
     plt.close()
 
     for i in range(stas.shape[0]):
@@ -206,6 +207,8 @@ def OMBanalyzer(exp_name, stimnr, nr_bins=20):
         plt.subplots_adjust(hspace=.4)
         plt.savefig(os.path.join(savepath, clusterids[i]+'.svg'),
                     bbox_inches='tight')
+        if plotall:
+            plt.show()
         plt.close()
 
     keystosave = ['nblinks', 'all_spikes', 'clusters',
