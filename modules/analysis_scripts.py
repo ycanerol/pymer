@@ -124,6 +124,13 @@ def read_spikesheet(exp_name, cutoff=4, defaultpath=True):
                          '{} {}.'.format(['column', 'row'][cl], rowcol))
     clusters = clusters.astype(int)
 
+    # Sort the clusters in ascending order based on channel number
+    # Normal sort function messes up the other columns for some reason
+    # so we explicitly use lexsort for the columns containing channel nrs
+    # Order of the columns given in lexsort are in reverse
+    sorted_idx = np.lexsort((clusters[:, 1], clusters[:, 0]))
+    clusters = clusters[sorted_idx, :]
+
     # Filter according to quality cutoff
     clusters = clusters[clusters[:, 2] <= cutoff]
 
