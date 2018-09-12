@@ -209,10 +209,10 @@ for i in range(clusters.shape[0]):
     ax4.set_axis_off()
 
     # Add scalebar
-    time_set = 100 # milliseconds
+    time_set = 50 # milliseconds
     dist_set = 100 # micrometers
 
-    barsize_time = time_set/(stx_h*px_size)
+    barsize_time = time_set/(frame_duration*1000)
     barsize_distance = dist_set/(stx_h*px_size)
 
     scalebars.add_scalebar(ax3,
