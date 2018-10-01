@@ -1,6 +1,6 @@
-# rsurround
-Collection of Python scripts for analyzing extracellular multielectrode
-array recordings from the retina in the Gollisch lab, Göttingen.
+# pymer
+Collection of **Py**thon scripts for analyzing extracellular **m**ulti**e**lectrode
+array recordings from the **r**etina in the Gollisch lab, Göttingen.
 
 # Installing
 ## Adding path variables

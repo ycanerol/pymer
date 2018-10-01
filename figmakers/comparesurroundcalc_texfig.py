@@ -15,7 +15,6 @@ import iofuncs as iof
 import miscfuncs as msc
 import plotfuncs as plf
 import analysis_scripts as asc
-from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
 from matplotlib.patches import Rectangle
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
@@ -129,16 +128,16 @@ for i in range(clusters.shape[0]):
         ax1.contour(Y, X, Zm, [inner_b, outer_b], linewidths=.5,
                    cmap=plf.RFcolormap(checkercolors))
 
-    barsize = 100/(stx_h*px_size)
-    scalebar = AnchoredSizeBar(ax1.transData,
-                               barsize, r'100 $\upmu$m',
-#                               barsize, r'100 µm',
-                               'lower left',
-                               pad=1,
-                               color='k',
-                               frameon=False,
-                               size_vertical=.2)
-    ax1.add_artist(scalebar)
+    barsize_set_checker = 100 # micrometers
+    checker_scalebarsize = barsize_set_checker/(stx_h*px_size)
+
+    scalebars.add_scalebar(ax1,
+                           matchx=False, sizex=checker_scalebarsize,
+                           labelx=f'{barsize_set_checker} µm',
+                           barwidth=1.2,
+                           loc='lower right',
+                           sep=3,
+                           pad=.5)
 
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore',
@@ -209,10 +208,10 @@ for i in range(clusters.shape[0]):
     ax4.set_axis_off()
 
     # Add scalebar
-    time_set = 100 # milliseconds
+    time_set = 50 # milliseconds
     dist_set = 100 # micrometers
 
-    barsize_time = time_set/(stx_h*px_size)
+    barsize_time = time_set/(frame_duration*1000)
     barsize_distance = dist_set/(stx_h*px_size)
 
     scalebars.add_scalebar(ax3,

@@ -14,4 +14,4 @@ To use:
 ```
 Note: seed can be either a negative integer or the seed returned by the gasdev/ran1 functions
 
-For Windows and Python 2.7, you need to install Visual Studio 2008 (or the Visual Studio C++ Tools for Python 2.7)
+If you are getting an error regarding 'cc1plus' not being found, install g++ by ```sudo apt-get install g++```
