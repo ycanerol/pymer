@@ -9,8 +9,8 @@ to your python path variable, so that the imports can work.
 
 One way would be adding a link to them in the site-packages:
 ```
-echo "<path_to_main_dir>/modules" > "<python_install_loc>/lib/python<your_version>/site-packages/modules.pth"
-echo "<path_to_main_dir>/external_libs" > "<python_install_loc>/lib/python<your_version>/site-packages/external_libs.pth"
+echo "<path_to_main_dir>/modules" >> "<python_install_loc>/lib/python<your_version>/site-packages/modules.pth"
+echo "<path_to_main_dir>/external_libs" >> "<python_install_loc>/lib/python<your_version>/site-packages/external_libs.pth"
 ```
 
 OR
