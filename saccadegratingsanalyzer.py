@@ -95,6 +95,7 @@ for i, trial in enumerate(greytr):
     nton_grey[trial[0]][trial[1]].append(i)
 
 savedir = os.path.join(exp_dir, 'data_analysis', stimname)
+os.makedirs(savedir, exist_ok=True)
 
 # %%
 for i in range(clusters.shape[0]):
@@ -124,6 +125,7 @@ for i in range(clusters.shape[0]):
                 ax.set_ylabel(f'{j}')
     plt.suptitle(f'{exp_name}\n{stimname}\n{clusterids[i]}')
     plt.savefig(os.path.join(savedir, f'{clusterids[i]}.svg'))
+    plt.close()
 
 # Save results
 keystosave = ['fixfr', 'sacfr', 't', 'averageshift', 'barwidth', 'seed',
@@ -134,4 +136,4 @@ data_in_dict = {}
 for key in keystosave:
     data_in_dict[key] = locals()[key]
 
-np.savez(os.path.join(savedir, stim_nr + '_data'), **data_in_dict)
+np.savez(os.path.join(savedir, str(stim_nr) + '_data'), **data_in_dict)
