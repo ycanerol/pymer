@@ -102,9 +102,8 @@ def saccadegratingsanalyzer(exp_name, stim_nr):
 
     savedir = os.path.join(exp_dir, 'data_analysis', stimname)
     os.makedirs(savedir, exist_ok=True)
-
     for i in range(clusters.shape[0]):
-        _, axes = plt.subplots(4, 4, sharex=True, sharey=True,
+        fig, axes = plt.subplots(4, 4, sharex=True, sharey=True,
                                figsize=(8, 8))
         for j in range(4):
             for k in range(4):
@@ -122,17 +121,27 @@ def saccadegratingsanalyzer(exp_name, stim_nr):
                            linestyle='dashed')
                 ax.plot(t*1000, psth_sac, label='Saccadic trans.')
                 ax.plot(t*1000, psth_grey, label='Grey trans.')
+                # Cosmetics
                 plf.spineless(ax)
                 if j == k:
                     ax.set_facecolor((1, 1, 0, 0.15))
                 if j == 0:
                     ax.set_xlabel(f'{k}')
+                    if k == 3:
+                        ax.legend(fontsize='xx-small', loc=0)
                 if k == 0:
                     ax.set_ylabel(f'{j}')
+        # Add an encompassing label for starting and target positions
+        ax0 = fig.add_axes([0.05, 0.05, .90, .90])
+        plf.spineless(ax0)
+        ax0.patch.set_alpha(0)
+        ax0.set_xticks([])
+        ax0.set_yticks([])
+        ax0.set_ylabel('Start position')
+        ax0.set_xlabel('Target position')
         plt.suptitle(f'{exp_name}\n{stimname}\n{clusterids[i]}')
         plt.savefig(os.path.join(savedir, f'{clusterids[i]}.svg'))
         plt.close()
-
     # Save results
     keystosave = ['fixfr', 'sacfr', 't', 'averageshift', 'barwidth', 'seed',
                   'trans', 'saccadetr', 'greytr', 'nton_sac', 'nton_grey',
