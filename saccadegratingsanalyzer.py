@@ -17,7 +17,7 @@ from randpy import randpy
 exp_name = '20180710'
 stim_nr = 7
 
-def saccadegratinganalyzer(exp_name, stim_nr):
+def saccadegratingsanalyzer(exp_name, stim_nr):
     pass
 
 exp_dir = iof.exp_dir_fixer(exp_name)
