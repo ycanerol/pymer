@@ -98,7 +98,7 @@ def checkerflickerplusanalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     marginkeys = ['tmargin', 'bmargin', 'rmargin', 'lmargin']
     margins = []
     for key in marginkeys:
-        margins.append(asc.parameter_dict_get(parameters, key, 0))
+        margins.append(parameters.get(key, 0))
 
     # Subtract bottom and top from vertical dimension; left and right
     # from horizontal dimension
@@ -106,14 +106,14 @@ def checkerflickerplusanalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     scr_height = scr_height-sum(margins[:2])
 
     nblinks = parameters['Nblinks']
-    bw = asc.parameter_dict_get(parameters, 'blackwhite', False)
+    bw = parameters.get('blackwhite', False)
 
     # Gaussian stimuli are not supported yet, we need to ensure we
     # have a black and white stimulus
     if bw is not True:
         raise ValueError('Gaussian stimuli are not supported yet!')
 
-    seed = asc.parameter_dict_get(parameters, 'seed', -1000)
+    seed = parameters.get('seed', -1000)
 
     sx, sy = scr_height/stx_h, scr_width/stx_w
 
@@ -134,14 +134,14 @@ def checkerflickerplusanalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
         frofr = parameters['FrozenFrames']
         # To generate the frozen noise, a second seed is used.
         # The default value of this is -10000 as per StimulateOpenGL
-        secondseed = asc.parameter_dict_get(parameters, 'secondseed', -10000)
+        secondseed = parameters.get('secondseed', -10000)
 
         if parameters['stimulus_type'] == 'checkerflickerplusmovie':
             mblinks = parameters['Nblinksmovie']
             # Retrivee the number of frames (files) from parameters['path']
             ipath = PureWindowsPath(parameters['path']).as_posix()
             cfg = iof.readconfig()
-            repldict = asc.parameter_dict_get(cfg, 'stimuli_path_replace', {})
+            repldict = cfg.get('stimuli_path_replace', {})
             for needle, repl in repldict.items():
                 ipath = ipath.replace(needle, repl)
             ipath = os.path.normpath(ipath)  # Windows compatiblity

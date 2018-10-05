@@ -50,7 +50,7 @@ def onoffstepsanalyzer(exp_name, stim_nrs):
         # frames to seconds
         stim_duration = parameters['Nframes']/refresh_rate
 
-        preframe_duration = asc.parameter_dict_get(parameters, 'preframes',
+        preframe_duration = parameters.get('preframes',
                                                    0)/refresh_rate
 
         contrast = parameters['contrast']

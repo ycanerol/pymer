@@ -61,8 +61,7 @@ def read_spikesheet(exp_name, cutoff=4, defaultpath=True):
     if defaultpath:
         exp_dir = iof.exp_dir_fixer(exp_name)
         cfg = iof.readconfig()
-        filenames = parameter_dict_get(cfg, 'spike_sorting_filenames',
-                                       'spike_sorting')
+        filenames = cfg.get('spike_sorting_filenames', 'spike_sorting')
         if type(filenames) is not list:
             filenames = [filenames]
         for filename in filenames:
@@ -646,16 +645,3 @@ def ft_nblinks(exp_dir, stimulusnr, nblinks, refresh_rate):
     # round filter_length for nblinks= 1, 2, 4
     filter_length = np.int(np.round(.666*refresh_rate/nblinks))
     return filter_length, frametimings
-
-
-def parameter_dict_get(dictionary, key, defaultvalue=None):
-    """
-    This function is used for parsing information from stimulus
-    parameter files.
-    """
-    try:
-        return dictionary[key]
-    except KeyError as e:
-        if defaultvalue is None:
-            raise e
-        return defaultvalue

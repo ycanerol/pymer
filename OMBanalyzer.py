@@ -58,14 +58,14 @@ def OMBanalyzer(exp_name, stimnr, plotall=False, nr_bins=20):
 
     parameters = asc.read_parameters(exp_name, stimnr)
     assert(parameters['stimulus_type']=='objectsmovingbackground')
-    stimframes = asc.parameter_dict_get(parameters, 'stimFrames', 108000)
-    preframes = asc.parameter_dict_get(parameters, 'preFrames', 200)
-    nblinks = asc.parameter_dict_get(parameters, 'Nblinks', 2)
+    stimframes = parameters.get('stimFrames', 108000)
+    preframes = parameters.get('preFrames', 200)
+    nblinks = parameters.get('Nblinks', 2)
 
-    seed = asc.parameter_dict_get(parameters, 'seed', -10000)
-    seed2 = asc.parameter_dict_get(parameters, 'objseed', -1000)
+    seed = parameters.get('seed', -10000)
+    seed2 = parameters.get('objseed', -1000)
 
-    stepsize = asc.parameter_dict_get(parameters, 'stepsize', 2)
+    stepsize = parameters.get('stepsize', 2)
 
     ntotal = int(stimframes / nblinks)
 

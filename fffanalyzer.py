@@ -43,9 +43,9 @@ def fffanalyzer(exp_name, stimnrs):
 
         nblinks = parameters['Nblinks']
 
-        bw = asc.parameter_dict_get(parameters, 'blackwhite', False)
+        bw = parameters.get('blackwhite', False)
 
-        seed = asc.parameter_dict_get(parameters, 'seed', -10000)
+        seed = parameters.get('seed', -10000)
 
         filter_length, frametimings = asc.ft_nblinks(exp_dir, stimnr,
                                                      nblinks, refresh_rate)
