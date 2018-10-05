@@ -74,6 +74,9 @@ greyftimes = trials[~trans, :]
 
 sacspikes = np.empty((clusters.shape[0], sacftimes.shape[0], t.shape[0]))
 greyspikes = np.empty((clusters.shape[0], greyftimes.shape[0], t.shape[0]))
+# Collect all the psth in one array. The order is
+# transision type, cluster index, start pos, target pos, time
+psth = np.zeros((2, clusters.shape[0], 4, 4, t.size))
 
 for i, (chid, clid, _) in enumerate(clusters):
     spiketimes = asc.read_raster(exp_dir, stim_nr, chid, clid)
@@ -106,19 +109,29 @@ for i in range(clusters.shape[0]):
             # Convert to spikes per second
             psth_sac = psth_sac/tstep
             psth_grey = psth_grey/tstep
+            psth[0, i, j, k, :] = psth_sac
+            psth[1, i, j, k, :] = psth_grey
             ax.axvline(sacfr/refresh_rate*1000, color='red',
                        linestyle='dashed')
             ax.plot(t*1000, psth_sac, label='Saccadic trans.')
             ax.plot(t*1000, psth_grey, label='Grey trans.')
+            plf.spineless(ax)
             if j == k:
                 ax.set_facecolor((1, 1, 0, 0.15))
             if j == 0:
                 ax.set_xlabel(f'{k}')
             if k == 0:
                 ax.set_ylabel(f'{j}')
-    plf.spineless(axes)
     plt.suptitle(f'{exp_name}\n{stimname}\n{clusterids[i]}')
-#    plt.savefig(os.path.join(savedir, f'{clusterids[i]}.svg'))
-    plt.show()
-    break
-#    if i == 5: break
+    plt.savefig(os.path.join(savedir, f'{clusterids[i]}.svg'))
+
+# Save results
+keystosave = ['fixfr', 'sacfr', 't', 'averageshift', 'barwidth', 'seed',
+              'trans', 'saccadetr', 'greytr', 'nton_sac', 'nton_grey',
+              'stimname', 'sacspikes', 'greyspikes', 'psth', 'nfr',
+              'parameters']
+data_in_dict = {}
+for key in keystosave:
+    data_in_dict[key] = locals()[key]
+
+np.savez(os.path.join(savedir, stim_nr + '_data'), **data_in_dict)
