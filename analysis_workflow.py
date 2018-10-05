@@ -17,7 +17,6 @@ from plot_checker_stas import plot_checker_stas
 from plotcheckersvd import plotcheckersvd
 from plotcheckersurround import plotcheckersurround
 from stripeflickeranalysis import stripeflickeranalysis
-from plotstripestas import plotstripestas
 from allonoff import allonoff
 from stripesurround import stripesurround
 from checkerflickerplusanalyzer import checkerflickerplusanalyzer
@@ -55,7 +54,6 @@ onoffstepsanalyzer(exp_name, onoffsteps)
 allonoff(exp_name, onoffsteps)
 
 stripeflickeranalysis(exp_name, stripeflicker)
-plotstripestas(exp_name, stripeflicker)
 stripesurround(exp_name, stripeflicker)
 
 OMSpatchesanalyzer(exp_name, OMSpatches)
