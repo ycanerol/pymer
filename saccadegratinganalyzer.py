@@ -14,8 +14,8 @@ import plotfuncs as plf
 from randpy import randpy
 
 
-exp_name = 'Kara'
-stim_nr = 10
+exp_name = '20180710'
+stim_nr = 7
 
 def saccadegratinganalyzer(exp_name, stim_nr):
     pass
@@ -47,7 +47,7 @@ stimpos = (4*randnrs[::2]).astype(int)
 
 # Transition variable, determines whether grating is moving during
 # the transion or only a grey screen is presented.
-trans = np.array(randnrs[1::2]>0.5)
+trans = np.array(randnrs[1::2] > 0.5)
 
 # Record before and after positions in a single array and remove
 # The first element b/c there is no before value
@@ -59,8 +59,8 @@ saccadetr = stimtr[trans, :]
 greytr = stimtr[~trans, :]
 
 # Create a time vector with defined temporal bin size
-tstep = 0.01 # Bin size is defined here, unit is seconds
-trialduration = (fixfr + sacfr)*60/1000/2
+tstep = 0.01  # Bin size is defined here, unit is seconds
+trialduration = (fixfr + sacfr)/refresh_rate
 nrsteps = int(trialduration/tstep)+1
 t = np.linspace(0, trialduration, num=nrsteps)
 
@@ -88,9 +88,9 @@ nton_grey = [[[] for _ in range(4)] for _ in range(4)]
 for i, trial in enumerate(greytr):
     nton_grey[trial[0]][trial[1]].append(i)
 
-
+#%%
 for i in range(clusters.shape[0]):
-    fig, axes = plt.subplots(4, 4, sharex=True, sharey=True, figsize=(8,8))
+    fig, axes = plt.subplots(4, 4, sharex=True, sharey=True, figsize=(8, 8))
     for j in range(4):
         for k in range(4):
             ax = axes[j][k]
@@ -100,6 +100,8 @@ for i in range(clusters.shape[0]):
             # Convert to spikes per second
             psth_sac = psth_sac/tstep
             psth_grey = psth_grey/tstep
+            ax.axvline(sacfr/refresh_rate, color='red',
+                       linestyle='dashed')
             ax.plot(t, psth_sac, label='Saccadic trans.')
             ax.plot(t, psth_grey, label='Grey trans.')
             plf.spineless(ax)
