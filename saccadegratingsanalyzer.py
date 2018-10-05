@@ -7,6 +7,7 @@ Created on Thu Oct  4 14:06:26 2018
 """
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 import iofuncs as iof
 import analysis_scripts as asc
@@ -21,8 +22,10 @@ def saccadegratingsanalyzer(exp_name, stim_nr):
     pass
 
 exp_dir = iof.exp_dir_fixer(exp_name)
+exp_name = os.path.split(exp_dir)[-1]
 stimname = iof.getstimname(exp_dir, stim_nr)
 clusters, metadata = asc.read_spikesheet(exp_dir)
+clusterids = plf.clusters_to_ids(clusters)
 
 refresh_rate = metadata['refresh_rate']
 
@@ -88,27 +91,34 @@ nton_grey = [[[] for _ in range(4)] for _ in range(4)]
 for i, trial in enumerate(greytr):
     nton_grey[trial[0]][trial[1]].append(i)
 
-#%%
+savedir = os.path.join(exp_dir, 'data_analysis', stimname)
+
+# %%
 for i in range(clusters.shape[0]):
     fig, axes = plt.subplots(4, 4, sharex=True, sharey=True, figsize=(8, 8))
     for j in range(4):
         for k in range(4):
-            ax = axes[j][k]
+            # Start from bottom left corner
+            ax = axes[3-j][k]
             # Average all transitions of one type
             psth_sac = sacspikes[i, nton_sac[j][k], :].mean(axis=0)
             psth_grey = greyspikes[i, nton_grey[j][k], :].mean(axis=0)
             # Convert to spikes per second
             psth_sac = psth_sac/tstep
             psth_grey = psth_grey/tstep
-            ax.axvline(sacfr/refresh_rate, color='red',
+            ax.axvline(sacfr/refresh_rate*1000, color='red',
                        linestyle='dashed')
-            ax.plot(t, psth_sac, label='Saccadic trans.')
-            ax.plot(t, psth_grey, label='Grey trans.')
-            plf.spineless(ax)
+            ax.plot(t*1000, psth_sac, label='Saccadic trans.')
+            ax.plot(t*1000, psth_grey, label='Grey trans.')
             if j == k:
                 ax.set_facecolor((1, 1, 0, 0.15))
-            if j == 3: ax.set_xlabel(f'{k}')
-            if k == 0: ax.set_ylabel(f'{j}')
+            if j == 0:
+                ax.set_xlabel(f'{k}')
+            if k == 0:
+                ax.set_ylabel(f'{j}')
+    plf.spineless(axes)
+    plt.suptitle(f'{exp_name}\n{stimname}\n{clusterids[i]}')
+#    plt.savefig(os.path.join(savedir, f'{clusterids[i]}.svg'))
     plt.show()
     break
 #    if i == 5: break
