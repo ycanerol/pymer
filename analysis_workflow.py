@@ -17,12 +17,12 @@ from plot_checker_stas import plot_checker_stas
 from plotcheckersvd import plotcheckersvd
 from plotcheckersurround import plotcheckersurround
 from stripeflickeranalysis import stripeflickeranalysis
-from plotstripestas import plotstripestas
 from allonoff import allonoff
 from stripesurround import stripesurround
 from checkerflickerplusanalyzer import checkerflickerplusanalyzer
 from OMSpatchesanalyzer import OMSpatchesanalyzer
 from OMBanalyzer import OMBanalyzer
+from saccadegratingsanalyzer import saccadegratingsanalyzer
 
 # Attempt to read from stdin
 try:
@@ -42,6 +42,7 @@ stripeflicker = sorted_stimuli['stripeflicker']
 checkerflickerplus = sorted_stimuli['frozennoise'] + sorted_stimuli['checkerflickerplusmovie']
 OMSpatches =  sorted_stimuli['OMSpatches']
 OMB = sorted_stimuli['OMB']
+saccadegrating = sorted_stimuli['saccadegrating']
 
 asc.saveframetimes(exp_name)
 
@@ -55,12 +56,13 @@ onoffstepsanalyzer(exp_name, onoffsteps)
 allonoff(exp_name, onoffsteps)
 
 stripeflickeranalysis(exp_name, stripeflicker)
-plotstripestas(exp_name, stripeflicker)
 stripesurround(exp_name, stripeflicker)
 
 OMSpatchesanalyzer(exp_name, OMSpatches)
 for stim in OMB:
     OMBanalyzer(exp_name, stim)
+for stim in saccadegrating:
+    saccadegratingsanalyzer(exp_name, stim)
 
 # %%
 for i in checkerflicker:
