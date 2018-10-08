@@ -118,9 +118,11 @@ def saccadegratingsanalyzer(exp_name, stim_nr):
                 psth[0, i, j, k, :] = psth_sac
                 psth[1, i, j, k, :] = psth_grey
                 ax.axvline(sacfr/refresh_rate*1000, color='red',
-                           linestyle='dashed')
+                           linestyle='dashed', linewidth=.5)
                 ax.plot(t*1000, psth_sac, label='Saccadic trans.')
                 ax.plot(t*1000, psth_grey, label='Grey trans.')
+                ax.set_yticks([])
+                ax.set_xticks([])
                 # Cosmetics
                 plf.spineless(ax)
                 if j == k:
@@ -131,8 +133,9 @@ def saccadegratingsanalyzer(exp_name, stim_nr):
                         ax.legend(fontsize='xx-small', loc=0)
                 if k == 0:
                     ax.set_ylabel(f'{j}')
+
         # Add an encompassing label for starting and target positions
-        ax0 = fig.add_axes([0.05, 0.05, .90, .90])
+        ax0 = fig.add_axes([0.08, 0.08, .86, .86])
         plf.spineless(ax0)
         ax0.patch.set_alpha(0)
         ax0.set_xticks([])
