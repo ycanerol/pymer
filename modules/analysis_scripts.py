@@ -586,7 +586,8 @@ def stimulisorter(exp_name):
     possible_stim_names = ['spontaneous', 'onoffsteps', 'fff', 'stripeflicker',
                            'checkerflicker', 'directiongratingsequence',
                            'rotatingstripes', 'frozennoise',
-                           'checkerflickerplusmovie', 'OMSpatches', 'OMB']
+                           'checkerflickerplusmovie', 'OMSpatches', 'OMB',
+                           'saccadegrating']
     sorted_stimuli = {key:[] for key in possible_stim_names}
     exp_dir = iof.exp_dir_fixer(exp_name)
 
