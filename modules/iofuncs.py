@@ -248,3 +248,34 @@ def getstimname(exp_name, stim_nr):
     else:
         raise IndexError('Stimulus {} does not exist in experiment:'
                          '\n{}'.format(stim_nr, exp_dir))
+
+
+def readmat(matfile):
+    """
+    Read a given .mat file and return the contents in a dictionary.
+
+    .mat files that are v>7.3 and v<7.3 must be treated differently.
+    """
+    import scipy.io
+    data = {}
+    try:
+        f = scipy.io.matlab.loadmat(matfile)
+        useh5 = False
+    except NotImplementedError:
+        useh5 = True
+
+    if not useh5:
+        for key, item in f.items():
+            if not str(key).startswith('__'):
+                if str(item.dtype).startswith('<U'):
+                    item = str(item)
+                else:
+                    item = np.squeeze(item)
+                data.update({key: item})
+        return data
+    else:
+        import h5py
+        with h5py.File(matfile, mode='r') as f:
+            for key in f.keys():
+                data.update({key: np.squeeze(f[key])})
+        return data
