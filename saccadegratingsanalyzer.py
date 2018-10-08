@@ -58,7 +58,7 @@ def saccadegratingsanalyzer(exp_name, stim_nr):
     # The first element b/c there is no before value
     stimposx = np.append(0, stimpos)[:-1]
     stimtr = np.stack((stimposx, stimpos), axis=1)[1:]
-    trans = trans[1:]
+    trans = trans[:-1]
 
     saccadetr = stimtr[trans, :]
     greytr = stimtr[~trans, :]
@@ -69,10 +69,10 @@ def saccadegratingsanalyzer(exp_name, stim_nr):
     nrsteps = int(trialduration/tstep)+1
     t = np.linspace(0, trialduration, num=nrsteps)
 
-    # Collect saccade beginning, saccade end and fixation end for each trial
-    trials = np.concatenate((ftimes[:-1, :], ftimes[1:, 0][:, None]), axis=1)
-    sacftimes = trials[trans, :]
-    greyftimes = trials[~trans, :]
+    # Collect saccade beginning time for each trial
+    trials = ftimes[1:, 0]
+    sacftimes = trials[trans]
+    greyftimes = trials[~trans]
 
     sacspikes = np.empty((clusters.shape[0], sacftimes.shape[0],
                           t.shape[0]))
@@ -86,10 +86,10 @@ def saccadegratingsanalyzer(exp_name, stim_nr):
         spiketimes = asc.read_raster(exp_dir, stim_nr, chid, clid)
         for j, _ in enumerate(sacftimes):
             sacspikes[i, j, :] = asc.binspikes(spiketimes,
-                                               sacftimes[j, 0]+t)
+                                               sacftimes[j]+t)
         for k, _ in enumerate(greyftimes):
             greyspikes[i, k, :] = asc.binspikes(spiketimes,
-                                                greyftimes[k, 0]+t)
+                                                greyftimes[k]+t)
 
     # Sort trials according to the transition type
     # nton[i][j] contains the indexes of trials where saccade was i to j
@@ -104,7 +104,7 @@ def saccadegratingsanalyzer(exp_name, stim_nr):
     os.makedirs(savedir, exist_ok=True)
     for i in range(clusters.shape[0]):
         fig, axes = plt.subplots(4, 4, sharex=True, sharey=True,
-                               figsize=(8, 8))
+                                 figsize=(8, 8))
         for j in range(4):
             for k in range(4):
                 # Start from bottom left corner
