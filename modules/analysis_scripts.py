@@ -76,11 +76,11 @@ def read_spikesheet(exp_name, cutoff=4, defaultpath=True):
                 break
             elif os.path.isfile(filepath + '.xlsx'):
                 filepath += '.xlsx'
-                meta_keys = [4, 1, 18, 2]
-                meta_vals = [4, 5, 18, 6]
-                cluster_chnl = [44, 1, 2000, 2]
-                cluster_cltr = [44, 5, 2000, 6]
-                cluster_rtng = [44, 6, 2000, 7]
+                meta_keys = [4, 1, 25, 2]
+                meta_vals = [4, 5, 25, 6]
+                cluster_chnl = [51, 1, 2000, 2]
+                cluster_cltr = [51, 5, 2000, 6]
+                cluster_rtng = [51, 6, 2000, 7]
                 break
         else:
             raise FileNotFoundError('Spike sorting file (ods/xlsx) not found.')
