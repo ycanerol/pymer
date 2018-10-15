@@ -58,7 +58,8 @@ allonoff(exp_name, onoffsteps)
 stripeflickeranalysis(exp_name, stripeflicker)
 stripesurround(exp_name, stripeflicker)
 
-OMSpatchesanalyzer(exp_name, OMSpatches)
+for stim in OMSpatches:
+    OMSpatchesanalyzer(exp_name, stim)
 for stim in OMB:
     OMBanalyzer(exp_name, stim)
 for stim in saccadegrating:
