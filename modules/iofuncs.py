@@ -51,13 +51,22 @@ def readconfig():
     """
     cfilename='config.json'
     if not os.path.isfile(cfilename):
-        cdict = {'root_experiment_dir': None,
-                 'valid_prefixes': []}
-        with open(cfilename, 'w') as cfile:
-            json.dump(cdict, cfile, indent=4)
-        raise FileNotFoundError('Configuration file not found. '
-                                'Empty file created in '
-                                '\'{}\''.format(os.path.realpath(cfilename)))
+        print('\nConfiguration file specifying the root directory for '
+              f'experiments cannot be found at {os.path.realpath(cfilename)}')
+        key_input = input('Would you like to initialize '
+                          'an empty config file here? \nThe root directory '
+                          'containing experiment data should be specified '
+                          'in this file.\n[y/n]: ')
+        if key_input.startswith('y'):
+            cdict = {'root_experiment_dir': None,
+                     'valid_prefixes': []}
+            with open(cfilename, 'w') as cfile:
+                json.dump(cdict, cfile, indent=4)
+            print('Empty file created in '
+                  '\'{}\'\n'.format(os.path.realpath(cfilename)))
+
+        else:
+            raise FileNotFoundError('Configuration file not found. ')
     elif os.stat(cfilename).st_size <= 0:
         raise RuntimeError('Configuration file may not be empty')
 
