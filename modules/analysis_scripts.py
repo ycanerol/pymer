@@ -13,6 +13,7 @@ import struct
 import warnings
 import numpy as np
 import pyexcel
+import re
 import iofuncs as iof
 
 
@@ -476,7 +477,9 @@ def read_parameters(exp_name, stimulusnr, defaultpath=True):
     else:
         stimdir = exp_dir
 
-    paramfile = glob.glob(os.path.join(stimdir, '{}_*'.format(stimulusnr)))
+    # Filter stimulus directory contents with RE to allow leading zero
+    pattern = f'0?{stimulusnr}_.*'
+    paramfile = list(filter(re.compile(pattern).match, os.listdir(stimdir)))
     if len(paramfile) == 1:
         paramfile = paramfile[0]
     elif len(paramfile) == 0:
@@ -488,13 +491,13 @@ def read_parameters(exp_name, stimulusnr, defaultpath=True):
         raise ValueError('Multiple files were found starting'
                          ' with {}'.format(stimulusnr))
 
-    f = open(paramfile)
+    f = open(os.path.join(stimdir, paramfile))
     lines = [line.strip('\n') for line in f]
     f.close()
 
     parameters = {}
 
-    parameters['filename'] = os.path.split(paramfile)[-1]
+    parameters['filename'] = paramfile
     if len(lines) == 0:
         parameters['stimulus_type'] = 'spontaneous_activity'
 
