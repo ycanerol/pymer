@@ -7,13 +7,13 @@ Created on Tue Nov 21 15:54:03 2017
 
 Collection of analysis functions
 """
+import re
 import os
 import glob
 import struct
 import warnings
 import numpy as np
 import pyexcel
-import re
 import iofuncs as iof
 
 
@@ -63,7 +63,7 @@ def read_spikesheet(exp_name, cutoff=4, defaultpath=True):
         exp_dir = iof.exp_dir_fixer(exp_name)
         cfg = iof.readconfig()
         filenames = cfg.get('spike_sorting_filenames', 'spike_sorting')
-        if type(filenames) is not list:
+        if isinstance(filenames, list):
             filenames = [filenames]
         for filename in filenames:
             filepath = os.path.join(exp_dir, filename)
@@ -194,9 +194,9 @@ def saveframetimes(exp_name, forceextraction=False, start=None, end=None,
     """
     exp_dir = iof.exp_dir_fixer(exp_name)
     if start is None:
-        start =1
+        start = 1
     if end is None:
-        end=100
+        end = 100
 
     for i in range(start, end):
         alreadyextracted = True

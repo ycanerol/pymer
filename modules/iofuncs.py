@@ -259,7 +259,7 @@ def readmat(matfile):
     import scipy.io
     data = {}
     try:
-        f = scipy.io.matlab.loadmat(matfile)
+        f = scipy.io.loadmat(matfile)
         useh5 = False
     except NotImplementedError:
         useh5 = True
