@@ -1,7 +1,7 @@
 {
     // Do not modify this file. This is the default configuration.
-    // To adjust the settings, copy and modify them in a file named .pymer
-    // in your home directory.
+    // To adjust the settings, copy and modify them in a file named
+    // .pymer_config in your home directory.
 
 
     // The base directory containing sub directories for all experiments.
@@ -10,6 +10,8 @@
     "root_experiment_dir": null,
 
     // List of prefixes tried for matching experiment names.
+    // This is useful if you have some experiment folders starting
+    // with the same pattern e.g. your name.
     "experiment_prefixes": [],
 
     // List of file names (excluding file extension) for spike sheets.
@@ -18,7 +20,8 @@
         "spike_sorting"
     ],
 
-    // Search and replace pairs for paths in stimulus files, e.g.
-    // "C:": "/"
+    // Search and replace pairs for paths in stimulus files,
+    // typically used for image or movie files on network e.g.
+    // "Y:\FromPeopleToPeople\Dimos\natural_stimuli": "~/natural_stimuli"
     "stimuli_path_replace": {}
 }

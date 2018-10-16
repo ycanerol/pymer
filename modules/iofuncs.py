@@ -43,7 +43,7 @@ def config(key, default=None):
 
     Notes
     -----
-    See 'defaultconfig.json' for more information.
+    See '.pymer_config_default' for more information.
     """
     return config.cfg.get(key, default)
 
@@ -76,7 +76,8 @@ def exp_dir_fixer(exp_name):
 
     """
     if config('root_experiment_dir') is None:
-        raise ValueError('Invalid root experiment directory')
+        raise Exception('Root experiment directory is not set. See User '
+                        'Configuration section on README for instructions.')
 
     exp_dir = str(exp_name)
     for s in [''] + config('experiment_prefixes'):

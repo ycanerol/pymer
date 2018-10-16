@@ -15,7 +15,7 @@ echo "<path_to_main_dir>/external_libs" >> "<python_install_loc>/lib/python<your
 
 OR
 Add the following to the ~/.pythonrc
-```bash
+```python
 import sys
 sys.path.append('<path_to_main_dir>/modules')
 sys.path.append('<path_to_main_dir>/external_libs')
@@ -26,6 +26,13 @@ The random number generator should be setup by running the setup.py file in
 external_libs/randpy as described in the readme file there.
 
 ## User Configuration
-The file `defaultconfig.json` is meant to be read-only. Local configurations may be set with a file `.pymer` in your home directory. These will override the default configuration.
+The file `.pymer_config_default` is meant to be read-only. Local configurations
+may be set with a file `.pymer_config` in your home directory. These will
+override the default configuration.
 
-Copy desired settings from `defaultconfig.json` into `~/.pymer` and adjust them to your preferences. A local setting *root_experiment_dir* is necessary for most functions.
+A local setting *root_experiment_dir* is necessary for most functions.
+
+To set it, copy the file ".pymer_config_default" from the repository directory
+to your home folder (`/home/<username>` and `C:\Users\<username>` for Windows)
+and rename it to ".pymer_config". Lastly, edit the file and
+set the variable "root_experiment_dir" to your root experiment directory.
