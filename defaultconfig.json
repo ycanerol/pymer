@@ -20,5 +20,8 @@
 
     // Search and replace pairs for paths in stimulus files, e.g.
     // "C:": "/"
-    "stimuli_path_replace": {}
+    "stimuli_path_replace": {},
+
+    // Common colormap for figures
+    "colormap": "seismic"
 }
