@@ -48,6 +48,19 @@ def config(key, default=None):
     return config.cfg.get(key, default)
 
 
+def reload_config():
+    """
+    Force reloading the cached config from disk.
+
+    Notes
+    -----
+    This is useful when changing the user config while running the
+    functions from command line.
+    """
+    cfg = getattr(cutil.cache_config()(config), 'cfg')
+    setattr(config, 'cfg', cfg)
+
+
 def exp_dir_fixer(exp_name):
     """
     Convert short experiment name into full path. If input is already
