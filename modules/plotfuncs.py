@@ -9,6 +9,7 @@ import os
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+import iofuncs as iof
 
 
 def spineless(axes, which='trlb'):
@@ -253,7 +254,7 @@ def stashow(sta, ax=None, cbar=True, **kwargs):
         imshow
             extent: Change the labels of the axes. [xmin, xmax, ymin, ymax]
             aspect: Aspect ratio of the image. 'auto', 'equal'
-            cmap:  Colormap to be used. Default is 'RdBu'
+            cmap:  Colormap to be used. Default is set in config
         colorbar
             size: Width of the colorbar as percentage of image dimension
                   Default is 2%
@@ -267,7 +268,7 @@ def stashow(sta, ax=None, cbar=True, **kwargs):
     vmin = -vmax
 
     # Make a dictionary for imshow and colorbar kwargs
-    imshowkw = {'cmap':'RdBu', 'vmin':vmin, 'vmax':vmax}
+    imshowkw = {'cmap': iof.config('colormap'), 'vmin':vmin, 'vmax':vmax}
     cbarkw = {'size':'2%', 'ticks':[vmin, vmax], 'format':'%.2f'}
     for key in kwargs.keys():
         if key in ['extent', 'aspect', 'cmap']:

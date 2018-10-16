@@ -59,7 +59,7 @@ def plot_checker_stas(exp_name, stim_nr, filename=None):
         for i in range(filter_length):
             ax = plt.subplot(subplot_arr[0], subplot_arr[1], i+1)
             im = ax.imshow(a[:, :, i], vmin=sta_min, vmax=sta_max,
-                           cmap='RdBu')
+                           cmap=iof.config('colormap'))
             ax.set_aspect('equal')
             plt.axis('off')
             if i == 0:
