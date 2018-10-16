@@ -75,6 +75,10 @@ def exp_dir_fixer(exp_name):
         <root_experiment_dir>/<prefix>_20171122_252MEA_fr_re_fp
 
     """
+    if os.path.isdir(exp_name):
+        # If the experiment name is already a path nothing needs to be done.
+        return exp_name
+
     if config('root_experiment_dir') is None:
         raise Exception('Root experiment directory is not set. See User '
                         'Configuration section on README for instructions.')
