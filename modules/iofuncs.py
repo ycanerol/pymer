@@ -43,7 +43,7 @@ def config(key, default=None):
 
     Notes
     -----
-    See '.pymer_config_default' for more information.
+    See 'pymer_config_default.json' for more information.
     """
     return config.cfg.get(key, default)
 

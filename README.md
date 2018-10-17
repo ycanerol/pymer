@@ -26,13 +26,19 @@ The random number generator should be setup by running the setup.py file in
 external_libs/randpy as described in the readme file there.
 
 ## User Configuration
-The file `.pymer_config_default` is meant to be read-only. Local configurations
+The file `pymer_config_default.json` is meant to be read-only. Local configurations
 may be set with a file `.pymer_config` in your home directory. These will
 override the default configuration.
 
 A local setting *root_experiment_dir* is necessary for most functions.
 
-To set it, copy the file ".pymer_config_default" from the repository directory
-to your home folder (`/home/<username>` and `C:\Users\<username>` for Windows)
-and rename it to ".pymer_config". Lastly, edit the file and
-set the variable "root_experiment_dir" to your root experiment directory.
+To set your local configuration, create an empty file named ".pymer_config" at
+your home directory (`/home/<username>` for Linux and Mac and
+`C:\Users\<username>` for Windows)
+and add the desired options. See the default configuration file for all options.
+
+A minimum working example to get you started would be:
+```json
+{
+        "root_experiment_dir" : "/home/<username>/mydata/"
+}```

@@ -80,7 +80,7 @@ def cache_config():
     Decorator for caching the loaded config files.
     """
     def _init(obj):
-        defaults = readjsonfile('.pymer_config_default', is_default_cfg=True)
+        defaults = readjsonfile('pymer_config_default.json', is_default_cfg=True)
         user = readjsonfile(os.path.expanduser('~/.pymer_config'))
         setattr(obj, 'cfg', nestedupdate(defaults, user))
         return obj
