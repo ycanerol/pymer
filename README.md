@@ -41,4 +41,5 @@ A minimum working example to get you started would be:
 ```json
 {
         "root_experiment_dir" : "/home/<username>/mydata/"
-}```
+}
+```
