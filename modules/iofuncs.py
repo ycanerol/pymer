@@ -8,10 +8,11 @@ Created on Fri Jan  5 16:55:33 2018
 Functions related to reading/writing files.
 """
 
-import json
 import os
 import glob
 import numpy as np
+
+import configutil as cutil
 
 
 # Some variables (e.g. STAs) are stored as lists originally
@@ -24,52 +25,40 @@ import numpy as np
 list_of_lists = ['stas', 'max_inds', 'all_frs', 'all_parameters', 'fits']
 
 
-def readconfig():
+@cutil.cache_config()
+def config(key, default=None):
     """
-    Read configuration from file. If the file does not exist, created with
-    empty entries.
+    Retrieve value from loaded config.
 
-    Returns:
-    --------
-    cdict:
-        Dictionary holding configuration key-value pairs.
+    Parameters
+    ----------
+    key : int or str
+        Key in the config dictionary
+    default : int or str, optional
+        Default value to return if key is not in config. Default is None
 
-    Raises:
+    Returns
     -------
-    FileNotFoundError:
-        If configuration file is not found.
-    RuntimeError:
-        If configuration file is empty.
-    AttributeError:
-        If configuration file contains syntax errors.
+    Value of the config for the given key.
 
-    Notes:
-    ------
-    The JSON configuration file should contain a dict with the following keys:
-        root_experiment_dir: string
-        valid_prefixes: list of strings
+    Notes
+    -----
+    See 'pymer_config_default.json' for more information.
     """
-    cfilename='config.json'
-    if not os.path.isfile(cfilename):
-        cdict = {'root_experiment_dir': None,
-                 'valid_prefixes': []}
-        with open(cfilename, 'w') as cfile:
-            json.dump(cdict, cfile, indent=4)
-        raise FileNotFoundError('Configuration file not found. '
-                                'Empty file created in '
-                                '\'{}\''.format(os.path.realpath(cfilename)))
-    elif os.stat(cfilename).st_size <= 0:
-        raise RuntimeError('Configuration file may not be empty')
+    return config.cfg.get(key, default)
 
-    with open(cfilename, 'r') as cfile:
-        try:
-            cdict = json.load(cfile)
-        except json.JSONDecodeError as je:
-            raise AttributeError('Error while reading the '
-                                 'configuration file \'{}\':'
-                                 '\n{}'.format(os.path.realpath(cfile.name),
-                                                      str(je)))
-    return cdict
+
+def reload_config():
+    """
+    Force reloading the cached config from disk.
+
+    Notes
+    -----
+    This is useful when changing the user config while running the
+    functions from command line.
+    """
+    cfg = getattr(cutil.cache_config()(config), 'cfg')
+    setattr(config, 'cfg', cfg)
 
 
 def exp_dir_fixer(exp_name):
@@ -86,15 +75,19 @@ def exp_dir_fixer(exp_name):
         <root_experiment_dir>/<prefix>_20171122_252MEA_fr_re_fp
 
     """
-    cfg = readconfig()
-    if 'root_experiment_dir' not in cfg or cfg['root_experiment_dir'] is None:
-        raise ValueError('Invalid root experiment directory')
+    if os.path.isdir(exp_name):
+        # If the experiment name is already a path nothing needs to be done.
+        return exp_name
+
+    if config('root_experiment_dir') is None:
+        raise Exception('Root experiment directory is not set. See User '
+                        'Configuration section on README for instructions.')
 
     exp_dir = str(exp_name)
-    for s in [''] + cfg['valid_prefixes']:
+    for s in [''] + config('experiment_prefixes'):
         exp_name = s + exp_name
         if not os.path.isdir(exp_dir):
-            exp_dir = os.path.join(cfg['root_experiment_dir'],
+            exp_dir = os.path.join(config('root_experiment_dir'),
                                    exp_name)
             if not os.path.isdir(exp_dir):
 
@@ -113,7 +106,6 @@ def exp_dir_fixer(exp_name):
                 else:
                     exp_dir = files[0]
     return exp_dir
-
 
 
 def loadh5(path):

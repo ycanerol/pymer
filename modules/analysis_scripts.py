@@ -61,10 +61,7 @@ def read_spikesheet(exp_name, cutoff=4, defaultpath=True):
     """
     if defaultpath:
         exp_dir = iof.exp_dir_fixer(exp_name)
-        cfg = iof.readconfig()
-        filenames = cfg.get('spike_sorting_filenames', 'spike_sorting')
-        if isinstance(filenames, list):
-            filenames = [filenames]
+        filenames = iof.config('spike_sorting_filenames')
         for filename in filenames:
             filepath = os.path.join(exp_dir, filename)
             if os.path.isfile(filepath + '.ods'):

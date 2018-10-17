@@ -140,8 +140,7 @@ def checkerflickerplusanalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
             mblinks = parameters['Nblinksmovie']
             # Retrivee the number of frames (files) from parameters['path']
             ipath = PureWindowsPath(parameters['path']).as_posix()
-            cfg = iof.readconfig()
-            repldict = cfg.get('stimuli_path_replace', {})
+            repldict = iof.config('stimuli_path_replace')
             for needle, repl in repldict.items():
                 ipath = ipath.replace(needle, repl)
             ipath = os.path.normpath(ipath)  # Windows compatiblity
