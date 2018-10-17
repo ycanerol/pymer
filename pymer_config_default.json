@@ -23,5 +23,8 @@
     // Search and replace pairs for paths in stimulus files,
     // typically used for image or movie files on network e.g.
     // "Y:\FromPeopleToPeople\Dimos\natural_stimuli": "~/natural_stimuli"
-    "stimuli_path_replace": {}
+    "stimuli_path_replace": {},
+
+    // Common colormap for figures
+    "colormap": "seismic"
 }
