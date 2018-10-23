@@ -12,7 +12,7 @@ import os
 import glob
 import numpy as np
 
-from . import configutil as cutil
+from pymer.modules.configutil import cache_config
 
 
 # Some variables (e.g. STAs) are stored as lists originally
@@ -25,7 +25,7 @@ from . import configutil as cutil
 list_of_lists = ['stas', 'max_inds', 'all_frs', 'all_parameters', 'fits']
 
 
-@cutil.cache_config()
+@cache_config()
 def config(key, default=None):
     """
     Retrieve value from loaded config.
@@ -57,7 +57,7 @@ def reload_config():
     This is useful when changing the user config while running the
     functions from command line.
     """
-    cfg = getattr(cutil.cache_config()(config), 'cfg')
+    cfg = getattr(cache_config()(config), 'cfg')
     setattr(config, 'cfg', cfg)
 
 
