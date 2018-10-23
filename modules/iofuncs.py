@@ -12,7 +12,7 @@ import os
 import glob
 import numpy as np
 
-from pymer.modules.configutil import cache_config
+from configutil import cache_config
 
 
 # Some variables (e.g. STAs) are stored as lists originally
