@@ -12,7 +12,7 @@ import os
 import glob
 import numpy as np
 
-import configutil as cutil
+from . import configutil as cutil
 
 
 # Some variables (e.g. STAs) are stored as lists originally

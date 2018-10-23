@@ -7,6 +7,8 @@ import collections
 import json
 import os
 import re
+from pathlib import Path
+import sys
 
 
 def readjsonfile(filename, is_default_cfg=False):
@@ -80,7 +82,9 @@ def cache_config():
     Decorator for caching the loaded config files.
     """
     def _init(obj):
-        defaults = readjsonfile('pymer_config_default.json', is_default_cfg=True)
+        root_path = Path(sys.modules[__name__].__file__).parents[1]
+        dflt_path = root_path.joinpath('pymer_config_default.json')
+        defaults = readjsonfile(dflt_path, is_default_cfg=True)
         user = readjsonfile(os.path.expanduser('~/.pymer_config'))
         setattr(obj, 'cfg', nestedupdate(defaults, user))
         return obj
