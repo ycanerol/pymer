@@ -8,8 +8,8 @@ array recordings from the retina in the Gollisch lab, Göttingen.
 """
 from __future__ import division, absolute_import, print_function
 
-# Externals
-from .external import randpy
+# Randpy
+from .randpy import randpy
 
 # Modules
 from . import modules

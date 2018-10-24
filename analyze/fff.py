@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-from ..external import randpy
+from .. import randpy
 from ..modules import analysisfuncs as asc
 from ..modules import iofuncs as iof
 from ..plot import util as plf

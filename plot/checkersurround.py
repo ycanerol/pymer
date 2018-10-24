@@ -12,7 +12,7 @@ import os
 import warnings
 
 from . import util as plf
-from ..external import gaussfitter as gfit
+from ..calc import gaussfitter as gfit
 from ..modules import analysisfuncs as asc
 from ..modules import iofuncs as iof
 from ..modules import miscfuncs as mf

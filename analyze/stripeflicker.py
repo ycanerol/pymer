@@ -9,7 +9,7 @@ Created on Wed Jan 10 14:36:31 2018
 import numpy as np
 import os
 
-from ..external import randpy
+from .. import randpy
 from ..modules import analysisfuncs as asc
 from ..modules import iofuncs as iof
 

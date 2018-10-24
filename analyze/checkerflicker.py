@@ -11,7 +11,7 @@ import numpy as np
 import os
 import warnings
 
-from ..external import randpy
+from .. import randpy
 from ..modules import analysisfuncs as asc
 from ..modules import iofuncs as iof
 from ..modules import miscfuncs as msc

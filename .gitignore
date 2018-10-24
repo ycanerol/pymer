@@ -1,4 +1,4 @@
 build/
 *.so
 __pycache__/
-/external_libs/randpy/randpy.cpp
+/randpy/randpy.cpp
