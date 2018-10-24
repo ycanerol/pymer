@@ -8,11 +8,10 @@ Created on Wed May 24 16:41:38 2017
 Functions for STA and STC analysis for checkerflicker stimulus
 
 """
-
 import numpy as np
+import peakutils
 from scipy.stats.mstats import mquantiles
 import scipy.ndimage as ndi
-import peakutils
 
 
 def sta(spikes, stimulus, filter_length, total_frames):

@@ -7,10 +7,9 @@ Created on Fri Jan  5 16:55:33 2018
 
 Functions related to reading/writing files.
 """
-
-import os
 import glob
 import numpy as np
+import os
 
 from .configutil import cache_config
 

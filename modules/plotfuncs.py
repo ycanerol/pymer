@@ -5,10 +5,11 @@ Created on Tue Nov 14 13:37:25 2017
 
 @author: ycan
 """
-import os
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+import os
+
 from . import iofuncs as iof
 
 

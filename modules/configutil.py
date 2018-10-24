@@ -2,7 +2,6 @@
 """
 Utility functions for reading the configuration.
 """
-
 import collections
 import json
 import os

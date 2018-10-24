@@ -15,8 +15,8 @@ Special characters like mu are rendered correctly on saved
 plots but not inline displayed ones, no idea why.
 
 """
-import numpy as np
 import matplotlib as mpl
+import numpy as np
 import os
 
 from matplotlib.backends.backend_pgf import FigureCanvasPgf

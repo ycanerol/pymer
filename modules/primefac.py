@@ -13,7 +13,6 @@ prime_factorize was modified so that its output is
 more similar to that of MATLAB factor().
 
 """
-
 import math
 
 

@@ -10,7 +10,6 @@ Functions for LNP model with full field flicker stimulus
 Includes STA, STC to be used in data analysis
 
 """
-
 import numpy as np
 from scipy.stats.mstats import mquantiles
 
