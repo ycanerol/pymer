@@ -1,0 +1,11 @@
+60  25000   1 14    0
+01_spontaneous_dark_lowl1                                1
+02_contraststepladder12preframes48levels8                1
+03_onoffsteps30preframes90contrast1                      1
+04_chirpStimulus_marmoset_15r                            1
+05_reversinggratingWVSP12preframes60                     1
+06_checkerflicker5x5bw1blink                             1
+07_checkerflicker5x5bw2blinks                            1
+08_checkerflickerplusmovie2x2bw4blinks_doves60Hz_seed1   1
+09_checkerflickerplusmovie2x2bw4blinks_doves60Hz_seed2   1
+10_checkerflicker_2x2bw_4blinks                          1
