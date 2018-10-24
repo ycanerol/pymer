@@ -10,34 +10,30 @@ from pathlib import Path
 import sys
 
 
-def readjsonfile(filename, is_default_cfg=False):
+def readjsonfile(filename, required=False, allow_comments=False):
     """
-    Parse JSON file and remove annotative comment when allowed.
+    Parse JSON file and strip off of annotative comments if allowed.
 
     Parameters
     ----------
     filename : str
         Path to a JSON file to parse
-    is_default_cfg : bool, optional
-        Treat as user or default configuration file. Default is False
+    required : bool, optional
+        If False, return empty dict if file does not exist or is empty
+    allow_comments : bool, optional
+        Allow annotative comments. Default is False
 
     Returns
     -------
     data : dict
-        Parsed configuration
+        Parsed JSON file
 
     Raises
     ------
     AttributeError
         If parsing of JSON file failed due to a syntax error
-
-    Notes
-    -----
-    The default config is allowed to have annotative comments which are
-    typically illegal in JSON. This enables some descriptions in the default
-    config file.
     """
-    if not is_default_cfg:
+    if not required:
         if not os.path.isfile(filename) or os.stat(filename).st_size <= 0:
             return {}
 
@@ -45,14 +41,14 @@ def readjsonfile(filename, is_default_cfg=False):
         data = cfile.read()
 
     # Remove annotative comments in default JSON (don't hate)
-    if is_default_cfg:
+    if allow_comments:
         data = re.sub(r"//.*$", "", data, flags=re.M)
 
     try:
         data = json.loads(data)
     except json.JSONDecodeError as je:
         apath = os.path.realpath(filename)
-        raise AttributeError('Invalid syntax in the configuration file '
+        raise AttributeError('Invalid syntax in the JSON file '
                              f'\'{apath}\':\n{str(je)}') from None
     return data
 
