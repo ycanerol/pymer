@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-from ..modules import iofuncs as iof
+from ...modules import iofuncs as iof
 
 
 def spineless(axes, which='trlb'):
@@ -32,10 +32,14 @@ def spineless(axes, which='trlb'):
         axes = [axes]
 
     for ax in axes:
-        if which.find('t') is not -1: ax.spines['top'].set_visible(False)
-        if which.find('r') is not -1: ax.spines['right'].set_visible(False)
-        if which.find('l') is not -1: ax.spines['left'].set_visible(False)
-        if which.find('b') is not -1: ax.spines['bottom'].set_visible(False)
+        if which.find('t') is not -1:
+            ax.spines['top'].set_visible(False)
+        if which.find('r') is not -1:
+            ax.spines['right'].set_visible(False)
+        if which.find('l') is not -1:
+            ax.spines['left'].set_visible(False)
+        if which.find('b') is not -1:
+            ax.spines['bottom'].set_visible(False)
 
 
 def savefigmkdir(path, **kwargs):
@@ -64,13 +68,14 @@ def RFcolormap(colors=None):
         Number:     39
     """
     if colors is None:
-        colors = ("#790102","#7C0B0C","#7F1314","#821B1C","#852122","#892828",
-                  "#8C2E2E","#903434","#943A3B","#984141","#9C4848","#A14F4F",
-                  "#A65757","#AB6060","#B16969","#B77474","#BF8181","#C89191",
-                  "#D5A8A8","#FFFFFF","#AFB0D3","#9A9BC7","#8C8DBF","#8081B9",
-                  "#7678B4","#6D6FAF","#6668AB","#5E61A8","#585AA5","#5254A3",
-                  "#4C4FA1","#46499F","#41449E","#3B3F9D","#363A9D","#30359D",
-                  "#2A309E","#232AA0","#1A24A2")
+        colors = ("#790102", "#7C0B0C", "#7F1314", "#821B1C", "#852122",
+                  "#892828", "#8C2E2E", "#903434", "#943A3B", "#984141",
+                  "#9C4848", "#A14F4F", "#A65757", "#AB6060", "#B16969",
+                  "#B77474", "#BF8181", "#C89191", "#D5A8A8", "#FFFFFF",
+                  "#AFB0D3", "#9A9BC7",  "#8C8DBF", "#8081B9", "#7678B4",
+                  "#6D6FAF", "#6668AB", "#5E61A8",  "#585AA5", "#5254A3",
+                  "#4C4FA1", "#46499F", "#41449E", "#3B3F9D",  "#363A9D",
+                  "#30359D", "#2A309E", "#232AA0", "#1A24A2")
     cm = mpl.colors.ListedColormap(colors)
     return cm
 
@@ -186,6 +191,7 @@ def colorbar(mappable, size='5%', **kwargs):
     cb.ax.tick_params(length=0)
     return cb
 
+
 def drawonoff(ax, preframedur, stimdur, h=1, contrast=1):
     """
     Draws rectangles on plot to represent different parts of
@@ -269,13 +275,17 @@ def stashow(sta, ax=None, cbar=True, **kwargs):
     vmin = -vmax
 
     # Make a dictionary for imshow and colorbar kwargs
-    imshowkw = {'cmap': iof.config('colormap'), 'vmin':vmin, 'vmax':vmax}
-    cbarkw = {'size':'2%', 'ticks':[vmin, vmax], 'format':'%.2f'}
+    imshowkw = {'cmap': iof.config('colormap'),
+                'vmin': vmin,
+                'vmax': vmax}
+    cbarkw = {'size': '2%',
+              'ticks': [vmin, vmax],
+              'format': '%.2f'}
     for key in kwargs.keys():
         if key in ['extent', 'aspect', 'cmap']:
-            imshowkw.update({key:kwargs[key]})
+            imshowkw.update({key: kwargs[key]})
         elif key in ['size', 'ticks', 'format']:
-            cbarkw.update({key:kwargs[key]})
+            cbarkw.update({key: kwargs[key]})
         else:
             raise ValueError(f'Unknown kwarg: {key}')
 
@@ -288,14 +298,16 @@ def stashow(sta, ax=None, cbar=True, **kwargs):
         colorbar(im, **cbarkw)
     return im
 
+
 def subplottext(text, axis, x=-.3, y=1.1, **kwargs):
-    textkwargs = {'transform':axis.transAxes,
-                  'fontsize':12,
-                  'fontweight':'bold',
-                  'va':'top',
-                  'ha':'right'}
+    textkwargs = {'transform': axis.transAxes,
+                  'fontsize': 12,
+                  'fontweight': 'bold',
+                  'va': 'top',
+                  'ha': 'right'}
     textkwargs.update(kwargs)
     axis.text(x, y, text, **textkwargs)
+
 
 def addarrowaxis(ax, x=0.5, y=0.5, dx=.1, dy=.2, xtext='',
                  ytext='', xtextoffset=0.02, ytextoffset=.032,
@@ -325,6 +337,6 @@ def addarrowaxis(ax, x=0.5, y=0.5, dx=.1, dy=.2, xtext='',
                 xytext=(x, y+dy), textcoords='axes fraction',
                 arrowprops=arrowprops)
     ax.text(x, y - xtextoffset, xtext, transform=ax.transAxes,
-        fontsize=fontsize, va='top')
+            fontsize=fontsize, va='top')
     ax.text(x - ytextoffset, y, ytext, rotation=90, transform=ax.transAxes,
-        fontsize=fontsize, ha='left', va='bottom')
+            fontsize=fontsize, ha='left', va='bottom')

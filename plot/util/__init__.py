@@ -13,7 +13,7 @@ from .util import (
     stashow,
     subplottext,
 )
-from .scalebars import add_scalebar as addscalebar
+from .scalebars import addscalebar
 
 __all__ = [
     'addscalebar',
