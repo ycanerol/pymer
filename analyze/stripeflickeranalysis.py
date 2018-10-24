@@ -6,15 +6,15 @@ Created on Wed Jan 10 14:36:31 2018
 @author: ycan
 """
 
-import os
-from os.path import join as pjoin
 import numpy as np
-import analysis_scripts as asc
-import iofuncs as iof
-from randpy import randpy
+import os
+
+from ..external import randpy
+from ..modules import analysisfuncs as asc
+from ..modules import iofuncs as iof
 
 
-def stripeflickeranalysis(exp_name, stim_nrs):
+def stripeflicker(exp_name, stim_nrs):
     exp_dir = iof.exp_dir_fixer(exp_name)
 
     if isinstance(stim_nrs, int):
@@ -133,7 +133,7 @@ def stripeflickeranalysis(exp_name, stim_nrs):
             quals = np.append(quals, asc.staquality(stas[i]))
 
         savefname = str(stim_nr)+'_data'
-        savepath = pjoin(exp_dir, 'data_analysis', stimname)
+        savepath = os.path.join(exp_dir, 'data_analysis', stimname)
 
         exp_name = os.path.split(exp_dir)[-1]
 

@@ -5,16 +5,17 @@ Created on Wed Jan 17 15:21:50 2018
 
 @author: ycan
 """
-import os
-import numpy as np
-import analysis_scripts as asc
-import iofuncs as iof
-from randpy import randpy
-import plotfuncs as plf
 import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+from ..external import randpy
+from ..modules import analysisfuncs as asc
+from ..modules import iofuncs as iof
+from ..modules import plotfuncs as plf
 
 
-def fffanalyzer(exp_name, stimnrs):
+def fff(exp_name, stimnrs):
     """
     Analyzes and plots data from full field flicker
     stimulus.

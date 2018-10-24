@@ -6,8 +6,8 @@ from .OMSpatchesanalyzer import omspatches
 from .onoffstepsanalyzer import onoffsteps
 from .saccadegratingsanalyzer import saccadegratings
 from .spontanalyzer import spont
-from .stripeflickeranalysis import stripeflickeranalysis as stripeflicker
-from .stripesurround import stripesurround as stripesurround
+from .stripeflickeranalysis import stripeflicker
+from .stripesurround import stripesurround
 
 from .allfff import allfff
 from .allonoff import allonoff

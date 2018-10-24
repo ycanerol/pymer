@@ -1,8 +1,9 @@
-from . import analysis_scripts, iofuncs, miscfuncs, plotfuncs
+from . import analysis_scripts as analysisfuncs
+from . import iofuncs, miscfuncs, plotfuncs
 
 __all__ = [
-        'analysis_scripts',
-        'iofuncs',
-        'miscfuncs',
-        'plotfuncs',
-        ]
+    'analysisfuncs',
+    'iofuncs',
+    'miscfuncs',
+    'plotfuncs',
+]

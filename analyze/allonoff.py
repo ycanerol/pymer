@@ -5,12 +5,13 @@ Created on Fri Jan 26 11:20:35 2018
 
 @author: ycan
 """
+import matplotlib.pyplot as plt
+import numpy as np
 import os
 import warnings
-import iofuncs as iof
-import numpy as np
-import matplotlib.pyplot as plt
-import plotfuncs as plf
+
+from ..modules import iofuncs as iof
+from ..modules import plotfuncs as plf
 
 
 def allonoff(exp_name, stim_nrs):

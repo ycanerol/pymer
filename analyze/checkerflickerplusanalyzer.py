@@ -5,18 +5,18 @@ Created on Fri Dec  8 11:22:39 2017
 
 @author: ycan
 """
-
 import datetime
+import matplotlib.pyplot as plt
+import numpy as np
+from pathlib import PureWindowsPath
 import os
 import warnings
-import numpy as np
-from randpy import randpy
-import analysis_scripts as asc
-import iofuncs as iof
-import miscfuncs as msc
-import matplotlib.pyplot as plt
-import plotfuncs as plf
-from pathlib import PureWindowsPath
+
+from ..external import randpy
+from ..modules import analysisfuncs as asc
+from ..modules import iofuncs as iof
+from ..modules import miscfuncs as msc
+from ..modules import plotfuncs as plf
 
 
 def runfreezemask(total_frames, runfr, frofr, refresh_rate):
@@ -32,8 +32,8 @@ def runfreezemask(total_frames, runfr, frofr, refresh_rate):
     return mask
 
 
-def checkerflickerplusanalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
-                               frametimingsfraction=None, cutoff=4):
+def checkerflickerplus(exp_name, stimulusnr, clusterstoanalyze=None,
+                       frametimingsfraction=None, cutoff=4):
     """
     Analyzes checkerflicker-like data, typically interspersed
     stimuli in between chunks of checkerflicker.

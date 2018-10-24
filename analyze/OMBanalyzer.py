@@ -5,15 +5,15 @@ Created on Tue Aug  7 14:54:08 2018
 
 @author: ycan
 """
-import os
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import os
 from scipy.stats.mstats import mquantiles
 
-from randpy import randpy
-import analysis_scripts as asc
-import plotfuncs as plf
-import iofuncs as iof
+from ..external import randpy
+from ..modules import analysisfuncs as asc
+from ..modules import plotfuncs as plf
+from ..modules import iofuncs as iof
 
 
 def calc_covar(stim_small):
@@ -45,7 +45,7 @@ def q_nlt_recovery(spikes, generator, nr_bins=20):
     return quantile_bins, spikecount_in_bins
 
 
-def OMBanalyzer(exp_name, stimnr, plotall=False, nr_bins=20):
+def omb(exp_name, stimnr, plotall=False, nr_bins=20):
     """
     Analyze responses to object moving background stimulus.
     """
@@ -57,7 +57,7 @@ def OMBanalyzer(exp_name, stimnr, plotall=False, nr_bins=20):
     stimname = iof.getstimname(exp_dir, stimnr)
 
     parameters = asc.read_parameters(exp_name, stimnr)
-    assert(parameters['stimulus_type']=='objectsmovingbackground')
+    assert(parameters['stimulus_type'] == 'objectsmovingbackground')
     stimframes = parameters.get('stimFrames', 108000)
     preframes = parameters.get('preFrames', 200)
     nblinks = parameters.get('Nblinks', 2)
@@ -73,7 +73,7 @@ def OMBanalyzer(exp_name, stimnr, plotall=False, nr_bins=20):
 
     refresh_rate = metadata['refresh_rate']
     filter_length, frametimings = asc.ft_nblinks(exp_name, stimnr, nblinks,
-                                                refresh_rate)
+                                                 refresh_rate)
 
     if ntotal+1 != frametimings.shape[0]:
         print(f'For {exp_name}\nstimulus {stimname} :\n'
@@ -142,15 +142,15 @@ def OMBanalyzer(exp_name, stimnr, plotall=False, nr_bins=20):
 
         # Calculate the generator signals and nonlinearities
         generators_x[i, :] = np.convolve(eigvecs_x[i, :, -1], xsteps,
-                                  mode='full')[:-filter_length+1]
+                                         mode='full')[:-filter_length+1]
         generators_y[i, :] = np.convolve(eigvecs_y[i, :, -1], ysteps,
-                                  mode='full')[:-filter_length+1]
+                                         mode='full')[:-filter_length+1]
         bins_x[i, :], spikecount_x[i, :] = q_nlt_recovery(all_spikes[i, :],
-                                                         generators_x[i, :],
-                                                         nr_bins)
+                                                          generators_x[i, :],
+                                                          nr_bins)
         bins_y[i, :], spikecount_y[i, :] = q_nlt_recovery(all_spikes[i, :],
-                                                         generators_y[i, :],
-                                                         nr_bins)
+                                                          generators_y[i, :],
+                                                          nr_bins)
     savepath = os.path.join(exp_dir, 'data_analysis', stimname)
     if not os.path.isdir(savepath):
         os.makedirs(savepath, exist_ok=True)
@@ -160,7 +160,7 @@ def OMBanalyzer(exp_name, stimnr, plotall=False, nr_bins=20):
     magy = eigvecs_y[:, :, -1].sum(axis=1)
     r_ = np.sqrt(magx**2 + magy**2)
     theta_ = np.arctan2(magy, magx)
-    # To draw the vectors starting from origin, insert zeros every other element
+    # To draw vectors starting from origin, insert zeros every other element
     r = np.zeros(r_.shape[0]*2)
     theta = np.zeros(theta_.shape[0]*2)
     r[1::2] = r_
@@ -217,7 +217,7 @@ def OMBanalyzer(exp_name, stimnr, plotall=False, nr_bins=20):
                   'filter_length', 'magx', 'magy',
                   'ntotal', 'r', 'theta', 'stas',
                   'stc_x', 'stc_y', 'bins_x', 'bins_y', 'nr_bins',
-                  'spikecount_x','spikecount_y',
+                  'spikecount_x', 'spikecount_y',
                   'generators_x', 'generators_y']
     datadict = {}
 

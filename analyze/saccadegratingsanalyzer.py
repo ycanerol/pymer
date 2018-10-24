@@ -5,17 +5,17 @@ Created on Thu Oct  4 14:06:26 2018
 
 @author: ycan
 """
-import os
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+import os
 
-import iofuncs as iof
-import analysis_scripts as asc
-import plotfuncs as plf
-from randpy import randpy
+from ..external import randpy
+from ..modules import iofuncs as iof
+from ..modules import analysisfuncs as asc
+from ..modules import plotfuncs as plf
 
 
-def saccadegratingsanalyzer(exp_name, stim_nr):
+def saccadegratings(exp_name, stim_nr):
     """
     Analyze and save responses to saccadegratings stimulus.
     """

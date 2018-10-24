@@ -5,11 +5,13 @@ Created on Mon Jan  8 19:01:30 2018
 
 @author: ycan
 """
-import os
 import numpy as np
 import scipy.io
-import iofuncs as iof
-import analysis_scripts as asc
+import os
+
+from .modules import analysisfuncs as asc
+from .modules import iofuncs as iof
+
 
 def frametimesfrommat(exp_name):
     """
@@ -33,7 +35,8 @@ def frametimesfrommat(exp_name):
             else:
                 raise
 
-        matfile = os.path.join(exp_dir, 'frametimes', name + '_frametimings.mat')
+        matfile = os.path.join(exp_dir, 'frametimes',
+                               name + '_frametimings.mat')
 
         try:
             f = scipy.io.matlab.loadmat(matfile)

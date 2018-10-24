@@ -5,15 +5,16 @@ Created on Thu Nov 30 18:18:03 2017
 
 @author: ycan
 """
-import os
-import numpy as np
 import matplotlib.pyplot as plt
-import analysis_scripts as asc
-import plotfuncs as plf
-import iofuncs as iof
+import numpy as np
+import os
+
+from ..modules import analysisfuncs as asc
+from ..modules import plotfuncs as plf
+from ..modules import iofuncs as iof
 
 
-def spontanalyzer(exp_name, stim_nrs):
+def spont(exp_name, stim_nrs):
     """
     Analyze spontaneous activity, plot and save it. Will make a directory
     /data_analysis/<stimulus_name> and save svg [and pdf in subfolder.].
@@ -47,7 +48,7 @@ def spontanalyzer(exp_name, stim_nrs):
             allspikes.append(spikes)
 
         # Use the time of the last spike to determine the total recording time.
-        last_spike = np.max([np.max(allspikes[i])\
+        last_spike = np.max([np.max(allspikes[i])
                              for i in range(clusters.shape[0])
                              if len(allspikes[i]) > 0])
         totalrecordingtime = np.int(np.ceil(last_spike) + 1)
@@ -82,7 +83,6 @@ def spontanalyzer(exp_name, stim_nrs):
             plt.eventplot(rasterplot, linewidth=.5, color='k')
             # Set the axis so they align with the rectangles
             plt.axis([0, step, -1, len(rasterplot)])
-
 
             plt.suptitle('{}\n{}'.format(exp_name, stimname))
             plt.title('{:0>3}{:0>2} Rating: {}'.format(clusters[i][0],

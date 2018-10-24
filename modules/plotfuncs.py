@@ -9,7 +9,7 @@ import os
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
-import iofuncs as iof
+from . import iofuncs as iof
 
 
 def spineless(axes, which='trlb'):

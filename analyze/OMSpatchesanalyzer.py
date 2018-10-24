@@ -5,15 +5,17 @@ Created on Wed Aug  1 18:13:17 2018
 
 @author: ycan
 """
-import os
-import numpy as np
-import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
-import analysis_scripts as asc
-import plotfuncs as plf
-import iofuncs as iof
+import matplotlib.pyplot as plt
+import numpy as np
+import os
 
-def OMSpatchesanalyzer(exp_name, stim_nrs):
+from ..modules import analysisfuncs as asc
+from ..modules import plotfuncs as plf
+from ..modules import iofuncs as iof
+
+
+def omspatches(exp_name, stim_nrs):
     """
     Analyze and plot the responses to object motion patches stimulus.
     """
@@ -43,13 +45,11 @@ def OMSpatchesanalyzer(exp_name, stim_nrs):
 
         nblinks = parameters.get('Nblinks', 1)
         seed = parameters.get('seed', -10000)
-        stim_duration = parameters.get('stimFrames',
-                                               1400)
+        stim_duration = parameters.get('stimFrames', 1400)
         # The duration in the parameters refers to the total duration of both
         # epochs. We divide by two to get the length of a single stim_duration
         stim_duration = int(stim_duration/2)
-        prefr_duration = parameters.get('preFrames',
-                                                100)
+        prefr_duration = parameters.get('preFrames', 100)
 
         frametimings = asc.readframetimes(exp_dir, stim_nr)
 
@@ -97,7 +97,8 @@ def OMSpatchesanalyzer(exp_name, stim_nrs):
             ax1 = plt.subplot(gs[0])
             ax2 = plt.subplot(gs[1])
 
-            rastermat = np.vstack((localspikes[i, :, :], globalspikes[i, :, :]))
+            rastermat = np.vstack((localspikes[i, :, :],
+                                   globalspikes[i, :, :]))
             ax1.matshow(rastermat, cmap='Greys')
             ax1.axhline(ntrials-1, color='r', lw=.1)
             ax1.plot([0, 0], [ntrials, 0])

@@ -5,21 +5,21 @@ Created on Fri Dec  8 11:22:39 2017
 
 @author: ycan
 """
-
 import datetime
+import matplotlib.pyplot as plt
+import numpy as np
 import os
 import warnings
-import numpy as np
-from randpy import randpy
-import analysis_scripts as asc
-import iofuncs as iof
-import miscfuncs as msc
-import matplotlib.pyplot as plt
-import plotfuncs as plf
+
+from ..external import randpy
+from ..modules import analysisfuncs as asc
+from ..modules import iofuncs as iof
+from ..modules import miscfuncs as msc
+from ..modules import plotfuncs as plf
 
 
-def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
-                           frametimingsfraction=None, cutoff=4):
+def checkerflicker(exp_name, stimulusnr, clusterstoanalyze=None,
+                   frametimingsfraction=None, cutoff=4):
     """
     Analyzes checkerflicker data. Saves the results in .npz and .h5
     formats.

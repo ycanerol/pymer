@@ -5,10 +5,12 @@ Created on Thu Jul 12 11:15:11 2018
 
 @author: ycan
 """
-from os.path import join as pjoin
+import os.path
 import scipy.io
-import iofuncs as iof
-import analysis_scripts as asc
+
+from .modules import analysisfuncs as asc
+from .modules import iofuncs as iof
+
 
 def savenpztomat(exp_name, savedir=None):
     """
@@ -38,10 +40,10 @@ def savenpztomat(exp_name, savedir=None):
         stimname = iof.getstimname(exp_dir, i)
 
         if savedir is None:
-            savedir = pjoin(exp_dir, 'frametimes')
-        savename = pjoin(savedir, stimname)
+            savedir = os.path.join(exp_dir, 'frametimes')
+        savename = os.path.join(savedir, stimname)
         print(savename)
         scipy.io.savemat(savename+'_frametimings',
-                         {'ftimes':ft_on,
-                          'ftimes_offsets':ft_off},
+                         {'ftimes': ft_on,
+                          'ftimes_offsets': ft_off},
                          appendmat=True)

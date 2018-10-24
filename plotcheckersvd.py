@@ -5,16 +5,16 @@ Created on Tue Jan  2 15:54:05 2018
 
 @author: ycan
 """
-
-import os
-import numpy as np
-import matplotlib.pyplot as plt
 import matplotlib
-import analysis_scripts as asc
-import iofuncs as iof
-import miscfuncs as msc
-import plotfuncs as plf
+import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
+import numpy as np
+import os
+
+from .modules import analysisfuncs as asc
+from .modules import iofuncs as iof
+from .modules import miscfuncs as msc
+from .modules import plotfuncs as plf
 
 
 def plotcheckersvd(expname, stimnr, filename=None):

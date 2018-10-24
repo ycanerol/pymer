@@ -6,13 +6,14 @@ Created on Mon Feb  5 01:35:23 2018
 @author: ycan
 """
 
-import os
-import numpy as np
-import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-import iofuncs as iof
-import plotfuncs as plf
-import analysis_scripts as asc
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+from .modules import iofuncs as iof
+from .modules import plotfuncs as plf
+from .modules import analysisfuncs as asc
 
 
 def csindexchange(exp_name, onoffcutoff=.5, qualcutoff=9):
@@ -80,7 +81,7 @@ def csindexchange(exp_name, onoffcutoff=.5, qualcutoff=9):
         else:
             colors.append('white')
 
-    scatterkwargs = {'c':colors, 'alpha':.6, 'linewidths':0}
+    scatterkwargs = {'c': colors, 'alpha': .6, 'linewidths': 0}
 
     colorcategories = ['blue', 'red', 'black']
     colorlabels = ['ON', 'OFF', 'ON-OFF']

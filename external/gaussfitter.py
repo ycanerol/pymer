@@ -12,7 +12,7 @@ Copied from https://github.com/keflavich/gaussfitter/blob/master/gaussfitter/gau
 
 
 import numpy as np
-from mpfit import mpfit
+from .mpfit import mpfit
 
 
 def moments(data, circle, rotate, vheight, estimator=np.ma.median, angle_guess=45.0,

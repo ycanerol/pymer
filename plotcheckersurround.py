@@ -5,17 +5,17 @@ Created on Tue Oct 10 11:51:38 2017
 
 @author: ycan
 """
-
+import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
+import numpy as np
 import os
 import warnings
-import numpy as np
-import matplotlib.pyplot as plt
-import gaussfitter as gfit
-import iofuncs as iof
-import miscfuncs as mf
-import plotfuncs as plf
-import analysis_scripts as asc
-from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
+
+from .external import gaussfitter as gfit
+from .modules import analysisfuncs as asc
+from .modules import iofuncs as iof
+from .modules import miscfuncs as mf
+from .modules import plotfuncs as plf
 
 
 def plotcheckersurround(exp_name, stim_nr, filename=None, spikecutoff=1000,

@@ -5,15 +5,16 @@ Created on Tue Dec 12 19:00:09 2017
 
 @author: ycan
 """
-import os
-import numpy as np
 import matplotlib.pyplot as plt
-import plotfuncs as plf
-import iofuncs as iof
-import analysis_scripts as asc
+import numpy as np
+import os
+
+from .modules import analysisfuncs as asc
+from .modules import iofuncs as iof
+from .modules import plotfuncs as plf
 
 
-def plot_checker_stas(exp_name, stim_nr, filename=None):
+def plotcheckerstas(exp_name, stim_nr, filename=None):
     """
     Plot and save all STAs from checkerflicker analysis. The plots
     will be saved in a new folder called STAs under the data analysis

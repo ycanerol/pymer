@@ -14,7 +14,7 @@ import struct
 import warnings
 import numpy as np
 import pyexcel
-import iofuncs as iof
+from . import iofuncs as iof
 
 
 def read_spikesheet(exp_name, cutoff=4, defaultpath=True):
@@ -317,7 +317,7 @@ def extractframetimes(exp_name, stimnr, threshold=75,
     voltage = voltage - voltage[voltage < threshold].mean()
 
     time = np.arange(length) / (sampling_rate * 1e-3)  # In miliseconds
-    time = time + monitor_delay # Correct for the time delay
+    time = time + monitor_delay  # Correct for the time delay
 
     print('Total recording time: {:6.1f} seconds'
           ' (= {:3.1f} minutes)'.format(length/sampling_rate,
@@ -393,6 +393,7 @@ def convert_bin2voltage(voltage_raw, zeroADvalue=32768,
     """
     voltage = (voltage_raw - zeroADvalue) / microvoltsperADunit
     return voltage
+
 
 def detect_threshold_crossing(array, threshold):
     """
@@ -587,7 +588,7 @@ def stimulisorter(exp_name):
                            'rotatingstripes', 'frozennoise',
                            'checkerflickerplusmovie', 'OMSpatches', 'OMB',
                            'saccadegrating']
-    sorted_stimuli = {key:[] for key in possible_stim_names}
+    sorted_stimuli = {key: [] for key in possible_stim_names}
     exp_dir = iof.exp_dir_fixer(exp_name)
 
     file = open(os.path.join(exp_dir, 'parameters.txt'), 'r')

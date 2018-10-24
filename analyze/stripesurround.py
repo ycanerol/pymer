@@ -5,16 +5,15 @@ Created on Tue Jan 30 15:42:40 2018
 
 @author: ycan
 """
-import os
-import numpy as np
 import matplotlib.pyplot as plt
-
+import numpy as np
+import os
 from scipy.optimize import curve_fit
 
-import iofuncs as iof
-import plotfuncs as plf
-import analysis_scripts as asc
-import miscfuncs as msc
+from ..modules import iofuncs as iof
+from ..modules import plotfuncs as plf
+from ..modules import analysisfuncs as asc
+from ..modules import miscfuncs as msc
 
 
 def onedgauss(x, *p):
@@ -92,7 +91,7 @@ def stripesurround(exp_name, stimnrs):
                     included[i] = False
                     continue
                 else:
-                    print(f'Error while analyzing {stimname}\n'+
+                    print(f'Error while analyzing {stimname}\n' +
                           f'Index:{i}    Cluster:{clusterids[i]}')
                     raise
 
@@ -142,7 +141,7 @@ def stripesurround(exp_name, stimnrs):
                     included[i] = False
                     continue
                 else:
-                    print(f'Error while analyzing {stimname}\n'+
+                    print(f'Error while analyzing {stimname}\n' +
                           f'Index:{i}    Cluster:{clusterids[i]}')
                     import pdb
                     pdb.set_trace()
@@ -171,13 +170,13 @@ def stripesurround(exp_name, stimnrs):
             plt.plot(onoroff*fitv, -s, label='Data')
             plt.plot(onoroff*fit, -s, label='Fit')
             plt.axvline(0, linestyle='dashed', alpha=.5)
-            plt.title(f'Center: a: {popt[0]:4.2f}, μ: {popt[1]:4.2f},'+
-                      f' σ: {popt[2]:4.2f}\n'+
-                      f'Surround: a: {popt[3]:4.2f}, μ: {popt[4]:4.2f},'+
-                      f' σ: {popt[5]:4.2f}'+
+            plt.title(f'Center: a: {popt[0]:4.2f}, μ: {popt[1]:4.2f},' +
+                      f' σ: {popt[2]:4.2f}\n' +
+                      f'Surround: a: {popt[3]:4.2f}, μ: {popt[4]:4.2f},' +
+                      f' σ: {popt[5]:4.2f}' +
                       f'\n CS index: {csi:4.2f}')
             plt.subplots_adjust(top=.85)
-            plt.suptitle(f'{exp_name}\n{stimname}\n{clusterids[i]} '+
+            plt.suptitle(f'{exp_name}\n{stimname}\n{clusterids[i]} ' +
                          f'Q: {quals[i]:4.2f}')
             os.makedirs(os.path.join(savepath, 'stripesurrounds'),
                         exist_ok=True)
@@ -186,8 +185,8 @@ def stripesurround(exp_name, stimnrs):
                         bbox_inches='tight')
             plt.close()
 
-        data.update({'cs_inds':cs_inds, 'polarities':polarities,
-                     'included':included, 'all_parameters':all_parameters,
-                     'fits':fits})
+        data.update({'cs_inds': cs_inds, 'polarities': polarities,
+                     'included': included, 'all_parameters': all_parameters,
+                     'fits': fits})
         np.savez(os.path.join(savepath, f'{stimnr}_data.npz'), **data)
         print(f'Surround plotted and saved for {stimname}.')

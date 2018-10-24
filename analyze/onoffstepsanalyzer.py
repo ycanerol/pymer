@@ -5,15 +5,16 @@ Created on Thu Nov 30 18:18:03 2017
 
 @author: ycan
 """
-import os
-import numpy as np
 import matplotlib.pyplot as plt
-import analysis_scripts as asc
-import plotfuncs as plf
-import iofuncs as iof
+import numpy as np
+import os
+
+from ..modules import analysisfuncs as asc
+from ..modules import plotfuncs as plf
+from ..modules import iofuncs as iof
 
 
-def onoffstepsanalyzer(exp_name, stim_nrs):
+def onoffsteps(exp_name, stim_nrs):
     """
     Analyze onoffsteps data, plot and save it. Will make a directory
     /data_analysis/<stimulus_name> and save svg [and pdf in subfolder.].
@@ -51,7 +52,7 @@ def onoffstepsanalyzer(exp_name, stim_nrs):
         stim_duration = parameters['Nframes']/refresh_rate
 
         preframe_duration = parameters.get('preframes',
-                                                   0)/refresh_rate
+                                           0)/refresh_rate
 
         contrast = parameters['contrast']
 
@@ -147,7 +148,6 @@ def onoffstepsanalyzer(exp_name, stim_nrs):
             plt.gca().invert_yaxis()
             ax1.set_xticks([])
             plf.spineless(ax1)
-
 
             # Collect all trials in one array to calculate firing rates
             ras = np.array([])
