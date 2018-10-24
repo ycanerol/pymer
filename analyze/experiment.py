@@ -9,7 +9,7 @@ import datetime
 import sys
 
 from . import *
-from .. import plotcheckerstas, plotcheckersurround, plotcheckersvd
+from .. import plot
 from ..modules import analysisfuncs as asc
 
 
@@ -68,15 +68,15 @@ def experiment(exp_name=''):
     # %%
     for i in checkerflicker:
         checkerflicker(exp_name, i)
-        plotcheckerstas(exp_name, i)
-        plotcheckersurround(exp_name, i)
-        plotcheckersvd(exp_name, i)
+        plot.checkerstas(exp_name, i)
+        plot.checkersurround(exp_name, i)
+        plot.checkersvd(exp_name, i)
 
     for i in checkerflickerplus:
         checkerflickerplus(exp_name, i)
-        plotcheckerstas(exp_name, i)
-        plotcheckersurround(exp_name, i)
-        plotcheckersvd(exp_name, i)
+        plot.checkerstas(exp_name, i)
+        plot.checkersurround(exp_name, i)
+        plot.checkersvd(exp_name, i)
 
     end_time = datetime.datetime.now().strftime('%A %X')
     print(f'Analysis completed on {end_time}')

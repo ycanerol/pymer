@@ -11,9 +11,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-from .modules import iofuncs as iof
-from .modules import plotfuncs as plf
-from .modules import analysisfuncs as asc
+from ..modules import iofuncs as iof
+from ..modules import plotfuncs as plf
+from ..modules import analysisfuncs as asc
 
 
 def csindexchange(exp_name, onoffcutoff=.5, qualcutoff=9):

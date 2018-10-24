@@ -9,12 +9,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-from .modules import analysisfuncs as asc
-from .modules import iofuncs as iof
-from .modules import plotfuncs as plf
+from ..modules import analysisfuncs as asc
+from ..modules import iofuncs as iof
+from ..modules import plotfuncs as plf
 
 
-def plotcheckerstas(exp_name, stim_nr, filename=None):
+def checkerstas(exp_name, stim_nr, filename=None):
     """
     Plot and save all STAs from checkerflicker analysis. The plots
     will be saved in a new folder called STAs under the data analysis

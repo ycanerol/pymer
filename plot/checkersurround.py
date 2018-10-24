@@ -11,16 +11,16 @@ import numpy as np
 import os
 import warnings
 
-from .external import gaussfitter as gfit
-from .modules import analysisfuncs as asc
-from .modules import iofuncs as iof
-from .modules import miscfuncs as mf
-from .modules import plotfuncs as plf
+from ..external import gaussfitter as gfit
+from ..modules import analysisfuncs as asc
+from ..modules import iofuncs as iof
+from ..modules import miscfuncs as mf
+from ..modules import plotfuncs as plf
 
 
-def plotcheckersurround(exp_name, stim_nr, filename=None, spikecutoff=1000,
-                        ratingcutoff=4, staqualcutoff=0, inner_b=2,
-                        outer_b=4):
+def checkersurround(exp_name, stim_nr, filename=None, spikecutoff=1000,
+                    ratingcutoff=4, staqualcutoff=0, inner_b=2,
+                    outer_b=4):
 
     """
     Divides into center and surround by fitting 2D Gaussian, and plot
