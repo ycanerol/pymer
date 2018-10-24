@@ -154,4 +154,4 @@ def OMSpatchesanalyzer(exp_name, stim_nrs):
     ax2.set_title(f'{exp_name}\nDistribution of OMSI')
     plf.spineless(ax2, 'tr')
     plt.savefig(pop_plot_savepath, bbox_inches='tight')
-    plt.show()
+    plt.close()
