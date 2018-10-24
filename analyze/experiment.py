@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Jan 22 15:21:30 2018
-
-@author: ycan
+Apply a selected set of analyzer on an experiment.
 """
 import datetime
 import sys
