@@ -11,10 +11,10 @@ from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
 import numpy as np
 import os
 
+from . import util as plf
 from ..modules import analysisfuncs as asc
 from ..modules import iofuncs as iof
 from ..modules import miscfuncs as msc
-from ..modules import plotfuncs as plf
 
 
 def checkersvd(expname, stimnr, filename=None):

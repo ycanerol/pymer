@@ -12,7 +12,7 @@ import os
 from ..external import randpy
 from ..modules import iofuncs as iof
 from ..modules import analysisfuncs as asc
-from ..modules import plotfuncs as plf
+from ..plot import util as plf
 
 
 def saccadegratings(exp_name, stim_nr):

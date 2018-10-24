@@ -12,7 +12,7 @@ import os
 from ..external import randpy
 from ..modules import analysisfuncs as asc
 from ..modules import iofuncs as iof
-from ..modules import plotfuncs as plf
+from ..plot import util as plf
 
 
 def fff(exp_name, stimnrs):

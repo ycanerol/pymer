@@ -11,11 +11,11 @@ import numpy as np
 import os
 import warnings
 
+from . import util as plf
 from ..external import gaussfitter as gfit
 from ..modules import analysisfuncs as asc
 from ..modules import iofuncs as iof
 from ..modules import miscfuncs as mf
-from ..modules import plotfuncs as plf
 
 
 def checkersurround(exp_name, stim_nr, filename=None, spikecutoff=1000,

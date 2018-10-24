@@ -10,8 +10,8 @@ import numpy as np
 import os
 
 from ..modules import iofuncs as iof
-from ..modules import plotfuncs as plf
 from ..modules import analysisfuncs as asc
+from ..plot import util as plf
 
 
 def allfff(exp_name, stim_nrs):

@@ -16,7 +16,7 @@ from ..external import randpy
 from ..modules import analysisfuncs as asc
 from ..modules import iofuncs as iof
 from ..modules import miscfuncs as msc
-from ..modules import plotfuncs as plf
+from ..plot import util as plf
 
 
 def runfreezemask(total_frames, runfr, frofr, refresh_rate):

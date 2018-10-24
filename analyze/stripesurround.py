@@ -10,10 +10,10 @@ import numpy as np
 import os
 from scipy.optimize import curve_fit
 
-from ..modules import iofuncs as iof
-from ..modules import plotfuncs as plf
 from ..modules import analysisfuncs as asc
+from ..modules import iofuncs as iof
 from ..modules import miscfuncs as msc
+from ..plot import util as plf
 
 
 def onedgauss(x, *p):

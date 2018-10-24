@@ -11,7 +11,7 @@ import os
 import warnings
 
 from ..modules import iofuncs as iof
-from ..modules import plotfuncs as plf
+from ..plot import util as plf
 
 
 def allonoff(exp_name, stim_nrs):

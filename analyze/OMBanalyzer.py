@@ -12,8 +12,8 @@ from scipy.stats.mstats import mquantiles
 
 from ..external import randpy
 from ..modules import analysisfuncs as asc
-from ..modules import plotfuncs as plf
 from ..modules import iofuncs as iof
+from ..plot import util as plf
 
 
 def calc_covar(stim_small):
