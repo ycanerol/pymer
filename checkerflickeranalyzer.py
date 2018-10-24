@@ -83,7 +83,7 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     marginkeys = ['tmargin', 'bmargin', 'rmargin', 'lmargin']
     margins = []
     for key in marginkeys:
-        margins.append(asc.parameter_dict_get(parameters, key, 0))
+        margins.append(parameters.get(key, 0))
 
     # Subtract bottom and top from vertical dimension; left and right
     # from horizontal dimension
@@ -91,14 +91,14 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     scr_height = scr_height-sum(margins[:2])
 
     nblinks = parameters['Nblinks']
-    bw = asc.parameter_dict_get(parameters, 'blackwhite', False)
+    bw = parameters.get('blackwhite', False)
 
     # Gaussian stimuli are not supported yet, we need to ensure we
     # have a black and white stimulus
     if bw is not True:
         raise ValueError('Gaussian stimuli are not supported yet!')
 
-    seed = asc.parameter_dict_get(parameters, 'seed', -10000)
+    seed = parameters.get('seed', -10000)
 
     sx, sy = scr_height/stx_h, scr_width/stx_w
 
