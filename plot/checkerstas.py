@@ -9,9 +9,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-from . import util as plf
-from ..modules import analysisfuncs as asc
 from .. import io as iof
+from . import util as plf
 
 
 def checkerstas(exp_name, stim_nr, filename=None):
@@ -32,7 +31,7 @@ def checkerstas(exp_name, stim_nr, filename=None):
     if filename:
         filename = str(filename)
 
-    _, metadata = asc.read_spikesheet(exp_dir)
+    _, metadata = iof.read_spikesheet(exp_dir)
     px_size = metadata['pixel_size(um)']
 
     if not filename:

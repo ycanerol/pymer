@@ -10,7 +10,6 @@ import numpy as np
 import os
 
 from .. import io as iof
-from ..modules import analysisfuncs as asc
 from ..plot import util as plf
 
 
@@ -31,7 +30,7 @@ def allfff(exp_name, stim_nrs):
     # Sanity check to ensure we are commparing the same stimuli and parameters
     prev_parameters = {}
     for i in stim_nrs:
-        pars = asc.read_parameters(exp_name, i)
+        pars = iof.read_parameters(exp_name, i)
         currentfname = pars.pop('filename')
         if len(prev_parameters) == 0:
             prev_parameters = pars

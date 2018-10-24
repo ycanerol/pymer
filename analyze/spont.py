@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-from ..modules import analysisfuncs as asc
 from .. import io as iof
 from ..plot import util as plf
 
@@ -35,7 +34,7 @@ def spont(exp_name, stim_nrs):
 
         stimname = iof.getstimname(exp_dir, stim_nr)
 
-        clusters, _ = asc.read_spikesheet(exp_dir, cutoff=4)
+        clusters, _ = iof.read_spikesheet(exp_dir, cutoff=4)
 
         # Length of chunks we use for dividing the activity for plotting.
         step = 1
@@ -43,7 +42,7 @@ def spont(exp_name, stim_nrs):
         allspikes = []
 
         for i in range(clusters.shape[0]):
-            spikes = asc.read_raster(exp_dir, stim_nr,
+            spikes = iof.read_raster(exp_dir, stim_nr,
                                      clusters[i, 0], clusters[i, 1])
             allspikes.append(spikes)
 

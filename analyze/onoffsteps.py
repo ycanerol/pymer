@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-from ..modules import analysisfuncs as asc
+from .. import frametimes as ft
 from .. import io as iof
 from ..plot import util as plf
 
@@ -39,11 +39,11 @@ def onoffsteps(exp_name, stim_nrs):
 
         stimname = iof.getstimname(exp_dir, stim_nr)
 
-        clusters, metadata = asc.read_spikesheet(exp_dir, cutoff=4)
+        clusters, metadata = iof.read_spikesheet(exp_dir, cutoff=4)
 
         clusterids = plf.clusters_to_ids(clusters)
 
-        parameters = asc.read_parameters(exp_dir, stim_nr)
+        parameters = iof.read_parameters(exp_dir, stim_nr)
 
         refresh_rate = metadata['refresh_rate']
 
@@ -94,7 +94,7 @@ def onoffsteps(exp_name, stim_nrs):
         # The first trial will be discarded by dropping the first four frames
         # If we don't save the original and re-initialize for each cell,
         # frametimings will get smaller over time.
-        frametimings_original = asc.readframetimes(exp_dir, stim_nr)
+        frametimings_original = ft.read(exp_dir, stim_nr)
 
         savedir = os.path.join(exp_dir, 'data_analysis', stimname)
         os.makedirs(os.path.join(savedir, 'pdf'), exist_ok=True)
@@ -103,7 +103,7 @@ def onoffsteps(exp_name, stim_nrs):
         all_frs = []
 
         for i in range(len(clusters[:, 0])):
-            spikes = asc.read_raster(exp_dir, stim_nr,
+            spikes = iof.read_raster(exp_dir, stim_nr,
                                      clusters[i, 0], clusters[i, 1])
             frametimings = frametimings_original
             # Discard all the spikes that happen after the last frame

@@ -12,10 +12,10 @@ from pathlib import PureWindowsPath
 import os
 import warnings
 
-from .. import randpy
-from .. import misc as msc
-from ..modules import analysisfuncs as asc
+from .. import frametimes as ft
 from .. import io as iof
+from .. import misc as msc
+from .. import randpy
 from ..plot import util as plf
 
 
@@ -68,7 +68,7 @@ def checkerflickerplus(exp_name, stimulusnr, clusterstoanalyze=None,
 
     exp_name = os.path.split(exp_dir)[-1]
 
-    clusters, metadata = asc.read_spikesheet(exp_dir, cutoff=cutoff)
+    clusters, metadata = iof.read_spikesheet(exp_dir, cutoff=cutoff)
 
     # Check that the inputs are as expected.
     if clusterstoanalyze:
@@ -88,7 +88,7 @@ def checkerflickerplus(exp_name, stimulusnr, clusterstoanalyze=None,
 
     refresh_rate = metadata['refresh_rate']
 
-    parameters = asc.read_parameters(exp_dir, stimulusnr)
+    parameters = iof.read_parameters(exp_dir, stimulusnr)
 
     stx_h = parameters['stixelheight']
     stx_w = parameters['stixelwidth']
@@ -125,8 +125,8 @@ def checkerflickerplus(exp_name, stimulusnr, clusterstoanalyze=None,
     else:
         raise ValueError('sx and sy must be integers')
 
-    filter_length, frametimings = asc.ft_nblinks(exp_dir, stimulusnr,
-                                                 nblinks, refresh_rate)
+    filter_length, frametimings = ft.ft_nblinks(exp_dir, stimulusnr, nblinks,
+                                                refresh_rate)
 
     if parameters['stimulus_type'] in ['FrozenNoise',
                                        'checkerflickerplusmovie']:
@@ -151,8 +151,7 @@ def checkerflickerplus(exp_name, stimulusnr, clusterstoanalyze=None,
             movielen = moviefr * mblinks
             triallen = noiselen + movielen
 
-            ft_on, ft_off = asc.readframetimes(exp_dir, stimulusnr,
-                                               returnoffsets=True)
+            ft_on, ft_off = ft.read(exp_dir, stimulusnr, returnoffsets=True)
             frametimings = np.empty(ft_on.shape[0]*2, dtype=float)
             frametimings[::2] = ft_on
             frametimings[1::2] = ft_off
@@ -192,10 +191,10 @@ def checkerflickerplus(exp_name, stimulusnr, clusterstoanalyze=None,
     stas = []
 
     for i in range(len(clusters[:, 0])):
-        spiketimes = asc.read_raster(exp_dir, stimulusnr,
+        spiketimes = iof.read_raster(exp_dir, stimulusnr,
                                      clusters[i, 0], clusters[i, 1])
 
-        spikes = asc.binspikes(spiketimes, frametimings)
+        spikes = msc.binspikes(spiketimes, frametimings)
         all_spiketimes.append(spikes)
         stas.append(np.zeros((sx, sy, filter_length)))
 
@@ -251,7 +250,7 @@ def checkerflickerplus(exp_name, stimulusnr, clusterstoanalyze=None,
                     stas[j] += spikes[k]*stim_small
         qual = np.array([])
         for c in range(clusters.shape[0]):
-            qual = np.append(qual, asc.staquality(stas[c]))
+            qual = np.append(qual, msc.staquality(stas[c]))
         quals = np.vstack((quals, qual))
 
         if i == 1:

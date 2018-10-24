@@ -9,9 +9,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-from .. import randpy
-from ..modules import analysisfuncs as asc
+from .. import frametimes as ft
 from .. import io as iof
+from .. import misc as msc
+from .. import randpy
 from ..plot import util as plf
 
 
@@ -31,9 +32,9 @@ def fff(exp_name, stimnrs):
 
         stimname = iof.getstimname(exp_name, stimnr)
 
-        clusters, metadata = asc.read_spikesheet(exp_dir)
+        clusters, metadata = iof.read_spikesheet(exp_dir)
 
-        parameters = asc.read_parameters(exp_dir, stimnr)
+        parameters = iof.read_parameters(exp_dir, stimnr)
 
         clusterids = plf.clusters_to_ids(clusters)
 
@@ -48,8 +49,8 @@ def fff(exp_name, stimnrs):
 
         seed = parameters.get('seed', -10000)
 
-        filter_length, frametimings = asc.ft_nblinks(exp_dir, stimnr,
-                                                     nblinks, refresh_rate)
+        filter_length, frametimings = ft.ft_nblinks(exp_dir, stimnr,
+                                                    nblinks, refresh_rate)
 
         frame_duration = np.average(np.ediff1d(frametimings))
         total_frames = frametimings.shape[0]
@@ -61,9 +62,9 @@ def fff(exp_name, stimnrs):
         # Make a list for covariances of the spike triggered ensemble
         covars = []
         for i in range(len(clusters[:, 0])):
-            spiketimes = asc.read_raster(exp_dir, stimnr,
+            spiketimes = iof.read_raster(exp_dir, stimnr,
                                          clusters[i, 0], clusters[i, 1])
-            spikes = asc.binspikes(spiketimes, frametimings)
+            spikes = msc.binspikes(spiketimes, frametimings)
             all_spiketimes.append(spikes)
             stas.append(np.zeros(filter_length))
             covars.append(np.zeros((filter_length, filter_length)))

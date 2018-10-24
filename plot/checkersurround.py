@@ -12,10 +12,9 @@ import os
 import warnings
 
 from . import util as plf
+from .. import io as iof
 from .. import misc as mf
 from ..calc import gaussfitter as gfit
-from ..modules import analysisfuncs as asc
-from .. import io as iof
 
 
 def checkersurround(exp_name, stim_nr, filename=None, spikecutoff=1000,
@@ -55,7 +54,7 @@ def checkersurround(exp_name, stim_nr, filename=None, spikecutoff=1000,
         label = filename.strip('.npz')
         savefolder = 'surroundplots_' + label
 
-    _, metadata = asc.read_spikesheet(exp_name)
+    _, metadata = iof.read_spikesheet(exp_name)
     px_size = metadata['pixel_size(um)']
 
     data = iof.load(exp_name, stim_nr, fname=filename)

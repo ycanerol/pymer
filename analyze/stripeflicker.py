@@ -9,9 +9,10 @@ Created on Wed Jan 10 14:36:31 2018
 import numpy as np
 import os
 
-from .. import randpy
-from ..modules import analysisfuncs as asc
+from .. import frametimes as ft
 from .. import io as iof
+from .. import misc as msc
+from .. import randpy
 
 
 def stripeflicker(exp_name, stim_nrs):
@@ -25,9 +26,9 @@ def stripeflicker(exp_name, stim_nrs):
     for stim_nr in stim_nrs:
         stimname = iof.getstimname(exp_name, stim_nr)
 
-        clusters, metadata = asc.read_spikesheet(exp_dir)
+        clusters, metadata = iof.read_spikesheet(exp_dir)
 
-        parameters = asc.read_parameters(exp_dir, stim_nr)
+        parameters = iof.read_parameters(exp_dir, stim_nr)
 
         scr_width = metadata['screen_width']
         px_size = metadata['pixel_size(um)']
@@ -52,8 +53,8 @@ def stripeflicker(exp_name, stim_nrs):
 
         seed = parameters.get('seed', -10000)
 
-        filter_length, frametimings = asc.ft_nblinks(exp_dir, stim_nr,
-                                                     nblinks, refresh_rate)
+        filter_length, frametimings = ft.ft_nblinks(exp_dir, stim_nr, nblinks,
+                                                    refresh_rate)
 
         # Omit everything that happens before the first 10 seconds
         cut_time = 10
@@ -67,9 +68,9 @@ def stripeflicker(exp_name, stim_nrs):
         stas = []
 
         for i in range(len(clusters[:, 0])):
-            spiketimes = asc.read_raster(exp_dir, stim_nr,
+            spiketimes = iof.read_raster(exp_dir, stim_nr,
                                          clusters[i, 0], clusters[i, 1])
-            spikes = asc.binspikes(spiketimes, frametimings)
+            spikes = msc.binspikes(spiketimes, frametimings)
             all_spiketimes.append(spikes)
             stas.append(np.zeros((sy, filter_length)))
 
@@ -130,7 +131,7 @@ def stripeflicker(exp_name, stim_nrs):
                 stas[i] = np.zeros(stas[i].shape)
             max_inds.append(max_i)
 
-            quals = np.append(quals, asc.staquality(stas[i]))
+            quals = np.append(quals, msc.staquality(stas[i]))
 
         savefname = str(stim_nr)+'_data'
         savepath = os.path.join(exp_dir, 'data_analysis', stimname)

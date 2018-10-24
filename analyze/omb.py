@@ -10,9 +10,10 @@ import numpy as np
 import os
 from scipy.stats.mstats import mquantiles
 
-from .. import randpy
-from ..modules import analysisfuncs as asc
+from .. import frametimes as ft
 from .. import io as iof
+from .. import misc as msc
+from .. import randpy
 from ..plot import util as plf
 
 
@@ -56,7 +57,7 @@ def omb(exp_name, stimnr, plotall=False, nr_bins=20):
     exp_name = os.path.split(exp_dir)[-1]
     stimname = iof.getstimname(exp_dir, stimnr)
 
-    parameters = asc.read_parameters(exp_name, stimnr)
+    parameters = iof.read_parameters(exp_name, stimnr)
     assert(parameters['stimulus_type'] == 'objectsmovingbackground')
     stimframes = parameters.get('stimFrames', 108000)
     preframes = parameters.get('preFrames', 200)
@@ -69,11 +70,11 @@ def omb(exp_name, stimnr, plotall=False, nr_bins=20):
 
     ntotal = int(stimframes / nblinks)
 
-    clusters, metadata = asc.read_spikesheet(exp_name)
+    clusters, metadata = iof.read_spikesheet(exp_name)
 
     refresh_rate = metadata['refresh_rate']
-    filter_length, frametimings = asc.ft_nblinks(exp_name, stimnr, nblinks,
-                                                 refresh_rate)
+    filter_length, frametimings = ft.ft_nblinks(exp_name, stimnr, nblinks,
+                                                refresh_rate)
 
     if ntotal+1 != frametimings.shape[0]:
         print(f'For {exp_name}\nstimulus {stimname} :\n'
@@ -100,8 +101,8 @@ def omb(exp_name, stimnr, plotall=False, nr_bins=20):
 
     all_spikes = np.empty((clusters.shape[0], ntotal))
     for i, (cluster, channel, _) in enumerate(clusters):
-        spiketimes = asc.read_raster(exp_name, stimnr, cluster, channel)
-        spikes = asc.binspikes(spiketimes, frametimings)[:-1]
+        spiketimes = iof.read_raster(exp_name, stimnr, cluster, channel)
+        spikes = msc.binspikes(spiketimes, frametimings)[:-1]
         all_spikes[i, :] = spikes
 
     # Collect STA for x and y movement in one array

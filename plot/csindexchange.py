@@ -12,7 +12,6 @@ import numpy as np
 import os
 
 from . import util as plf
-from ..modules import analysisfuncs as asc
 from .. import io as iof
 
 
@@ -37,7 +36,7 @@ def csindexchange(exp_name, onoffcutoff=.5, qualcutoff=9):
 
     exp_dir = iof.exp_dir_fixer(exp_name)
     exp_name = os.path.split(exp_dir)[-1]
-    clusternr = asc.read_spikesheet(exp_name)[0].shape[0]
+    clusternr = iof.read_spikesheet(exp_name)[0].shape[0]
 
     # Collect all CS indices, on-off indices and quality scores
     csinds = np.zeros((3, clusternr))

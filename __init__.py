@@ -14,23 +14,19 @@ from .randpy import randpy
 # Modules
 from . import io
 from . import misc
+from . import frametimes
 
 # Plotting module
 from . import plot
-
-# General functions
-from .frametimesfrommat import frametimesfrommat
-from .frametimestomat import savenpztomat
 
 # Analyzers
 from . import analyze
 
 # Root
 __all__ = [
-    'frametimesfrommat',
-    'savenpztomat',
-    'io',
     'analyze',
+    'frametimes',
+    'io',
     'misc',
     'plot',
     'randpy',

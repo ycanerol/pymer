@@ -9,9 +9,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-from .. import randpy
+from .. import frametimes
 from .. import io as iof
-from ..modules import analysisfuncs as asc
+from .. import misc as msc
+from .. import randpy
 from ..plot import util as plf
 
 
@@ -23,12 +24,12 @@ def saccadegratings(exp_name, stim_nr):
     exp_dir = iof.exp_dir_fixer(exp_name)
     exp_name = os.path.split(exp_dir)[-1]
     stimname = iof.getstimname(exp_dir, stim_nr)
-    clusters, metadata = asc.read_spikesheet(exp_dir)
+    clusters, metadata = iof.read_spikesheet(exp_dir)
     clusterids = plf.clusters_to_ids(clusters)
 
     refresh_rate = metadata['refresh_rate']
 
-    parameters = asc.read_parameters(exp_name, stim_nr)
+    parameters = iof.read_parameters(exp_name, stim_nr)
     if parameters['stimulus_type'] != 'saccadegrating':
         raise ValueError('Unexpected stimulus type: '
                          f'{parameters["stimulus_type"]}')
@@ -39,7 +40,7 @@ def saccadegratings(exp_name, stim_nr):
     # The seed is hard-coded in the Stimulator
     seed = -10000
 
-    ftimes = asc.readframetimes(exp_dir, stim_nr)
+    ftimes = frametimes.read(exp_dir, stim_nr)
     ftimes.resize(int(ftimes.shape[0]/2), 2)
     nfr = ftimes.size
     # Re-generate the stimulus
@@ -83,12 +84,12 @@ def saccadegratings(exp_name, stim_nr):
     psth = np.zeros((2, clusters.shape[0], 4, 4, t.size))
 
     for i, (chid, clid, _) in enumerate(clusters):
-        spiketimes = asc.read_raster(exp_dir, stim_nr, chid, clid)
+        spiketimes = iof.read_raster(exp_dir, stim_nr, chid, clid)
         for j, _ in enumerate(sacftimes):
-            sacspikes[i, j, :] = asc.binspikes(spiketimes,
+            sacspikes[i, j, :] = msc.binspikes(spiketimes,
                                                sacftimes[j]+t)
         for k, _ in enumerate(greyftimes):
-            greyspikes[i, k, :] = asc.binspikes(spiketimes,
+            greyspikes[i, k, :] = msc.binspikes(spiketimes,
                                                 greyftimes[k]+t)
 
     # Sort trials according to the transition type

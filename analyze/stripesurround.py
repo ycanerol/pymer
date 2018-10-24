@@ -10,9 +10,8 @@ import numpy as np
 import os
 from scipy.optimize import curve_fit
 
-from .. import misc as msc
-from ..modules import analysisfuncs as asc
 from .. import io as iof
+from .. import misc as msc
 from ..plot import util as plf
 
 
@@ -39,7 +38,7 @@ def stripesurround(exp_name, stimnrs):
     for stimnr in stimnrs:
         data = iof.load(exp_name, stimnr)
 
-        _, metadata = asc.read_spikesheet(exp_dir)
+        _, metadata = iof.read_spikesheet(exp_dir)
         px_size = metadata['pixel_size(um)']
 
         clusters = data['clusters']

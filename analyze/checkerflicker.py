@@ -11,10 +11,10 @@ import numpy as np
 import os
 import warnings
 
-from .. import randpy
-from ..modules import analysisfuncs as asc
+from .. import frametimes as ft
 from .. import io as iof
 from .. import misc as msc
+from .. import randpy
 from ..plot import util as plf
 
 
@@ -53,7 +53,7 @@ def checkerflicker(exp_name, stimulusnr, clusterstoanalyze=None,
 
     exp_name = os.path.split(exp_dir)[-1]
 
-    clusters, metadata = asc.read_spikesheet(exp_dir, cutoff=cutoff)
+    clusters, metadata = iof.read_spikesheet(exp_dir, cutoff=cutoff)
 
     # Check that the inputs are as expected.
     if clusterstoanalyze:
@@ -73,7 +73,7 @@ def checkerflicker(exp_name, stimulusnr, clusterstoanalyze=None,
 
     refresh_rate = metadata['refresh_rate']
 
-    parameters = asc.read_parameters(exp_dir, stimulusnr)
+    parameters = iof.read_parameters(exp_dir, stimulusnr)
 
     stx_h = parameters['stixelheight']
     stx_w = parameters['stixelwidth']
@@ -83,7 +83,7 @@ def checkerflicker(exp_name, stimulusnr, clusterstoanalyze=None,
     marginkeys = ['tmargin', 'bmargin', 'rmargin', 'lmargin']
     margins = []
     for key in marginkeys:
-        margins.append(asc.parameter_dict_get(parameters, key, 0))
+        margins.append(parameters.get(key, 0))
 
     # Subtract bottom and top from vertical dimension; left and right
     # from horizontal dimension
@@ -91,14 +91,14 @@ def checkerflicker(exp_name, stimulusnr, clusterstoanalyze=None,
     scr_height = scr_height-sum(margins[:2])
 
     nblinks = parameters['Nblinks']
-    bw = asc.parameter_dict_get(parameters, 'blackwhite', False)
+    bw = parameters.dict('blackwhite', False)
 
     # Gaussian stimuli are not supported yet, we need to ensure we
     # have a black and white stimulus
     if bw is not True:
         raise ValueError('Gaussian stimuli are not supported yet!')
 
-    seed = asc.parameter_dict_get(parameters, 'seed', -10000)
+    seed = parameters.get('seed', -10000)
 
     sx, sy = scr_height/stx_h, scr_width/stx_w
 
@@ -110,8 +110,8 @@ def checkerflicker(exp_name, stimulusnr, clusterstoanalyze=None,
     else:
         raise ValueError('sx and sy must be integers')
 
-    filter_length, frametimings = asc.ft_nblinks(exp_dir, stimulusnr,
-                                                 nblinks, refresh_rate)
+    filter_length, frametimings = ft.ft_nblinks(exp_dir, stimulusnr, nblinks,
+                                                refresh_rate)
 
     savefname = str(stimulusnr)+'_data'
 
@@ -134,10 +134,10 @@ def checkerflicker(exp_name, stimulusnr, clusterstoanalyze=None,
     stas = []
 
     for i in range(len(clusters[:, 0])):
-        spiketimes = asc.read_raster(exp_dir, stimulusnr,
+        spiketimes = iof.read_raster(exp_dir, stimulusnr,
                                      clusters[i, 0], clusters[i, 1])
 
-        spikes = asc.binspikes(spiketimes, frametimings)
+        spikes = msc.binspikes(spiketimes, frametimings)
         all_spiketimes.append(spikes)
         stas.append(np.zeros((sx, sy, filter_length)))
 
@@ -177,7 +177,7 @@ def checkerflicker(exp_name, stimulusnr, clusterstoanalyze=None,
                     stas[j] += spikes[k]*stim_small
         qual = np.array([])
         for c in range(clusters.shape[0]):
-            qual = np.append(qual, asc.staquality(stas[c]))
+            qual = np.append(qual, msc.staquality(stas[c]))
         quals = np.vstack((quals, qual))
 
         if i == 1:
@@ -207,7 +207,7 @@ def checkerflicker(exp_name, stimulusnr, clusterstoanalyze=None,
 
         max_inds.append(max_i)
 
-    print(f'Completed. Total elapsed time: {msc.timediff(startime)}\n'+
+    print(f'Completed. Total elapsed time: {msc.timediff(startime)}\n' +
           f'Finished on {datetime.datetime.now().strftime("%A %X")}')
 
     savepath = os.path.join(exp_dir, 'data_analysis', stimname)

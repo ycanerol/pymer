@@ -10,8 +10,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-from ..modules import analysisfuncs as asc
+from .. import frametimes as ft
 from .. import io as iof
+from .. import misc as msc
 from ..plot import util as plf
 
 
@@ -29,7 +30,7 @@ def omspatches(exp_name, stim_nrs):
     elif len(stim_nrs) == 0:
         return
 
-    clusters, metadata = asc.read_spikesheet(exp_dir, cutoff=4)
+    clusters, metadata = iof.read_spikesheet(exp_dir, cutoff=4)
     clusterids = plf.clusters_to_ids(clusters)
     all_omsi = np.empty((clusters.shape[0], len(stim_nrs)))
     stimnames = []
@@ -39,7 +40,7 @@ def omspatches(exp_name, stim_nrs):
         stimname = iof.getstimname(exp_dir, stim_nr)
         stimnames.append(stimname)
 
-        parameters = asc.read_parameters(exp_dir, stim_nr)
+        parameters = iof.read_parameters(exp_dir, stim_nr)
 
         refresh_rate = metadata['refresh_rate']
 
@@ -51,7 +52,7 @@ def omspatches(exp_name, stim_nrs):
         stim_duration = int(stim_duration/2)
         prefr_duration = parameters.get('preFrames', 100)
 
-        frametimings = asc.readframetimes(exp_dir, stim_nr)
+        frametimings = ft.read(exp_dir, stim_nr)
 
         # ntrials is the number of trials containing both
         ntrials = np.rint((frametimings.shape[0] / (stim_duration+1)))/2
@@ -66,11 +67,11 @@ def omspatches(exp_name, stim_nrs):
         globalspikes = np.empty((clusters.shape[0], ntrials, stim_duration))
 
         for i, cluster in enumerate(clusters):
-            spikes = asc.read_raster(exp_name, stim_nr, cluster[0],
+            spikes = iof.read_raster(exp_name, stim_nr, cluster[0],
                                      cluster[1])
             for j in range(ntrials):
-                localspikes[i, j, :] = asc.binspikes(spikes, ft_local[j, :])
-                globalspikes[i, j, :] = asc.binspikes(spikes, ft_global[j, :])
+                localspikes[i, j, :] = msc.binspikes(spikes, ft_local[j, :])
+                globalspikes[i, j, :] = msc.binspikes(spikes, ft_global[j, :])
 
         response_local = localspikes.mean(axis=1)
         response_global = globalspikes.mean(axis=1)

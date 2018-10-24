@@ -10,6 +10,10 @@ Functions related to reading/writing files.
 import glob
 import numpy as np
 import os
+import pyexcel
+import re
+import scipy.io
+import struct
 
 from .modules.configutil import cache_config
 
@@ -218,6 +222,230 @@ def load(exp_name, stimnr, fname=None):
     return data_in_dict
 
 
+def read_spikesheet(exp_name, cutoff=4, defaultpath=True):
+    """
+    Read metadata and cluster information from spike sorting file
+    (manually created during spike sorting), return good clusters.
+
+    Parameters:
+    -----------
+    exp_name:
+        Experiment name for the directory that contains the
+        .xlsx or .ods file. Possible file names may be set in
+        the configuration file. Fallback/default name is
+        'spike_sorting.[ods|xlsx]'.
+    cutoff:
+        Worst rating that is tolerated for analysis. Default
+        is 4. The source of this value is manual rating of each
+        cluster.
+    defaultpath:
+        Whether to iterate over all possible file names in exp_dir.
+        If False, the full path to the file should be supplied
+        in exp_name.
+
+    Returns:
+    --------
+    clusters:
+        Channel number, cluster number and rating of those
+        clusters that match the cutoff criteria in a numpy array.
+    metadata:
+        Information about the experiment in a dictionary.
+
+    Raises:
+    -------
+    FileNotFoundError:
+        If no spike sorting file can be located.
+    ValueError:
+        If the spike sorting file containes incomplete information.
+
+    Notes:
+    ------
+    The script assumes adherence to defined cell locations for
+    metadata and cluster information. If changed undefined behavior
+    may occur.
+    """
+    if defaultpath:
+        exp_dir = exp_dir_fixer(exp_name)
+        filenames = config('spike_sorting_filenames')
+        for filename in filenames:
+            filepath = os.path.join(exp_dir, filename)
+            if os.path.isfile(filepath + '.ods'):
+                filepath += '.ods'
+                meta_keys = [0, 0, 1, 25]
+                meta_vals = [1, 0, 2, 25]
+                cluster_chnl = [4, 0, 2000, 1]
+                cluster_cltr = [4, 4, 2000, 5]
+                cluster_rtng = [4, 5, 2000, 6]
+                break
+            elif os.path.isfile(filepath + '.xlsx'):
+                filepath += '.xlsx'
+                meta_keys = [4, 1, 25, 2]
+                meta_vals = [4, 5, 25, 6]
+                cluster_chnl = [51, 1, 2000, 2]
+                cluster_cltr = [51, 5, 2000, 6]
+                cluster_rtng = [51, 6, 2000, 7]
+                break
+        else:
+            raise FileNotFoundError('Spike sorting file (ods/xlsx) not found.')
+    else:
+        filepath = exp_name
+
+    sheet = np.array(pyexcel.get_array(file_name=filepath, sheets=[0]))
+
+    meta_keys = sheet[meta_keys[0]:meta_keys[2], meta_keys[1]:meta_keys[3]]
+    meta_vals = sheet[meta_vals[0]:meta_vals[2], meta_vals[1]:meta_vals[3]]
+    metadata = dict(zip(meta_keys.ravel(), meta_vals.ravel()))
+
+    # Concatenate cluster information
+    clusters = sheet[cluster_chnl[0]:cluster_chnl[2],
+                     cluster_chnl[1]:cluster_chnl[3]]
+    cl = np.argmin(clusters.shape)
+    clusters = np.append(clusters,
+                         sheet[cluster_cltr[0]:cluster_cltr[2],
+                               cluster_cltr[1]:cluster_cltr[3]],
+                         axis=cl)
+    clusters = np.append(clusters,
+                         sheet[cluster_rtng[0]:cluster_rtng[2],
+                               cluster_rtng[1]:cluster_rtng[3]],
+                         axis=cl)
+    if cl != 1:
+        clusters = clusters.T
+    clusters = clusters[np.any(clusters != [['', '', '']], axis=1)]
+
+    # The channels with multiple clusters have an empty line after the first
+    # line. Fill the empty lines using the first line of each channel.
+    for i, c in enumerate(clusters[:, 0]):
+        if c != '':
+            nr = c
+        else:
+            clusters[i, 0] = nr
+
+    if '' in clusters:
+        rowcol = (np.where(clusters == '')[1-cl][0]+1 + cluster_chnl[1-cl])
+        raise ValueError('Spike sorting file is missing information in '
+                         '{} {}.'.format(['column', 'row'][cl], rowcol))
+    clusters = clusters.astype(int)
+
+    # Sort the clusters in ascending order based on channel number
+    # Normal sort function messes up the other columns for some reason
+    # so we explicitly use lexsort for the columns containing channel nrs
+    # Order of the columns given in lexsort are in reverse
+    sorted_idx = np.lexsort((clusters[:, 1], clusters[:, 0]))
+    clusters = clusters[sorted_idx, :]
+
+    # Filter according to quality cutoff
+    clusters = clusters[clusters[:, 2] <= cutoff]
+
+    return clusters, metadata
+
+
+def read_raster(exp_name, stimnr, channel, cluster, defaultpath=True):
+    """
+    Return the spike times from the specified raster file.
+
+    Use defaultpath=False if the raster directory is not
+    exp_dir + '/results/rasters/'. In this case pass the full
+    path to the raster with exp_dir.
+    """
+    exp_dir = exp_dir_fixer(exp_name)
+    if defaultpath:
+        r = os.path.join(exp_dir, 'results/rasters/')
+    else:
+        r = exp_dir
+    s = str(stimnr)
+    c = str(channel)
+    fullpath = r + s + '_SP_C' + c + '{:0>2}'.format(cluster) + '.txt'
+    spike_file = open(fullpath)
+    spike_times = np.array([float(line) for line in spike_file])
+    spike_file.close()
+
+    return spike_times
+
+
+def read_parameters(exp_name, stimulusnr, defaultpath=True):
+    """
+    Reads the parameters from stimulus files
+
+    Parameters:
+    -----------
+    exp_name:
+        Experiment name. The function will look for 'stimuli'
+        folder under the experiment directory.
+    stimulusnr:
+        The order of the stimulus. The function will open the files with the
+        file name '<stimulusnr>_*' under the stimulus directory.
+    defaultpath:
+         Whether to use exp_dir+'/stimuli/' to access the stimuli
+         parameters. Default is True. If False full path to stimulus folder
+         should be passed with exp_dir.
+
+    Returns:
+    -------
+    parameters:
+        Dictionary containing all of the parameters. Parameters are
+        are variable for different stimuli; but for each type, at least file
+        name and stimulus type are returned.
+
+    For spontaneous activity recordings, an empty text file is expected in the
+    stimuli folder. In this case the stimulus type is returned as spontaneous
+    activity.
+
+    """
+    exp_dir = exp_dir_fixer(exp_name)
+
+    if defaultpath:
+        stimdir = os.path.join(exp_dir, 'stimuli')
+    else:
+        stimdir = exp_dir
+
+    # Filter stimulus directory contents with RE to allow leading zero
+    pattern = f'0?{stimulusnr}_.*'
+    paramfile = list(filter(re.compile(pattern).match, os.listdir(stimdir)))
+    if len(paramfile) == 1:
+        paramfile = paramfile[0]
+    elif len(paramfile) == 0:
+        raise IOError('No parameter file that starts with {} exists under'
+                      ' the directory: {}'.format(stimulusnr, stimdir))
+    else:
+        print(paramfile)
+
+        raise ValueError('Multiple files were found starting'
+                         ' with {}'.format(stimulusnr))
+
+    f = open(os.path.join(stimdir, paramfile))
+    lines = [line.strip('\n') for line in f]
+    f.close()
+
+    parameters = {}
+
+    parameters['filename'] = paramfile
+    if len(lines) == 0:
+        parameters['stimulus_type'] = 'spontaneous_activity'
+
+    for line in lines:
+        if len(line) == 0:
+            continue
+        try:
+            key, value = line.split('=')
+            key = key.strip(' ')
+            value = value.strip(' ')
+            try:
+                value = float(value)
+                if value % 1 == 0:
+                    value = int(value)
+            except ValueError:
+                if value == ' true' or value == 'true':
+                    value = True
+                elif value == ' false' or value == 'false':
+                    value = False
+
+            parameters[key] = value
+        except ValueError:
+            parameters['stimulus_type'] = line
+
+    return parameters
+
+
 def getstimname(exp_name, stim_nr):
     """
     Returns the stimulus name for a given experiment and stimulus
@@ -247,7 +475,6 @@ def readmat(matfile):
 
     .mat files that are v>7.3 and v<7.3 must be treated differently.
     """
-    import scipy.io
     data = {}
     try:
         f = scipy.io.loadmat(matfile)
@@ -270,3 +497,25 @@ def readmat(matfile):
             for key in f.keys():
                 data.update({key: np.squeeze(f[key])})
         return data
+
+
+def read_binaryfile(filepath):
+    """
+    Reads and returns the contents of a binary file.
+    """
+    with open(filepath, 'rb') as file:
+        file_content = file.read()
+    return file_content
+
+
+def parse_binary(file_content):
+    """
+    Parses the binary file returned by read_binaryfile by separating
+    into length and voltage trace parts.
+    """
+    # The header contains the length of the recording as a unsigned 32 bit int
+    length = struct.unpack('I', file_content[:4])[0]
+    # The rest of the binary data is the voltage trace, as unsigned 16 bit int
+    voltage_raw = np.array(struct.unpack('H'*length, file_content[16:]))
+
+    return length, voltage_raw

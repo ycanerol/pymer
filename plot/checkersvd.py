@@ -12,9 +12,8 @@ import numpy as np
 import os
 
 from . import util as plf
-from .. import misc as msc
-from ..modules import analysisfuncs as asc
 from .. import io as iof
+from .. import misc as msc
 
 
 def checkersvd(expname, stimnr, filename=None):
@@ -25,7 +24,7 @@ def checkersvd(expname, stimnr, filename=None):
         filename = str(filename)
 
     exp_dir = iof.exp_dir_fixer(expname)
-    _, metadata = asc.read_spikesheet(exp_dir)
+    _, metadata = iof.read_spikesheet(exp_dir)
     px_size = metadata['pixel_size(um)']
 
     if not filename:

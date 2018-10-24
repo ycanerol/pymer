@@ -9,8 +9,9 @@ import datetime
 import sys
 
 from . import *
+from .. import frametimes
+from .. import misc as msc
 from .. import plot
-from ..modules import analysisfuncs as asc
 
 
 def experiment(exp_name=''):
@@ -31,7 +32,7 @@ def experiment(exp_name=''):
 
     start_time = datetime.datetime.now().strftime('%A %X')
     print(f'Analysis started on {start_time}')
-    sorted_stimuli = asc.stimulisorter(exp_name)
+    sorted_stimuli = msc.stimulisorter(exp_name)
 
     spontaneous = sorted_stimuli['spontaneous']
     fullfieldflicker = sorted_stimuli['fff']
@@ -44,7 +45,7 @@ def experiment(exp_name=''):
     OMB = sorted_stimuli['OMB']
     saccadegrating = sorted_stimuli['saccadegrating']
 
-    asc.saveframetimes(exp_name)
+    frametimes.save(exp_name)
 
     # %%
     spont(exp_name, spontaneous)
