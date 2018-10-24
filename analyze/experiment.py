@@ -8,9 +8,9 @@ Created on Mon Jan 22 15:21:30 2018
 import datetime
 import sys
 
-from . import analyze
-from . import plotcheckerstas, plotcheckersurround, plotcheckersvd
-from .modules import analysisfuncs as asc
+from . import *
+from .. import plotcheckerstas, plotcheckersurround, plotcheckersvd
+from ..modules import analysisfuncs as asc
 
 
 def experiment(exp_name=''):
@@ -47,33 +47,33 @@ def experiment(exp_name=''):
     asc.saveframetimes(exp_name)
 
     # %%
-    analyze.spont(exp_name, spontaneous)
+    spont(exp_name, spontaneous)
 
-    analyze.fff(exp_name, fullfieldflicker)
-    analyze.allfff(exp_name, fullfieldflicker)
+    fff(exp_name, fullfieldflicker)
+    allfff(exp_name, fullfieldflicker)
 
-    analyze.onoffsteps(exp_name, onoffsteps)
-    analyze.allonoff(exp_name, onoffsteps)
+    onoffsteps(exp_name, onoffsteps)
+    allonoff(exp_name, onoffsteps)
 
-    analyze.stripeflicker(exp_name, stripeflicker)
-    analyze.stripesurround(exp_name, stripeflicker)
+    stripeflicker(exp_name, stripeflicker)
+    stripesurround(exp_name, stripeflicker)
 
     for stim in OMSpatches:
-        analyze.omspatches(exp_name, stim)
+        omspatches(exp_name, stim)
     for stim in OMB:
-        analyze.omb(exp_name, stim)
+        omb(exp_name, stim)
     for stim in saccadegrating:
-        analyze.saccadegratings(exp_name, stim)
+        saccadegratings(exp_name, stim)
 
     # %%
     for i in checkerflicker:
-        analyze.checkerflicker(exp_name, i)
+        checkerflicker(exp_name, i)
         plotcheckerstas(exp_name, i)
         plotcheckersurround(exp_name, i)
         plotcheckersvd(exp_name, i)
 
     for i in checkerflickerplus:
-        analyze.checkerflickerplus(exp_name, i)
+        checkerflickerplus(exp_name, i)
         plotcheckerstas(exp_name, i)
         plotcheckersurround(exp_name, i)
         plotcheckersvd(exp_name, i)

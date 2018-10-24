@@ -11,8 +11,10 @@ from .stripesurround import stripesurround
 
 from .allfff import allfff
 from .allonoff import allonoff
+from .experiment import experiment
 
 __all__ = [
+        'experiment',
         'checkerflicker',
         'checkerflickerplus',
         'fff',
