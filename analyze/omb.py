@@ -58,7 +58,7 @@ def omb(exp_name, stimnr, plotall=False, nr_bins=20):
     stimname = iof.getstimname(exp_dir, stimnr)
 
     parameters = iof.read_parameters(exp_name, stimnr)
-    assert(parameters['stimulus_type'] == 'objectsmovingbackground')
+    assert parameters['stimulus_type'] == 'objectsmovingbackground'
     stimframes = parameters.get('stimFrames', 108000)
     preframes = parameters.get('preFrames', 200)
     nblinks = parameters.get('Nblinks', 2)
