@@ -49,8 +49,8 @@ def fff(exp_name, stimnrs):
 
         seed = parameters.get('seed', -10000)
 
-        filter_length, frametimings = ft.ft_nblinks(exp_dir, stimnr,
-                                                    nblinks, refresh_rate)
+        filter_length, frametimings = ft.nblinks(exp_dir, stimnr,
+                                                 nblinks, refresh_rate)
 
         frame_duration = np.average(np.ediff1d(frametimings))
         total_frames = frametimings.shape[0]

@@ -73,8 +73,8 @@ def omb(exp_name, stimnr, plotall=False, nr_bins=20):
     clusters, metadata = iof.read_spikesheet(exp_name)
 
     refresh_rate = metadata['refresh_rate']
-    filter_length, frametimings = ft.ft_nblinks(exp_name, stimnr, nblinks,
-                                                refresh_rate)
+    filter_length, frametimings = ft.nblinks(exp_name, stimnr, nblinks,
+                                             refresh_rate)
 
     if ntotal+1 != frametimings.shape[0]:
         print(f'For {exp_name}\nstimulus {stimname} :\n'

@@ -125,8 +125,8 @@ def checkerflickerplus(exp_name, stimulusnr, clusterstoanalyze=None,
     else:
         raise ValueError('sx and sy must be integers')
 
-    filter_length, frametimings = ft.ft_nblinks(exp_dir, stimulusnr, nblinks,
-                                                refresh_rate)
+    filter_length, frametimings = ft.nblinks(exp_dir, stimulusnr, nblinks,
+                                             refresh_rate)
 
     if parameters['stimulus_type'] in ['FrozenNoise',
                                        'checkerflickerplusmovie']:
@@ -280,7 +280,7 @@ def checkerflickerplus(exp_name, stimulusnr, clusterstoanalyze=None,
 
         max_inds.append(max_i)
 
-    print(f'Completed. Total elapsed time: {msc.timediff(startime)}\n'+
+    print(f'Completed. Total elapsed time: {msc.timediff(startime)}\n' +
           f'Finished on {datetime.datetime.now().strftime("%A %X")}')
 
     savepath = os.path.join(exp_dir, 'data_analysis', stimname)

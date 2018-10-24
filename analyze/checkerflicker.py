@@ -110,8 +110,8 @@ def checkerflicker(exp_name, stimulusnr, clusterstoanalyze=None,
     else:
         raise ValueError('sx and sy must be integers')
 
-    filter_length, frametimings = ft.ft_nblinks(exp_dir, stimulusnr, nblinks,
-                                                refresh_rate)
+    filter_length, frametimings = ft.nblinks(exp_dir, stimulusnr, nblinks,
+                                             refresh_rate)
 
     savefname = str(stimulusnr)+'_data'
 

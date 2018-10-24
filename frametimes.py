@@ -233,7 +233,7 @@ def extract(exp_name, stimnr, threshold=75, plotting=False, zeroADvalue=32768):
     return frametimings_on, frametimings_off
 
 
-def ft_nblinks(exp_dir, stimulusnr, nblinks, refresh_rate):
+def nblinks(exp_dir, stimulusnr, nblinks, refresh_rate):
     """
     Return the appropriate frametimings array depending on the stimulus
     update frequency.
