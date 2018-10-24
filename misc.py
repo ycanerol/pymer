@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Nov 13 14:58:16 2017
-
-@author: ycan
-
-Collection of functions that are used for various stages of analysis
+Collection of functions that are used for various stages of analysis.
 """
 import glob
 import numpy as np
+import warnings
 
 
 def binspikes(spiketimes, frametimings):
@@ -66,30 +63,6 @@ def staquality(sta):
     return z.astype('float16')
 
 
-def stimulisorter(exp_name):
-    """
-    Read parameters.txt file and return the stimuli type and
-    stimuli numbers in a dictionary.
-    """
-    possible_stim_names = ['spontaneous', 'onoffsteps', 'fff', 'stripeflicker',
-                           'checkerflicker', 'directiongratingsequence',
-                           'rotatingstripes', 'frozennoise',
-                           'checkerflickerplusmovie', 'OMSpatches', 'OMB',
-                           'saccadegrating']
-    sorted_stimuli = {key: [] for key in possible_stim_names}
-    exp_dir = iof.exp_dir_fixer(exp_name)
-
-    file = open(os.path.join(exp_dir, 'parameters.txt'), 'r')
-
-    for line in file:
-        for stimname in possible_stim_names:
-            if line.find(stimname) > 0:
-                stimnr = int(line.split('_')[0])
-                toadd = sorted_stimuli[stimname]
-                toadd = toadd.append(stimnr)
-    return sorted_stimuli
-
-
 def svd(sta, flip=False):
     # Perform singular value decomposition on STA
     # As described by Gauthier et al. 2009
@@ -127,7 +100,8 @@ def readexps(directory, test=False):
                            '*/analyzed/{}*.npz'.format(stimulus_order))
     file_paths = sorted(file_paths)
     exp_names = [i.split('/')[-3] for i in file_paths]
-    clusters = [i.split('/')[-1].split('C')[-1].split('.')[0] for i in file_paths]
+    clusters = [i.split('/')[-1].split('C')[-1].split('.')[0]
+                for i in file_paths]
 
     files = np.array([file_paths, exp_names, clusters])
 
@@ -164,13 +138,14 @@ def ringmask(data, center_px, r):
 
 
 def cut_around_center(sta_original, max_i_o, f_size):
-    if f_size+2 > (sta_original.shape[0])/2 or f_size+2 > (sta_original.shape[1])/2:
+    if (f_size+2 > (sta_original.shape[0])/2
+            or f_size+2 > (sta_original.shape[1])/2):
         raise ValueError('Frame size is larger than STA dimensions')
     if (max_i_o[0] + f_size > sta_original.shape[0] or
-        max_i_o[0] - f_size < 1):
+            max_i_o[0] - f_size < 1):
         raise ValueError('Frame is out of the STA dimension')
     if (max_i_o[1] + f_size > sta_original.shape[1] or
-        max_i_o[1] - f_size < 1):
+            max_i_o[1] - f_size < 1):
         raise ValueError('Frame is out of the STA dimension')
 
     if len(sta_original.shape) == 3:
