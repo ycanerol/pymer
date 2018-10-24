@@ -9,7 +9,7 @@ import os.path
 import scipy.io
 
 from .modules import analysisfuncs as asc
-from .modules import iofuncs as iof
+from . import io as iof
 
 
 def savenpztomat(exp_name, savedir=None):

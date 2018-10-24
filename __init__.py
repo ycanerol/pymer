@@ -12,7 +12,8 @@ from __future__ import division, absolute_import, print_function
 from .randpy import randpy
 
 # Modules
-from . import modules
+from . import io
+from . import misc
 
 # Plotting module
 from . import plot
@@ -28,13 +29,12 @@ from . import analyze
 __all__ = [
     'frametimesfrommat',
     'savenpztomat',
+    'io',
     'analyze',
+    'misc',
     'plot',
     'randpy',
 ]
 
-__all__.extend(modules.__all__)
-
-
 # Clean up relative imports
-del modules, division, absolute_import, print_function
+del division, absolute_import, print_function

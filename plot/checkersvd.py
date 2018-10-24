@@ -12,9 +12,9 @@ import numpy as np
 import os
 
 from . import util as plf
+from .. import misc as msc
 from ..modules import analysisfuncs as asc
-from ..modules import iofuncs as iof
-from ..modules import miscfuncs as msc
+from .. import io as iof
 
 
 def checkersvd(expname, stimnr, filename=None):

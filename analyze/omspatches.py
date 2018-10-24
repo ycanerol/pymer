@@ -11,7 +11,7 @@ import numpy as np
 import os
 
 from ..modules import analysisfuncs as asc
-from ..modules import iofuncs as iof
+from .. import io as iof
 from ..plot import util as plf
 
 

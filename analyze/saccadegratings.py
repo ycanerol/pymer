@@ -10,7 +10,7 @@ import numpy as np
 import os
 
 from .. import randpy
-from ..modules import iofuncs as iof
+from .. import io as iof
 from ..modules import analysisfuncs as asc
 from ..plot import util as plf
 

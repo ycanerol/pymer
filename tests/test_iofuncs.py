@@ -10,7 +10,7 @@ From the root directory of pymer run on the command line
 ``py.test -v tests``
 
 """
-from pymer.modules import iofuncs as iof
+import pymer.io as iof
 
 import utils
 

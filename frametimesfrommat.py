@@ -10,7 +10,7 @@ import scipy.io
 import os
 
 from .modules import analysisfuncs as asc
-from .modules import iofuncs as iof
+from . import io as iof
 
 
 def frametimesfrommat(exp_name):

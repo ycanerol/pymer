@@ -10,7 +10,7 @@ import numpy as np
 import os
 import warnings
 
-from ..modules import iofuncs as iof
+from .. import io as iof
 from ..plot import util as plf
 
 

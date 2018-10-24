@@ -13,8 +13,8 @@ import warnings
 
 from .. import randpy
 from ..modules import analysisfuncs as asc
-from ..modules import iofuncs as iof
-from ..modules import miscfuncs as msc
+from .. import io as iof
+from .. import misc as msc
 from ..plot import util as plf
 
 

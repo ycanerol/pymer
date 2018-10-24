@@ -13,7 +13,7 @@ import os
 
 from . import util as plf
 from ..modules import analysisfuncs as asc
-from ..modules import iofuncs as iof
+from .. import io as iof
 
 
 def csindexchange(exp_name, onoffcutoff=.5, qualcutoff=9):

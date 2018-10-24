@@ -10,9 +10,9 @@ import numpy as np
 import os
 from scipy.optimize import curve_fit
 
+from .. import misc as msc
 from ..modules import analysisfuncs as asc
-from ..modules import iofuncs as iof
-from ..modules import miscfuncs as msc
+from .. import io as iof
 from ..plot import util as plf
 
 

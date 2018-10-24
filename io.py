@@ -11,7 +11,7 @@ import glob
 import numpy as np
 import os
 
-from .configutil import cache_config
+from .modules.configutil import cache_config
 
 
 # Some variables (e.g. STAs) are stored as lists originally

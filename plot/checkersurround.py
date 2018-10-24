@@ -12,10 +12,10 @@ import os
 import warnings
 
 from . import util as plf
+from .. import misc as mf
 from ..calc import gaussfitter as gfit
 from ..modules import analysisfuncs as asc
-from ..modules import iofuncs as iof
-from ..modules import miscfuncs as mf
+from .. import io as iof
 
 
 def checkersurround(exp_name, stim_nr, filename=None, spikecutoff=1000,

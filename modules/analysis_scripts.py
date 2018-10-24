@@ -7,14 +7,15 @@ Created on Tue Nov 21 15:54:03 2017
 
 Collection of analysis functions
 """
-import re
-import os
 import glob
+import numpy as np
+import os
+import pyexcel
+import re
 import struct
 import warnings
-import numpy as np
-import pyexcel
-from . import iofuncs as iof
+
+from .. import io as iof
 
 
 def read_spikesheet(exp_name, cutoff=4, defaultpath=True):

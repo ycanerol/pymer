@@ -11,7 +11,7 @@ import os
 
 from .. import randpy
 from ..modules import analysisfuncs as asc
-from ..modules import iofuncs as iof
+from .. import io as iof
 
 
 def stripeflicker(exp_name, stim_nrs):
