@@ -44,12 +44,12 @@ def OMSpatchesanalyzer(exp_name, stim_nrs):
         nblinks = parameters.get('Nblinks', 1)
         seed = parameters.get('seed', -10000)
         stim_duration = parameters.get('stimFrames',
-                                               1400)
+                                       1400)
         # The duration in the parameters refers to the total duration of both
         # epochs. We divide by two to get the length of a single stim_duration
         stim_duration = int(stim_duration/2)
         prefr_duration = parameters.get('preFrames',
-                                                100)
+                                        100)
 
         frametimings = asc.readframetimes(exp_dir, stim_nr)
 
