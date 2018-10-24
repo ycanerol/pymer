@@ -14,24 +14,22 @@ from .external import randpy
 # Modules
 from . import modules
 
+# Plotting module
+from . import plot
+
 # General functions
-from .csindexchange import csindexchange
 from .frametimesfrommat import frametimesfrommat
-from .plot_checker_stas import plotcheckerstas
-from .plotcheckersurround import plotcheckersurround
-from .plotcheckersvd import plotcheckersvd
+from .frametimestomat import savenpztomat
 
 # Analyzers
 from . import analyze
 
 # Root
 __all__ = [
-    'csindexchange',
     'frametimesfrommat',
-    'plotcheckerstas',
-    'plotcheckersurround',
-    'plotcheckersvd',
+    'savenpztomat',
     'analyze',
+    'plot',
     'randpy',
 ]
 
