@@ -54,7 +54,7 @@ def OMSpatchesanalyzer(exp_name, stim_nrs):
         frametimings = asc.readframetimes(exp_dir, stim_nr)
 
         # ntrials is the number of trials containing both
-        ntrials = np.rint((frametimings.shape[0] / (stim_duration+1)))/2
+        ntrials = np.floor((frametimings.shape[0] / (stim_duration+1)))/2
         ntrials = ntrials.astype(int)
         frametimings_rs = frametimings[:ntrials*2*(stim_duration+1)]
         frametimings_rs = frametimings_rs.reshape((ntrials*2, stim_duration+1))
@@ -132,7 +132,7 @@ def OMSpatchesanalyzer(exp_name, stim_nrs):
         npzfpath = os.path.join(savepath, str(stim_nr)+'_data')
         np.savez(npzfpath, **datadict)
         all_omsi[:, stim_index] = omsi
-
+    print(f'Analysis of {stimname} completed.')
     # Draw the distribution of the OMSI for all OMSI stimuli
     # If there is only one OMS stimulus, draw it in the same folder
     # If there are multiple stimuli, save it in the data analysis folder
