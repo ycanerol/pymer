@@ -91,7 +91,7 @@ def checkerflicker(exp_name, stimulusnr, clusterstoanalyze=None,
     scr_height = scr_height-sum(margins[:2])
 
     nblinks = parameters['Nblinks']
-    bw = parameters.dict('blackwhite', False)
+    bw = parameters.get('blackwhite', False)
 
     # Gaussian stimuli are not supported yet, we need to ensure we
     # have a black and white stimulus

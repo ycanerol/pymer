@@ -138,9 +138,11 @@ def omb(exp_name, stimnr, plotall=False, nr_bins=20):
         stas[i, :, :] = stas[i, :, :] / totalspikes
         stc_x[i, :, :] = stc_x[i, :, :] / totalspikes
         stc_y[i, :, :] = stc_y[i, :, :] / totalspikes
-        eigvals_x[i, :], eigvecs_x[i, :, :] = np.linalg.eigh(stc_x[i, :, :])
-        eigvals_y[i, :], eigvecs_y[i, :, :] = np.linalg.eigh(stc_y[i, :, :])
-
+        try:
+            eigvals_x[i, :], eigvecs_x[i, :, :] = np.linalg.eigh(stc_x[i, :, :])
+            eigvals_y[i, :], eigvecs_y[i, :, :] = np.linalg.eigh(stc_y[i, :, :])
+        except np.linalg.LinAlgError:
+            continue
         # Calculate the generator signals and nonlinearities
         generators_x[i, :] = np.convolve(eigvecs_x[i, :, -1], xsteps,
                                          mode='full')[:-filter_length+1]
