@@ -25,3 +25,7 @@ __all__ = [
     'ran1',
     'ranb',
 ]
+
+# Remove randpy as reference
+randpy = None
+del randpy

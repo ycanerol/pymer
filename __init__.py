@@ -27,5 +27,6 @@ __all__ = [
     'randpy',
 ]
 
-# Clean up relative imports
-del division, absolute_import, print_function
+# Clean up relative imports and remove references
+calc = None
+del calc, division, absolute_import, print_function
