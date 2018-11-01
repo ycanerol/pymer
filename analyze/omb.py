@@ -75,7 +75,7 @@ def omb(exp_name, stimnr, plotall=False, nr_bins=20):
     refresh_rate = metadata['refresh_rate']
     filter_length, frametimings = ft.nblinks(exp_name, stimnr, nblinks,
                                              refresh_rate)
-
+    frame_duration = np.ediff1d(frametimings).mean()
     if ntotal+1 != frametimings.shape[0]:
         print(f'For {exp_name}\nstimulus {stimname} :\n'
               f'Number of frames specified in the parameters file ({ntotal}'
@@ -214,7 +214,7 @@ def omb(exp_name, stimnr, plotall=False, nr_bins=20):
             plt.show()
         plt.close()
 
-    keystosave = ['nblinks', 'all_spikes', 'clusters',
+    keystosave = ['nblinks', 'all_spikes', 'clusters', 'frame_duration',
                   'eigvals_x', 'eigvals_y',
                   'eigvecs_x', 'eigvecs_y',
                   'filter_length', 'magx', 'magy',

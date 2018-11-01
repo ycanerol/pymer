@@ -53,8 +53,7 @@ def stripeflicker(exp_name, stim_nrs):
 
         seed = parameters.get('seed', -10000)
 
-        filter_length, frametimings = ft.nblinks(exp_dir, stim_nr, nblinks,
-                                                 refresh_rate)
+        filter_length, frametimings = ft.nblinks(exp_dir, stim_nr)
 
         # Omit everything that happens before the first 10 seconds
         cut_time = 10

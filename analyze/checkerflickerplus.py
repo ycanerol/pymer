@@ -125,8 +125,7 @@ def checkerflickerplus(exp_name, stimulusnr, clusterstoanalyze=None,
     else:
         raise ValueError('sx and sy must be integers')
 
-    filter_length, frametimings = ft.nblinks(exp_dir, stimulusnr, nblinks,
-                                             refresh_rate)
+    filter_length, frametimings = ft.nblinks(exp_dir, stimulusnr)
 
     if parameters['stimulus_type'] in ['FrozenNoise',
                                        'checkerflickerplusmovie']:
