@@ -75,14 +75,16 @@ def OMBanalyzer(exp_name, stimnr, plotall=False, nr_bins=20):
     filter_length, frametimings = asc.ft_nblinks(exp_name, stimnr, nblinks,
                                                  refresh_rate)
     frame_duration = np.ediff1d(frametimings).mean()
-    if ntotal+1 != frametimings.shape[0]:
+    frametimings = frametimings[:-1]
+
+    if ntotal != frametimings.shape[0]:
         print(f'For {exp_name}\nstimulus {stimname} :\n'
               f'Number of frames specified in the parameters file ({ntotal}'
               f' frames) and frametimings ({frametimings.shape[0]}) do not'
               ' agree!'
               ' The stimulus was possibly interrupted during recording.'
               ' ntotal is changed to match actual frametimings.')
-        ntotal = frametimings.shape[0]-1
+        ntotal = frametimings.shape[0]
 
     # Generate the numbers to be used for reconstructing the motion
     # ObjectsMovingBackground.cpp line 174, steps are generated in an
@@ -101,7 +103,7 @@ def OMBanalyzer(exp_name, stimnr, plotall=False, nr_bins=20):
     all_spikes = np.empty((clusters.shape[0], ntotal))
     for i, (cluster, channel, _) in enumerate(clusters):
         spiketimes = asc.read_raster(exp_name, stimnr, cluster, channel)
-        spikes = asc.binspikes(spiketimes, frametimings)[:-1]
+        spikes = asc.binspikes(spiketimes, frametimings)
         all_spikes[i, :] = spikes
 
     # Collect STA for x and y movement in one array
