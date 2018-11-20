@@ -9,6 +9,7 @@ import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import sys
 import warnings
 
 from .. import frametimes as ft
@@ -152,6 +153,7 @@ def checkerflicker(exp_name, stimulusnr, clusterstoanalyze=None,
     print(f'\nAnalyzing {stimname}.\nTotal chunks: {nrofchunks}')
 
     time = startime = datetime.datetime.now()
+    timedeltas = []
 
     quals = np.zeros(len(stas))
 
@@ -179,11 +181,21 @@ def checkerflicker(exp_name, stimulusnr, clusterstoanalyze=None,
             qual = np.append(qual, msc.staquality(stas[c]))
         quals = np.vstack((quals, qual))
 
-        if i == 1:
-            print('Estimated analysis time: '
-                  f'{msc.timediff(time)*(nrofchunks)}\n')
+        # Draw progress bar
+        width = 50  # Number of characters
+        prog = i/(nrofchunks-1)
+        bar_complete = int(prog*width)
+        bar_noncomplete = width-bar_complete
+        timedeltas.append(msc.timediff(time))  # Calculate running avg
+        avgelapsed = np.mean(timedeltas)
+        elapsed = np.sum(timedeltas)
+        etc = startime + elapsed + avgelapsed*(nrofchunks-i)
+        sys.stdout.flush()
+        sys.stdout.write('\r{}{} |{:4.1f}% ETC: {}'.format('█'*bar_complete,
+                         '-'*bar_noncomplete,
+                         prog*100, etc.strftime("%a %X")))
         time = datetime.datetime.now()
-
+    sys.stdout.write('\n')
     # Remove the first row which is full of random nrs.
     quals = quals[1:, :]
 
@@ -191,7 +203,9 @@ def checkerflicker(exp_name, stimulusnr, clusterstoanalyze=None,
     spikenrs = np.array([spikearr.sum() for spikearr in all_spiketimes])
 
     for i in range(clusters.shape[0]):
-        stas[i] = stas[i]/spikenrs[i]
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', '.*true_divide*.')
+            stas[i] = stas[i]/spikenrs[i]
         # Find the pixel with largest absolute value
         max_i = np.squeeze(np.where(np.abs(stas[i])
                                     == np.max(np.abs(stas[i]))))
