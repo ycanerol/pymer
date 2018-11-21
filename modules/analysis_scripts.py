@@ -601,16 +601,11 @@ def stimulisorter(exp_name):
     return sorted_stimuli
 
 
-def ft_nblinks(exp_dir, stimulusnr, nblinks, refresh_rate):
+def ft_nblinks(exp_name, stimulusnr, nblinks=None, refresh_rate=None):
     """
     Return the appropriate frametimings array depending on the stimulus
     update frequency.
-    Parameters
-        nblinks :
-            Number of screen frames for each stimulus frame, as defined
-            in stimulator program.
-        refresh_rate :
-            Update frequency of the screen that is used. Typically 60Hz.
+
     Returns
         filter_length:
             Appropriate length of the temporal filter length for STA
@@ -619,6 +614,12 @@ def ft_nblinks(exp_dir, stimulusnr, nblinks, refresh_rate):
             frame was updated.
 
     """
+    exp_dir = iof.exp_dir_fixer(exp_name)
+    if nblinks is None:
+        parameters = read_parameters(exp_dir, stimulusnr)
+        nblinks = parameters.get('Nblinks', None)
+    if refresh_rate is None:
+        refresh_rate = read_spikesheet(exp_name)[1]['refresh_rate']
 
     # Both onsets and offsets are required in the case of odd numbered
     # nblinks values.

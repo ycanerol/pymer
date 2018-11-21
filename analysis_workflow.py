@@ -6,8 +6,8 @@ Created on Mon Jan 22 15:21:30 2018
 @author: ycan
 """
 import sys
-import analysis_scripts as asc
 import datetime
+import analysis_scripts as asc
 from spontanalyzer import spontanalyzer
 from fffanalyzer import fffanalyzer
 from allfff import allfff
@@ -40,7 +40,7 @@ onoffsteps = sorted_stimuli['onoffsteps']
 checkerflicker = sorted_stimuli['checkerflicker']
 stripeflicker = sorted_stimuli['stripeflicker']
 checkerflickerplus = sorted_stimuli['frozennoise'] + sorted_stimuli['checkerflickerplusmovie']
-OMSpatches =  sorted_stimuli['OMSpatches']
+OMSpatches = sorted_stimuli['OMSpatches']
 OMB = sorted_stimuli['OMB']
 saccadegrating = sorted_stimuli['saccadegrating']
 
@@ -58,8 +58,7 @@ allonoff(exp_name, onoffsteps)
 stripeflickeranalysis(exp_name, stripeflicker)
 stripesurround(exp_name, stripeflicker)
 
-for stim in OMSpatches:
-    OMSpatchesanalyzer(exp_name, stim)
+OMSpatchesanalyzer(exp_name, OMSpatches)
 for stim in OMB:
     OMBanalyzer(exp_name, stim)
 for stim in saccadegrating:

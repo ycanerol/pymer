@@ -8,6 +8,7 @@ Created on Fri Dec  8 11:22:39 2017
 
 import datetime
 import os
+import sys
 import warnings
 import numpy as np
 from randpy import randpy
@@ -83,7 +84,7 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     marginkeys = ['tmargin', 'bmargin', 'rmargin', 'lmargin']
     margins = []
     for key in marginkeys:
-        margins.append(asc.parameter_dict_get(parameters, key, 0))
+        margins.append(parameters.get(key, 0))
 
     # Subtract bottom and top from vertical dimension; left and right
     # from horizontal dimension
@@ -91,14 +92,14 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     scr_height = scr_height-sum(margins[:2])
 
     nblinks = parameters['Nblinks']
-    bw = asc.parameter_dict_get(parameters, 'blackwhite', False)
+    bw = parameters.get('blackwhite', False)
 
     # Gaussian stimuli are not supported yet, we need to ensure we
     # have a black and white stimulus
     if bw is not True:
         raise ValueError('Gaussian stimuli are not supported yet!')
 
-    seed = asc.parameter_dict_get(parameters, 'seed', -10000)
+    seed = parameters.get('seed', -10000)
 
     sx, sy = scr_height/stx_h, scr_width/stx_w
 
@@ -110,8 +111,7 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     else:
         raise ValueError('sx and sy must be integers')
 
-    filter_length, frametimings = asc.ft_nblinks(exp_dir, stimulusnr,
-                                                 nblinks, refresh_rate)
+    filter_length, frametimings = asc.ft_nblinks(exp_dir, stimulusnr)
 
     savefname = str(stimulusnr)+'_data'
 
@@ -153,6 +153,7 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     print(f'\nAnalyzing {stimname}.\nTotal chunks: {nrofchunks}')
 
     time = startime = datetime.datetime.now()
+    timedeltas = []
 
     quals = np.zeros(len(stas))
 
@@ -180,11 +181,21 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
             qual = np.append(qual, asc.staquality(stas[c]))
         quals = np.vstack((quals, qual))
 
-        if i == 1:
-            print('Estimated analysis time: '
-                  f'{msc.timediff(time)*(nrofchunks)}\n')
+        # Draw progress bar
+        width = 50  # Number of characters
+        prog = i/(nrofchunks-1)
+        bar_complete = int(prog*width)
+        bar_noncomplete = width-bar_complete
+        timedeltas.append(msc.timediff(time))  # Calculate running avg
+        avgelapsed = np.mean(timedeltas)
+        elapsed = np.sum(timedeltas)
+        etc = startime + elapsed + avgelapsed*(nrofchunks-i)
+        sys.stdout.flush()
+        sys.stdout.write('\r{}{} |{:4.1f}% ETC: {}'.format('█'*bar_complete,
+                         '-'*bar_noncomplete,
+                         prog*100, etc.strftime("%a %X")))
         time = datetime.datetime.now()
-
+    sys.stdout.write('\n')
     # Remove the first row which is full of random nrs.
     quals = quals[1:, :]
 
@@ -192,7 +203,9 @@ def checkerflickeranalyzer(exp_name, stimulusnr, clusterstoanalyze=None,
     spikenrs = np.array([spikearr.sum() for spikearr in all_spiketimes])
 
     for i in range(clusters.shape[0]):
-        stas[i] = stas[i]/spikenrs[i]
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', '.*true_divide*.')
+            stas[i] = stas[i]/spikenrs[i]
         # Find the pixel with largest absolute value
         max_i = np.squeeze(np.where(np.abs(stas[i])
                                     == np.max(np.abs(stas[i]))))
