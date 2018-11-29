@@ -114,7 +114,7 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial, x, time_res, spikes
         dLdmu = spikes.sum() - time_res*np.sum(P)
 #        import pdb; pdb.set_trace()
         dL = flattenpars(dLdk, dLdq, dLdmu)
-        return dL
+        return -dL
 
     print('Gradient diff', check_grad(loglikelihood, gradients, kQmu_initial))
 
