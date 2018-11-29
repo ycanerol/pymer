@@ -5,7 +5,7 @@
 """
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.linalg import hankel
+from scipy.linalg import hankel, eigh
 from scipy.optimize import minimize
 
 #%%
@@ -81,7 +81,7 @@ def makeQ2(t):
     return Q, ks, ws
 
 
-from scipy.optimize import check_grad
+from scipy.optimize import check_grad, approx_fprime
 
 def minimize_loglikelihood(k_initial, Q_initial, mu_initial, x, time_res, spikes):
     kQmu_initial = flattenpars(k_initial, Q_initial, mu_initial)
@@ -109,18 +109,21 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial, x, time_res, spikes
         # Using einsum to multiply and sum along the desired axis.
         # more detailed explanation here:
         # https://stackoverflow.com/questions/26089893/understanding-numpys-einsum
-        dLdq = np.einsum('ijk,i', sTs, spikes) - time_res*np.einsum('ijk,i', sTs, P)
+        dLdq = (np.einsum('ijk,i', sTs, spikes)
+                - time_res*np.einsum('ijk,i', sTs, P))
         dLdmu = spikes.sum() - time_res*np.sum(P)
 #        import pdb; pdb.set_trace()
         dL = flattenpars(dLdk, dLdq, dLdmu)
         return dL
 
-    print(check_grad(loglikelihood, gradients, kQmu_initial))
+    print('Gradient diff', check_grad(loglikelihood, gradients, kQmu_initial))
+
+#    print('approx. gradient', approx_fprime(kQmu_initial, loglikelihood, 1e-2))
 
 
     res = minimize(loglikelihood, kQmu_initial, tol=1e-2,
-#                   method='Newton-CG',
-#                   jac=gradients,
+                   method='CG',
+                   jac=gradients,
                    options={'disp':True})
     return res
 
@@ -154,6 +157,7 @@ plt.show()
 import time
 start = time.time()
 res = minimize_loglikelihood(k_in, Q_in, mu_in, stim, time_res, spikes)
+#res = minimize_loglikelihood(np.zeros(k_in.shape), np.zeros(Q_in.shape), 0, stim, time_res, spikes)
 elapsed = time.time()-start
 print(f'Time elapsed: {elapsed/60:6.1f} mins')
 
