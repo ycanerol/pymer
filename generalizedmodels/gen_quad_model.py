@@ -143,9 +143,9 @@ tmini = t[:filter_length]
 mu_in = .01
 k_in = np.exp(-(tmini-0.12)**2/.002)
 Q_in, Qks, Qws = makeQ2(tmini)
-plt.imshow(Q_in)
-plt.title('Q in')
-plt.show()
+
+Q_in = np.zeros(Q_in.shape)
+
 
 f = gqm_neuron(k_in, Q_in, mu_in)
 rate = f(stim)
