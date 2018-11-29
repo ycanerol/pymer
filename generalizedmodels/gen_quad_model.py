@@ -172,3 +172,12 @@ axq1.imshow(Q_in)
 axq2.imshow(Q_out)
 
 plt.show()
+
+#%%
+w_in, v_in = eigh(Q_in)
+w_out, v_out = eigh(Q_out)
+
+[plt.plot(Qk*Qw, color='C1') for Qk, Qw in zip(Qks, Qws)]
+plt.plot(v_in[:, [0, -2, -1]], color='C0')
+plt.plot(v_out[:, [0, -2, -1]], color='C2')
+plt.show()
