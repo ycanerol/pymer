@@ -15,7 +15,7 @@ import iofuncs as iof
 import analysis_scripts as asc
 import miscfuncs as msc
 
-exp = '20180207'
+exp = '20171122'
 sorted_stimuli = asc.stimulisorter(exp)
 checker = sorted_stimuli['checkerflicker'][0]
 data = iof.load(exp, checker)
@@ -42,10 +42,20 @@ def fitgaussian(sta, bound=2, f_size=10):
     pars_out = pars
     pars_out[2:4] = pars[2:4] - [f_size, f_size] + max_i[:2]
     return pars_out
+
+def mahalonobis_convert(Z, pars):
+    warnings.filterwarnings('ignore', '.*divide by zero*.', RuntimeWarning)
+    with warnings.catch_warnings():
+        Zm = np.log((Z-pars[0])/pars[1])
+        Zm[np.isinf(Zm)] = np.nan
+        Zm = np.sqrt(Zm*-2)
+    return Zm
 #%%
 X, Y = np.meshgrid(np.arange(sta.shape[0]),
                    np.arange(sta.shape[1]))
 ax = plt.subplot(111)
+all_pars = np.zeros((len(stas), 7))
+
 for i, _ in enumerate(data['clusters']):
     sta = stas[i]
     max_i = max_inds[i]
@@ -54,6 +64,7 @@ for i, _ in enumerate(data['clusters']):
     except ValueError as e:
         if str(e).startswith('Fit failed'):
             continue
+    all_pars[i, :] = pars
     f = gfit.twodgaussian(pars)
     Z = f(Y, X)
     with warnings.catch_warnings():
@@ -65,7 +76,21 @@ for i, _ in enumerate(data['clusters']):
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', category=UserWarning)
         ax.contour(Y, X, Zm, [bound])
-#    plt.show()
-image = mpimg.imread('/media/ycan/datadrive/data/Erol_20180207/microscope_images/afterexperiment_grid.tif')
-ax.imshow(image)
 plt.show()
+#image = mpimg.imread('/media/ycan/datadrive/data/Erol_20180207/microscope_images/afterexperiment_grid.tif')
+#ax.imshow(image)
+#plt.show()
+
+#%%
+import pandas as pd
+import seaborn as sns
+
+pars_filtered = all_pars[:, (4, 5)]
+pars_filtered = pars_filtered[pars_filtered[:, 0]<6]
+pars_filtered = pars_filtered[pars_filtered[:, 1]<6]
+
+sizes = pd.DataFrame(data=pars_filtered, columns=['x', 'y'])
+
+sns.set(style='darkgrid')
+
+g = sns.jointplot('x','y', sizes, 'kde', xlim=[0, 6], ylim=[0, 6])
