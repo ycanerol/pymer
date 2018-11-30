@@ -50,7 +50,7 @@ plt.suptitle('Bases for Q')
 
 
 myW = np.zeros((nbases, nbases))
-myW[5:10, 9:11] = np.ones((5, 2))
+myW[4:7, 2:4] = np.ones((3, 2))
 
 def fit2dbases(nbases, d, Wtofit):
     x = y = np.arange(d)
@@ -69,3 +69,4 @@ def fit2dbases(nbases, d, Wtofit):
     return A
 
 W = fit2dbases(nbases, d, myW)
+plt.imshow(W)
