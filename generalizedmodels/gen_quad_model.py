@@ -104,26 +104,35 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial, x, time_res, spikes
     def gradients(kQmu):
         k, Q, mu = splitpars(kQmu)
         P = np.exp(gqm_in(k, Q, mu)(x))
-        dLdk = spikes @ xh - time_res*(P @ xh)
-
-        # Using einsum to multiply and sum along the desired axis.
-        # more detailed explanation here:
-        # https://stackoverflow.com/questions/26089893/understanding-numpys-einsum
-        dLdq = (np.einsum('ijk,i', sTs, spikes)
-                - time_res*np.einsum('ijk,i', sTs, P))
-        dLdmu = spikes.sum() - time_res*np.sum(P)
+        dLdk = np.zeros(k.shape)
+        dLdq = np.zeros(Q.shape)
+        dLdmu = 0
+        for i in range(filter_length, x_mini.shape[0]):
+            s = x[i-filter_length:i]
+            dLdk += (spikes[i] * s -
+                       time_res*P[i]*s)
+            dLdq += (spikes[i] * np.outer(s,s) - time_res*P[i] * np.outer(s, s))
+            dLdmu += spikes[i] - time_res * P[i]
+#        dLdk = spikes @ xh - time_res*(P @ xh)
+#
+#        # Using einsum to multiply and sum along the desired axis.
+#        # more detailed explanation here:
+#        # https://stackoverflow.com/questions/26089893/understanding-numpys-einsum
+#        dLdq = (np.einsum('ijk,i->jk', sTs, spikes)
+#                - time_res*np.einsum('ijk,i->jk', sTs, P))
+#        dLdmu = spikes.sum() - time_res*np.sum(P)
 #        import pdb; pdb.set_trace()
         dL = flattenpars(dLdk, dLdq, dLdmu)
         return -dL
 
     print('Gradient diff', check_grad(loglikelihood, gradients, kQmu_initial))
 
-#    print('approx. gradient', approx_fprime(kQmu_initial, loglikelihood, 1e-2))
+    print('approx. gradient', approx_fprime(kQmu_initial, loglikelihood, 1e-2))
 
 
     res = minimize(loglikelihood, kQmu_initial, tol=1e-2,
                    method='CG',
-                   jac=gradients,
+#                   jac=gradients,
                    options={'disp':True})
     return res
 
@@ -132,7 +141,7 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial, x, time_res, spikes
 filter_length = 40
 frame_rate = 60
 time_res = (1/frame_rate)
-tstop = 20 # in seconds
+tstop = 10*60 # in seconds
 t = np.arange(0, tstop, time_res)
 np.random.seed(1221)
 
@@ -144,7 +153,7 @@ mu_in = .01
 k_in = np.exp(-(tmini-0.12)**2/.002)
 Q_in, Qks, Qws = makeQ2(tmini)
 
-Q_in = np.zeros(Q_in.shape)
+#Q_in = np.zeros(Q_in.shape)
 
 
 f = gqm_neuron(k_in, Q_in, mu_in)
@@ -162,7 +171,7 @@ elapsed = time.time()-start
 print(f'Time elapsed: {elapsed/60:6.1f} mins')
 
 k_out, Q_out, mu_out = splitpars(res.x)
-
+#%%
 axk = plt.subplot(211)
 axk.plot(k_in, label='k_in')
 axk.plot(k_out, label='k_out')
@@ -174,7 +183,9 @@ axq1 = plt.subplot(223)
 axq2 = plt.subplot(224)
 axq1.imshow(Q_in)
 axq2.imshow(Q_out)
-
+savepath= '/home/ycan/Documents/meeting_notes/2018-12-05/'
+#plt.savefig(savepath+'simulatedsuccess.pdf')
+#plt.savefig(savepath+'simulatedsuccess.png')
 plt.show()
 
 #%%
