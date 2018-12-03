@@ -139,60 +139,61 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial, x, time_res, spikes
 
 #%%
 filter_length = 40
-frame_rate = 60
-time_res = (1/frame_rate)
-tstop = 10*60 # in seconds
-t = np.arange(0, tstop, time_res)
-np.random.seed(1221)
+if __name__ == '__main__':
+    frame_rate = 60
+    time_res = (1/frame_rate)
+    tstop = 10*60 # in seconds
+    t = np.arange(0, tstop, time_res)
+    np.random.seed(1221)
 
-stim = np.random.normal(size=t.shape)*.2
+    stim = np.random.normal(size=t.shape)*.2
 
-tmini = t[:filter_length]
+    tmini = t[:filter_length]
 
-mu_in = .01
-k_in = np.exp(-(tmini-0.12)**2/.002)
-Q_in, Qks, Qws = makeQ2(tmini)
+    mu_in = .01
+    k_in = np.exp(-(tmini-0.12)**2/.002)
+    Q_in, Qks, Qws = makeQ2(tmini)
 
-#Q_in = np.zeros(Q_in.shape)
+    #Q_in = np.zeros(Q_in.shape)
 
 
-f = gqm_neuron(k_in, Q_in, mu_in)
-rate = f(stim)
+    f = gqm_neuron(k_in, Q_in, mu_in)
+    rate = f(stim)
 
-spikes = np.random.poisson(rate)
-plt.plot(spikes)
-plt.show()
-#%%
-import time
-start = time.time()
-res = minimize_loglikelihood(k_in, Q_in, mu_in, stim, time_res, spikes)
-#res = minimize_loglikelihood(np.zeros(k_in.shape), np.zeros(Q_in.shape), 0, stim, time_res, spikes)
-elapsed = time.time()-start
-print(f'Time elapsed: {elapsed/60:6.1f} mins')
+    spikes = np.random.poisson(rate)
+    plt.plot(spikes)
+    plt.show()
+    #%%
+    import time
+    start = time.time()
+    #res = minimize_loglikelihood(k_in, Q_in, mu_in, stim, time_res, spikes)
+    res = minimize_loglikelihood(np.zeros(k_in.shape), np.zeros(Q_in.shape), 0, stim, time_res, spikes)
+    elapsed = time.time()-start
+    print(f'Time elapsed: {elapsed/60:6.1f} mins')
 
-k_out, Q_out, mu_out = splitpars(res.x)
-#%%
-axk = plt.subplot(211)
-axk.plot(k_in, label='k_in')
-axk.plot(k_out, label='k_out')
-axk.legend()
+    k_out, Q_out, mu_out = splitpars(res.x)
+    #%%
+    axk = plt.subplot(211)
+    axk.plot(k_in, label='k_in')
+    axk.plot(k_out, label='k_out')
+    axk.legend()
 
-axk.text(filter_length*.8, 0.5, f'mu_in:  {mu_in:4.2f}\nmu_out: {mu_out:4.2f}')
+    axk.text(filter_length*.8, 0.5, f'mu_in:  {mu_in:4.2f}\nmu_out: {mu_out:4.2f}')
 
-axq1 = plt.subplot(223)
-axq2 = plt.subplot(224)
-axq1.imshow(Q_in)
-axq2.imshow(Q_out)
-savepath= '/home/ycan/Documents/meeting_notes/2018-12-05/'
-#plt.savefig(savepath+'simulatedsuccess.pdf')
-#plt.savefig(savepath+'simulatedsuccess.png')
-plt.show()
+    axq1 = plt.subplot(223)
+    axq2 = plt.subplot(224)
+    axq1.imshow(Q_in)
+    axq2.imshow(Q_out)
+    savepath= '/home/ycan/Documents/meeting_notes/2018-12-05/'
+    #plt.savefig(savepath+'simulatedsuccess.pdf')
+    #plt.savefig(savepath+'simulatedsuccess.png')
+    plt.show()
 
-#%%
-w_in, v_in = eigh(Q_in)
-w_out, v_out = eigh(Q_out)
+    #%%
+    w_in, v_in = eigh(Q_in)
+    w_out, v_out = eigh(Q_out)
 
-[plt.plot(Qk*Qw, color='C1') for Qk, Qw in zip(Qks, Qws)]
-plt.plot(v_in[:, [0, -2, -1]], color='C0')
-plt.plot(v_out[:, [0, -2, -1]], color='C2')
-plt.show()
+    [plt.plot(Qk*Qw, color='C1') for Qk, Qw in zip(Qks, Qws)]
+    plt.plot(v_in[:, [0, -2, -1]], color='C0')
+    plt.plot(v_out[:, [0, -2, -1]], color='C2')
+    plt.show()
