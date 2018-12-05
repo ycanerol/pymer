@@ -10,12 +10,12 @@ from scipy.optimize import minimize
 
 #%%
 def conv(k, x):
-    return np.convolve(k, x, 'full')[k.shape[0]-1:-k.shape[0]+1]
+    return np.convolve(k, x, 'full')[:-k.shape[0]+1]
 
 
 def conv2d(Q, x):
     l = Q.shape[0]
-    out = np.zeros((x.shape[0]-l+1))
+    out = np.zeros((x.shape[0]))
     for i in range(x.shape[0]-l+1):
         s = x[i:i+l]
         res = s[:, None].T @ Q @ s
@@ -23,6 +23,7 @@ def conv2d(Q, x):
     return out
 
 
+#%%
 def flattenpars(k, Q, mu):
     """
     Flatten a set of parameters to be used with optimization
@@ -96,7 +97,7 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial, x, time_res, spikes
 
     xh = hankel(x_mini)[:, :filter_length]
     sTs = np.zeros((spikes.shape[0], filter_length, filter_length))
-    for i in range(spikes.shape[0]):
+    for i in range(spikes.shape[0]-filter_length+1):
         x_temp = x[i:i+filter_length][np.newaxis, :]
         sTs[i, :, :] = np.dot(x_temp.T, x_temp)
 #    import pdb; pdb.set_trace()
@@ -138,11 +139,11 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial, x, time_res, spikes
 
 
 #%%
-filter_length = 40
+filter_length = 20
 if __name__ == '__main__':
     frame_rate = 60
     time_res = (1/frame_rate)
-    tstop = 10*60 # in seconds
+    tstop = 90 # in seconds
     t = np.arange(0, tstop, time_res)
     np.random.seed(1221)
 
