@@ -127,7 +127,13 @@ def glm_fr(k, mu):
 #    return lambda x:3/(1+np.exp(-(conv(k, x) + mu))) # logistic
 
 
-def minimize_loglhd(k_initial, mu_initial, x, time_res, spikes):
+def minimize_loglhd(k_initial, mu_initial, x, time_res, spikes, usegrad=True,
+                    **kwargs):
+
+    minimizekwargs = {'method':'CG',
+                      'tol':1e-2,
+                      'options':{'disp':True}}
+    minimizekwargs.update(**kwargs)
 
     def loglhd(kmu):
         k_ = kmu[:-1]
@@ -135,7 +141,14 @@ def minimize_loglhd(k_initial, mu_initial, x, time_res, spikes):
         nlt_in = (conv(k_, x)+mu_)
         return -np.sum(spikes * nlt_in) + time_res*np.sum(np.exp(nlt_in))
 
-    res = minimize(loglhd, [*k_initial, mu_initial], method='CG', tol=1e-2)
+    def grad(kmu):
+
+        return None
+
+    if usegrad:
+        minimizekwargs.update({'jac':grad})
+
+    res = minimize(loglhd, [*k_initial, mu_initial], **minimizekwargs)
 
     return res
 

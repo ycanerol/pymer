@@ -31,7 +31,7 @@ def minimize_loglhd(k_initial, mu_initial, x, time_res, spikes):
 filter_length = 40
 frame_rate = 60
 time_res = (1/frame_rate)
-tstop = 5 # in seconds
+tstop = 500 # in seconds
 t = np.arange(0, tstop, time_res)
 np.random.seed(1221)
 
