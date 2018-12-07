@@ -7,13 +7,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.linalg import hankel, eigh
 from scipy.optimize import minimize
+import analysis_scripts as asc
 
 #%%
 def conv(k, x):
     return np.convolve(k, x, 'full')[k.shape[0]-1:-k.shape[0]+1]
 
 
-def conv2d(Q, x):
+def conv2d_old(Q, x):
     l = Q.shape[0]
     out = np.zeros((x.shape[0]-l+1))
     for i in range(x.shape[0]-l+1):
@@ -22,6 +23,27 @@ def conv2d(Q, x):
         out[i] = res
     return out
 
+
+def conv2d(Q, x, optimize='greedy'):
+    """
+    Calculate the quadratic form for each time bin for generalized quadratic
+    model.
+
+    Uses
+    * rolling window to reduce used memory
+    * np.broadcast_to for shaping the quadratic filter matrix in the required
+      form without allocating memory
+    """
+    l = Q.shape[0]
+    # Generate a rolling view of the stimulus wihtout allocating space in memory
+    # Equivalent to "xr = hankel(x)[:, :l]" but much more memory efficient
+    xr = asc.rolling_window(x, l)
+    # Stack copies of Q along a new axis without copying in memory.
+    Qb = np.broadcast_to(Q, (x.shape[0]-l+1, *Q.shape))
+    return np.einsum('ij,ijk,ki->i', xr, Qb, xr.T, optimize=optimize)
+
+
+#%%
 
 def flattenpars(k, Q, mu):
     """
