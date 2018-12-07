@@ -105,7 +105,8 @@ def makeQ2(t):
 
 from scipy.optimize import check_grad, approx_fprime
 
-def minimize_loglikelihood(k_initial, Q_initial, mu_initial, x, time_res, spikes):
+def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
+                           x, time_res, spikes, debug_grad=False):
     kQmu_initial = flattenpars(k_initial, Q_initial, mu_initial)
     x_mini = x[filter_length-1:]
     def loglikelihood(kQmu):
@@ -116,7 +117,7 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial, x, time_res, spikes
     # multiplication like so: X @ xh , where X is a vector containing
     # some number for each time bin.
 
-    xh = hankel(x_mini)[:, :filter_length]
+#    xh = hankel(x)[:, :filter_length]
     sTs = np.zeros((spikes.shape[0], filter_length, filter_length))
     for i in range(spikes.shape[0]):
         x_temp = x[i:i+filter_length][np.newaxis, :]
@@ -126,30 +127,40 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial, x, time_res, spikes
     def gradients(kQmu):
         k, Q, mu = splitpars(kQmu)
         P = np.exp(gqm_in(k, Q, mu)(x))
-        dLdk = np.zeros(k.shape)
-        dLdq = np.zeros(Q.shape)
-        dLdmu = 0
-        for i in range(filter_length, x_mini.shape[0]):
-            s = x[i-filter_length:i]
-            dLdk += (spikes[i] * s -
-                       time_res*P[i]*s)
-            dLdq += (spikes[i] * np.outer(s,s) - time_res*P[i] * np.outer(s, s))
-            dLdmu += spikes[i] - time_res * P[i]
-#        dLdk = spikes @ xh - time_res*(P @ xh)
-#
-#        # Using einsum to multiply and sum along the desired axis.
-#        # more detailed explanation here:
-#        # https://stackoverflow.com/questions/26089893/understanding-numpys-einsum
-#        dLdq = (np.einsum('ijk,i->jk', sTs, spikes)
-#                - time_res*np.einsum('ijk,i->jk', sTs, P))
-#        dLdmu = spikes.sum() - time_res*np.sum(P)
-#        import pdb; pdb.set_trace()
+#        dLdk = np.zeros(k.shape)
+#        dLdq = np.zeros(Q.shape)
+#        dLdmu = 0
+#        for i in range(filter_length, x_mini.shape[0]):
+#            s = x[i:i+filter_length]
+#            dLdk += (spikes[i] * s -
+#                       time_res*P[i]*s)
+#            dLdq += (spikes[i] * np.outer(s,s) - time_res*P[i] * np.outer(s, s))
+#            dLdmu += spikes[i] - time_res * P[i]
+        dLdk = spikes @ xh - time_res*(P @ xh)
+
+        # Using einsum to multiply and sum along the desired axis.
+        # more detailed explanation here:
+        # https://stackoverflow.com/questions/26089893/understanding-numpys-einsum
+        dLdq = (np.einsum('ijk,i->jk', sTs, spikes)
+                - time_res*np.einsum('ijk,i->jk', sTs, P))
+        dLdmu = spikes.sum() - time_res*np.sum(P)
+#        importc pdb; pdb.set_trace()
         dL = flattenpars(dLdk, dLdq, dLdmu)
         return -dL
-
-    print('Gradient diff', check_grad(loglikelihood, gradients, kQmu_initial))
-
-    print('approx. gradient', approx_fprime(kQmu_initial, loglikelihood, 1e-2))
+    if debug_grad:
+        eps = 1e-2
+        ap_grad = approx_fprime(kQmu_initial, loglikelihood, eps)
+        man_grad = gradients(kQmu_initial)
+        diff = ap_grad - man_grad
+        k_diff, Q_diff, mu_diff = splitpars(diff)
+        print('Gradient diff L2 norm', np.sum(diff**2))
+        axk = plt.subplot(121)
+        axk.plot(k_diff, 'k')
+        axq = plt.subplot(122)
+        im = axq.imshow(Q_diff)
+        plt.colorbar(im)
+        plt.suptitle(f'Difference of numerical and explicit gradients, mu_diff: {mu_diff:11.2f}')
+        plt.show()
 
 
     res = minimize(loglikelihood, kQmu_initial, tol=1e-2,
