@@ -190,3 +190,57 @@ def cutstripe(sta, max_i, fsize):
     sta_r = sta[max_i[0]-fsize:max_i[0]+fsize+1, :]
     max_i_r = np.append(fsize, max_i[-1])
     return sta_r, max_i_r
+
+
+def rolling_window(a, window):
+    """
+
+    Make an ndarray with a rolling window of the last dimension,
+    this is useful for replacing for loops with numpy operations.
+
+    Parameters
+    ----------
+    a : array_like
+        Array to add rolling window to
+    window : int
+        Size of rolling window
+
+    Returns
+    -------
+    Array that is a view of the original array with a added dimension
+    of size w.
+
+    Notes
+    -------
+    Equivalent to
+
+    >>> from scipy.linalg import hankel
+    >>> res = hankel(a)[:-window+1, :window]
+
+    where ``a`` is a 1D numpy array containing values for the stimulus.
+
+    Examples
+    --------
+    >>> x=np.arange(10).reshape((2,5))
+    >>> rolling_window(x, 3)
+    array([[[0, 1, 2], [1, 2, 3], [2, 3, 4]],
+           [[5, 6, 7], [6, 7, 8], [7, 8, 9]]])
+
+    Calculate rolling mean of last dimension:
+
+    >>> np.mean(rolling_window(x, 3), -1)
+    array([[ 1.,  2.,  3.],
+          [ 6.,  7.,  8.]])
+
+    Reference
+    ----------
+    Taken from https://stackoverflow.com/a/4924433/9205838
+
+    """
+    if window < 1:
+        raise ValueError("`window` must be at least 1.")
+    if window > a.shape[-1]:
+        raise ValueError("`window` is too long.")
+    shape = a.shape[:-1] + (a.shape[-1] - window + 1, window)
+    strides = a.strides + (a.strides[-1],)
+    return np.lib.stride_tricks.as_strided(a, shape=shape, strides=strides)
