@@ -26,10 +26,9 @@ frametimes = asc.ft_nblinks(exp_name, stim_nr)[1]
 filter_length = l = data['filter_length']
 refresh_rate = asc.read_spikesheet(exp_name)[1]['refresh_rate']
 
-l = 20  # Manually trim to speed up
+l = 10  # Manually trim to speed up
 
-i = 0
-#lim = 3000
+i = 2
 lim = None
 
 sta = data['stas'][i]
@@ -82,10 +81,10 @@ eiginds = [0, 1, l-2, l-1]
 for ind, (eigind, w) in enumerate(zip(eiginds, w_out[eiginds])):
     axv.plot(eigind, w, 'o', color=colors[ind])
     axw.plot(v_out[-k_plotlim:, eigind], lw=1, color=colors[ind])
-axw.plot(sta[k_plotlim::-1], '--', label='STA')
+axw.plot(sta[l-1::-1], '--', label='STA')
 #axw.plot(k_out[k_plotlim::-1], '--')
 
-axw.plot(data['eigvecs'][i][k_plotlim::-1, -1], '--', label='STC0')
+axw.plot(data['eigvecs'][i][l-1::-1, -1], '--', label='STC0')
 axw.legend(fontsize='x-small')
 
 plt.tight_layout()

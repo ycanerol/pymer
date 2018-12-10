@@ -30,10 +30,11 @@ _, frametimes = asc.ft_nblinks(exp_name, stim_nr, parameters.get('Nblinks', 2))
 filter_length = l = data['filter_length']
 refresh_rate = asc.read_spikesheet(exp_name)[1]['refresh_rate']
 
-i = 0
+i = 2
+l = 10
 
 # Limit the amount of data that will be loaded
-lim = 15000
+lim = None
 
 sta = data['stas'][i][0]
 rawspikes = asc.read_raster(exp_name, stim_nr, *clusters[i][:2])[:lim]
@@ -41,7 +42,6 @@ frametimes = frametimes[:-1][:lim]
 stimulus = stimulus[:lim]
 
 spikes = asc.binspikes(rawspikes, frametimes)
-
 
 import time
 start = time.time()
@@ -75,11 +75,11 @@ axv = plt.subplot(323)
 axw = plt.subplot(324)
 
 axv.plot(w_out, 'ko')
-eiginds = [0, 1, 19]
+eiginds = [0, 1, l-1]
 for ind, (eigind, w) in enumerate(zip(eiginds, w_out[eiginds])):
     axv.plot(eigind, w, 'o', color=colors[ind])
     axw.plot(v_out[:, eigind], lw=.8, color=colors[ind])
-axw.plot(data['eigvecs_x'][i][::-1, -1], '--',label='STC0')
+axw.plot(data['eigvecs_x'][i][l-1::-1, -1], '--',label='STC0')
 axw.legend(fontsize='x-small')
 
 plt.tight_layout()
