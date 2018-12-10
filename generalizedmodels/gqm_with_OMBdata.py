@@ -37,7 +37,7 @@ lim = 15000
 
 sta = data['stas'][i][0]
 rawspikes = asc.read_raster(exp_name, stim_nr, *clusters[i][:2])[:lim]
-frametimes = frametimes[:lim]
+frametimes = frametimes[:-1][:lim]
 stimulus = stimulus[:lim]
 
 spikes = asc.binspikes(rawspikes, frametimes)
