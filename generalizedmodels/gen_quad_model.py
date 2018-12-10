@@ -9,6 +9,8 @@ from scipy.linalg import hankel, eigh
 from scipy.optimize import minimize
 import analysis_scripts as asc
 
+filter_length = None
+
 #%%
 def conv(k, x):
     return np.convolve(k, x, 'full')[k.shape[0]-1:-k.shape[0]+1]
@@ -109,6 +111,12 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
                            x, time_res, spikes, debug_grad=False):
     kQmu_initial = flattenpars(k_initial, Q_initial, mu_initial)
     x_mini = x[filter_length-1:]
+
+    # Infer the filter length from the shape of the initial guesses and
+    # set it globally so that other functions can also use it.
+    global filter_length
+    if filter_length is None:
+        filter_length = k_initial.shape[0]
     def loglikelihood(kQmu):
         P = gqm_in(*splitpars(kQmu))
         return -(np.sum(spikes*P(x) - time_res*np.sum(np.exp(P(x)))))
@@ -171,11 +179,11 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
 
 
 #%%
-filter_length = 40
 if __name__ == '__main__':
+    filter_length = 10
     frame_rate = 60
     time_res = (1/frame_rate)
-    tstop = 10*60 # in seconds
+    tstop = 100 # in seconds
     t = np.arange(0, tstop, time_res)
     np.random.seed(1221)
 
