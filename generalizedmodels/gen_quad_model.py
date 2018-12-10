@@ -110,13 +110,17 @@ from scipy.optimize import check_grad, approx_fprime
 def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
                            x, time_res, spikes, debug_grad=False):
     kQmu_initial = flattenpars(k_initial, Q_initial, mu_initial)
-    x_mini = x[filter_length-1:]
 
     # Infer the filter length from the shape of the initial guesses and
     # set it globally so that other functions can also use it.
     global filter_length
     if filter_length is None:
         filter_length = k_initial.shape[0]
+    # Trim away the first filter_length elements to align spikes array
+    # with the output of the convolution operations
+    if spikes.shape[0] == x.shape[0]:
+        print('spikes array reshaped while fitting GQM likelihood')
+        spikes = spikes[filter_length-1:]
     def loglikelihood(kQmu):
         P = gqm_in(*splitpars(kQmu))
         return -(np.sum(spikes*P(x) - time_res*np.sum(np.exp(P(x)))))
