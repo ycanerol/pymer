@@ -163,9 +163,6 @@ def minimize_loglhd(k_initial, mu_initial, x, time_res, spikes, usegrad=True,
 
     if usegrad:
         minimizekwargs.update({'jac':grad})
-        if not 'method' in kwargs:
-            # If method is not explicitly stated, set it to Newton-CG
-            minimizekwargs.update({'method':'Newton-CG'})
     if debug_grad:
         from scipy.optimize import check_grad, approx_fprime
         kmu = [*k_initial, mu_initial]
