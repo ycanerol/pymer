@@ -13,7 +13,7 @@ filter_length = None
 
 #%%
 def conv(k, x):
-    return np.convolve(k, x, 'full')[k.shape[0]-1:-k.shape[0]+1]
+    return np.convolve(k, x, 'full')[:-k.shape[0]+1]
 
 
 def conv2d_old(Q, x):
@@ -39,9 +39,9 @@ def conv2d(Q, x, optimize='greedy'):
     l = Q.shape[0]
     # Generate a rolling view of the stimulus wihtout allocating space in memory
     # Equivalent to "xr = hankel(x)[:, :l]" but much more memory efficient
-    xr = asc.rolling_window(x, l)
+    xr = asc.rolling_window(x, l)[:, ::-1]
     # Stack copies of Q along a new axis without copying in memory.
-    Qb = np.broadcast_to(Q, (x.shape[0]-l+1, *Q.shape))
+    Qb = np.broadcast_to(Q, (x.shape[0], *Q.shape))
     return np.einsum('ij,ijk,ki->i', xr, Qb, xr.T, optimize=optimize)
 
 
@@ -119,8 +119,9 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
     # Trim away the first filter_length elements to align spikes array
     # with the output of the convolution operations
     if spikes.shape[0] == x.shape[0]:
-        print('spikes array reshaped while fitting GQM likelihood')
-        spikes = spikes[filter_length-1:]
+#        print('spikes array reshaped while fitting GQM likelihood')
+#        spikes = spikes[filter_length-1:]
+        pass
     def loglikelihood(kQmu):
         P = gqm_in(*splitpars(kQmu))
         return -(np.sum(spikes*P(x) - time_res*np.sum(np.exp(P(x)))))
@@ -130,9 +131,10 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
     # some number for each time bin.
 
 #    xh = hankel(x)[:, :filter_length]
+    xr = asc.rolling_window(x, filter_length)[:, ::-1]
     sTs = np.zeros((spikes.shape[0], filter_length, filter_length))
-    for i in range(spikes.shape[0]):
-        x_temp = x[i:i+filter_length][np.newaxis, :]
+    for i in range(spikes.shape[0]-filter_length):
+        x_temp = x[i:i+filter_length][np.newaxis, ::-1]
         sTs[i, :, :] = np.dot(x_temp.T, x_temp)
 #    import pdb; pdb.set_trace()
 
@@ -148,7 +150,7 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
 #                       time_res*P[i]*s)
 #            dLdq += (spikes[i] * np.outer(s,s) - time_res*P[i] * np.outer(s, s))
 #            dLdmu += spikes[i] - time_res * P[i]
-        dLdk = spikes @ xh - time_res*(P @ xh)
+        dLdk = spikes @ xr - time_res*(P @ xr)
 
         # Using einsum to multiply and sum along the desired axis.
         # more detailed explanation here:
@@ -160,7 +162,7 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
         dL = flattenpars(dLdk, dLdq, dLdmu)
         return -dL
     if debug_grad:
-        eps = 1e-2
+        eps = 1e-1
         ap_grad = approx_fprime(kQmu_initial, loglikelihood, eps)
         man_grad = gradients(kQmu_initial)
         diff = ap_grad - man_grad
@@ -175,16 +177,16 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
         plt.show()
 
 
-    res = minimize(loglikelihood, kQmu_initial, tol=1e-2,
+    res = minimize(loglikelihood, kQmu_initial, tol=1e-1,
                    method='CG',
-#                   jac=gradients,
+                   jac=gradients,
                    options={'disp':True})
     return res
 
 
 #%%
 if __name__ == '__main__':
-    filter_length = 10
+    filter_length = 40
     frame_rate = 60
     time_res = (1/frame_rate)
     tstop = 100 # in seconds

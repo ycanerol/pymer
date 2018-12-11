@@ -146,10 +146,8 @@ def minimize_loglhd(k_initial, mu_initial, x, time_res, spikes, usegrad=True,
     def grad(kmu):
         k_ = np.array(kmu[:-1])
         mu_ = kmu[-1]
-        l = k_.shape[0]
         nlt_in = (conv(k_, x)+mu_)
-        x_zeros = np.concatenate((np.zeros(l-1),x, ))
-        xr = asc.rolling_window(x_zeros, k_.shape[0])[:, ::-1]
+        xr = asc.rolling_window(x, k_.shape[0])[:, ::-1]
         dldk = spikes@xr - time_res*np.exp(nlt_in)@xr
 #        dldk2 = np.zeros(l)
 #        for i in range(len(spikes)):
