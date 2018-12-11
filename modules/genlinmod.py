@@ -91,7 +91,7 @@ def loadstim(exp, stim_nr, maxframenr=10000):
         frame_duration = np.ediff1d(frametimings).mean()
         frametimings = frametimings[:-1]
         if ntotal != frametimings.shape[0]:
-            print(f'For {exp}\nstimulus {iof.getstimname()} :\n'
+            print(f'For {exp}\nstimulus {iof.getstimname(exp, stim_nr)} :\n'
                   f'Number of frames specified in the parameters file ({ntotal}'
                   f' frames) and frametimings ({frametimings.shape[0]}) do not'
                   ' agree!'
