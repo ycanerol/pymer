@@ -158,21 +158,37 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
         dLdq = (np.einsum('ijk,i->jk', sTs, spikes)
                 - time_res*np.einsum('ijk,i->jk', sTs, P))
         dLdmu = spikes.sum() - time_res*np.sum(P)
-#        importc pdb; pdb.set_trace()
+#        import pdb; pdb.set_trace()
         dL = flattenpars(dLdk, dLdq, dLdmu)
         return -dL
     if debug_grad:
         eps = 1e-1
         ap_grad = approx_fprime(kQmu_initial, loglikelihood, eps)
         man_grad = gradients(kQmu_initial)
+        kda, qda, muda = splitpars(ap_grad)
+        kdm, qdm, mudm = splitpars(man_grad)
         diff = ap_grad - man_grad
         k_diff, Q_diff, mu_diff = splitpars(diff)
         print('Gradient diff L2 norm', np.sum(diff**2))
-        axk = plt.subplot(121)
-        axk.plot(k_diff, 'k')
-        axq = plt.subplot(122)
-        im = axq.imshow(Q_diff)
-        plt.colorbar(im)
+        plt.figure(figsize=(7, 10))
+        axk = plt.subplot(411)
+        axk.plot(kda, label='Auto grad')
+        axk.plot(kdm, label='Manual grad')
+        axk.legend()
+        axkdif = plt.subplot(412)
+        axkdif.plot(k_diff, 'k', label='auto - manual gradient')
+        axkdif.legend()
+        axqa = plt.subplot(425)
+        imqa = axqa.imshow(qda)
+        axqa.set_title('Auto grad Q')
+        plt.colorbar(imqa)
+        axqm = plt.subplot(426)
+        axqm.set_title('Manual grad Q')
+        imqm = axqm.imshow(qdm)
+        plt.colorbar(imqm)
+        axqdif = plt.subplot(427)
+        imqdif = axqdif.imshow(Q_diff)
+        plt.colorbar(imqdif)
         plt.suptitle(f'Difference of numerical and explicit gradients, mu_diff: {mu_diff:11.2f}')
         plt.show()
 
@@ -214,7 +230,8 @@ if __name__ == '__main__':
     import time
     start = time.time()
     #res = minimize_loglikelihood(k_in, Q_in, mu_in, stim, time_res, spikes)
-    res = minimize_loglikelihood(np.zeros(k_in.shape), np.zeros(Q_in.shape), 0, stim, time_res, spikes)
+    res = minimize_loglikelihood(np.zeros(k_in.shape), np.zeros(Q_in.shape), 0,
+                                 stim, time_res, spikes, debug_grad=True)
     elapsed = time.time()-start
     print(f'Time elapsed: {elapsed/60:6.1f} mins')
 

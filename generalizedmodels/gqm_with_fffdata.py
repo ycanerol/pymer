@@ -40,7 +40,7 @@ spikes = asc.binspikes(rawspikes, frametimes)
 import time
 start = time.time()
 res = gqm.minimize_loglikelihood(np.zeros(l), np.zeros((l, l)), 0,
-                                 stimulus, 1/refresh_rate, spikes)
+                                 stimulus, 1/refresh_rate, spikes, debug_grad=True)
 elapsed = time.time()-start
 
 print(f'Time elapsed: {elapsed/60:6.1f} mins')
