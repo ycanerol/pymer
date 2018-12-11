@@ -52,7 +52,8 @@ for i, cluster in enumerate(clusters):
     spikes = asc.read_raster(exp_name, stim_nr, *cluster)
     spikes = asc.binspikes(spikes, frametimes)
 
-    res = glm.minimize_loglhd(np.zeros(sta.shape), 0, stimulus, frame_dur, spikes)
+    res = glm.minimize_loglhd(np.zeros(sta.shape), 0, stimulus,
+                              frame_dur, spikes)
     #%%
     k_pred = res['x'][:-1]
     mu_pred = res['x'][-1]

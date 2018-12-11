@@ -115,6 +115,7 @@ def conv(k, x):
     # Using 'same' as the mode results in the estimated filter to be
     # half a filter length later in time. So we convolve in full mode
     # and truncate the end.
+    k = np.array(k)
     return np.convolve(k, x, 'full')[:-k.shape[0]+1]
 
 
@@ -128,11 +129,12 @@ def glm_fr(k, mu):
 
 
 def minimize_loglhd(k_initial, mu_initial, x, time_res, spikes, usegrad=True,
-                    **kwargs):
+                    debug_grad=False, **kwargs):
 
     minimizekwargs = {'method':'CG',
-                      'tol':1e-2,
-                      'options':{'disp':True}}
+                      'tol':1e-1,
+#                      'options':{'disp':True},
+                      }
     minimizekwargs.update(**kwargs)
 
     def loglhd(kmu):
@@ -142,12 +144,34 @@ def minimize_loglhd(k_initial, mu_initial, x, time_res, spikes, usegrad=True,
         return -np.sum(spikes * nlt_in) + time_res*np.sum(np.exp(nlt_in))
 
     def grad(kmu):
-
-        return None
+        k_ = np.array(kmu[:-1])
+        mu_ = kmu[-1]
+        l = k_.shape[0]
+        nlt_in = (conv(k_, x)+mu_)
+        x_zeros = np.concatenate((np.zeros(l-1),x, ))
+        xr = asc.rolling_window(x_zeros, k_.shape[0])[:, ::-1]
+        dldk = spikes@xr - time_res*np.exp(nlt_in)@xr
+#        dldk2 = np.zeros(l)
+#        for i in range(len(spikes)):
+#            dldk2 += spikes[i] * xr[i, :]
+#            dldk2 -= time_res*np.exp(nlt_in[i])*xr[i, :]
+#        assert np.isclose(dldk, dldk2).all()
+#        import pdb; pdb.set_trace()
+        dldm = spikes.sum() - time_res*nlt_in.sum()
+        dl = -np.array([*dldk, dldm])
+        return dl
 
     if usegrad:
         minimizekwargs.update({'jac':grad})
-
+        if not 'method' in kwargs:
+            # If method is not explicitly stated, set it to Newton-CG
+            minimizekwargs.update({'method':'Newton-CG'})
+    if debug_grad:
+        from scipy.optimize import check_grad, approx_fprime
+        kmu = [*k_initial, mu_initial]
+        auto = lambda a: approx_fprime(a, loglhd, 1e-2)
+        manu = lambda a: grad(a)
+        return auto, manu
     res = minimize(loglhd, [*k_initial, mu_initial], **minimizekwargs)
 
     return res
