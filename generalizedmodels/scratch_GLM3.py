@@ -47,6 +47,18 @@ res = glm.minimize_loglhd(k_guess, mu_guess, x, time_res, spikes,
 #%
 if not debug_grad:
     k_res, mu_res = res['x'][:-1], res['x'][-1]
+    fig2, axes2 = plt.subplots(1, 1)
+    [axk] = np.array([axes2]).ravel()
+    axk.plot(t[:filter_length], k_real, label='Real filter')
+    #axk.plot(t[:filter_length], k_res/np.abs(k_res).max(), label='Predicted')
+    axk.plot(t[:filter_length], k_res, label='Predicted')
+    axk.set_xlabel('Time[s]')
+    axk.legend()
+    print(f'mu_real: {mu_real:4.2f}\nmu_res: {mu_res:4.2f}')
+    plf.spineless(axes2, 'tr')
+    #plt.savefig('/media/owncloud/20181105_meeting_files/GLMsimulated_filter.pdf',
+    #            bbox_inches='tight')
+    plt.show()
 else:
     auto, manu = res
     kmu = [*k_real, mu_real]
@@ -54,18 +66,4 @@ else:
     plt.plot(manu(kmu), label='manu')
     plt.legend()
     plt.title('Gradients')
-
-
-#%%
-fig2, axes2 = plt.subplots(1, 1)
-[axk] = np.array([axes2]).ravel()
-axk.plot(t[:filter_length], k_real, label='Real filter')
-#axk.plot(t[:filter_length], k_res/np.abs(k_res).max(), label='Predicted')
-axk.plot(t[:filter_length], k_res, label='Predicted')
-axk.set_xlabel('Time[s]')
-axk.legend()
-print(f'mu_real: {mu_real:4.2f}\nmu_res: {mu_res:4.2f}')
-plf.spineless(axes2, 'tr')
-#plt.savefig('/media/owncloud/20181105_meeting_files/GLMsimulated_filter.pdf',
-#            bbox_inches='tight')
-plt.show()
+    plt.show()
