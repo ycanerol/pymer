@@ -136,8 +136,9 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
     xr = asc.rolling_window(x, filter_length)[:, ::-1]
     sTs = np.zeros((spikes.shape[0], filter_length, filter_length))
     for i in range(spikes.shape[0]-filter_length):
-        x_temp = x[i:i+filter_length][np.newaxis, ::-1]
-        sTs[i, :, :] = np.dot(x_temp.T, x_temp)
+#        x_temp = x[i:i+filter_length][np.newaxis,:]
+        x_temp = xr[i, :]
+        sTs[i, :, :] = np.outer(x_temp, x_temp)
 #    import pdb; pdb.set_trace()
 
     def gradients(kQmu):
