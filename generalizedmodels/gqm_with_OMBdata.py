@@ -43,10 +43,16 @@ stimulus = stimulus[:lim]
 
 spikes = asc.binspikes(rawspikes, frametimes)
 
+usegrad = False
+debug_grad = True
+
+
 import time
 start = time.time()
 res = gqm.minimize_loglikelihood(np.zeros(l), np.zeros((l, l)), 0,
-                                 stimulus, 1/refresh_rate, spikes)
+                                 stimulus, 1/refresh_rate, spikes,
+                                 usegrad=usegrad, debug_grad=debug_grad,
+                                 minimize_disp=True)
 elapsed = time.time()-start
 
 print(f'Time elapsed: {elapsed/60:6.1f} mins')
@@ -83,6 +89,6 @@ axw.plot(data['eigvecs_x'][i][l-1::-1, -1], '--',label='STC0')
 axw.legend(fontsize='x-small')
 
 plt.tight_layout()
-plt.savefig(savepath+'gqm_omb.pdf', bbox_inches = 'tight', pad_inches = 0.3)
-plt.savefig(savepath+'gqm_omb.png', bbox_inches = 'tight', pad_inches = 0.3)
+#plt.savefig(savepath+'gqm_omb.pdf', bbox_inches = 'tight', pad_inches = 0.3)
+#plt.savefig(savepath+'gqm_omb.png', bbox_inches = 'tight', pad_inches = 0.3)
 plt.show()

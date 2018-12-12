@@ -37,10 +37,14 @@ frametimes = frametimes[:lim]
 stimulus = stimulus[:lim]
 spikes = asc.binspikes(rawspikes, frametimes)
 
+usegrad = True
+debug_grad = True
+
 import time
 start = time.time()
 res = gqm.minimize_loglikelihood(np.zeros(l), np.zeros((l, l)), 0,
-                                 stimulus, 1/refresh_rate, spikes, debug_grad=True)
+                                 stimulus, 1/refresh_rate, spikes,
+                                 debug_grad=debug_grad, usegrad=usegrad)
 elapsed = time.time()-start
 
 print(f'Time elapsed: {elapsed/60:6.1f} mins')
@@ -81,10 +85,10 @@ eiginds = [0, 1, l-2, l-1]
 for ind, (eigind, w) in enumerate(zip(eiginds, w_out[eiginds])):
     axv.plot(eigind, w, 'o', color=colors[ind])
     axw.plot(v_out[-k_plotlim:, eigind], lw=1, color=colors[ind])
-axw.plot(sta[l-1::-1], '--', label='STA')
+axw.plot(sta[:l-1], '--', label='STA')
 #axw.plot(k_out[k_plotlim::-1], '--')
 
-axw.plot(data['eigvecs'][i][l-1::-1, -1], '--', label='STC0')
+axw.plot(data['eigvecs'][i][:l-1, -1], '--', label='STC0')
 axw.legend(fontsize='x-small')
 
 plt.tight_layout()
