@@ -26,7 +26,7 @@ frametimes = asc.ft_nblinks(exp_name, stim_nr)[1]
 filter_length = l = data['filter_length']
 refresh_rate = asc.read_spikesheet(exp_name)[1]['refresh_rate']
 
-l = 10  # Manually trim to speed up
+l = 20  # Manually trim to speed up
 
 i = 2
 lim = None
@@ -39,12 +39,14 @@ spikes = asc.binspikes(rawspikes, frametimes)
 
 usegrad = True
 debug_grad = True
+method = 'Newton-CG'
 
 import time
 start = time.time()
 res = gqm.minimize_loglikelihood(np.zeros(l), np.zeros((l, l)), 0,
                                  stimulus, 1/refresh_rate, spikes,
-                                 debug_grad=debug_grad, usegrad=usegrad)
+                                 debug_grad=debug_grad, usegrad=usegrad,
+                                 method=method)
 elapsed = time.time()-start
 
 print(f'Time elapsed: {elapsed/60:6.1f} mins')

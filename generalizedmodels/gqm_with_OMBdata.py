@@ -30,8 +30,8 @@ _, frametimes = asc.ft_nblinks(exp_name, stim_nr, parameters.get('Nblinks', 2))
 filter_length = l = data['filter_length']
 refresh_rate = asc.read_spikesheet(exp_name)[1]['refresh_rate']
 
-i = 2
-l = 10
+i = 0
+l = 20
 
 # Limit the amount of data that will be loaded
 lim = None
@@ -45,6 +45,7 @@ spikes = asc.binspikes(rawspikes, frametimes)
 
 usegrad = False
 debug_grad = True
+method = 'CG'
 
 
 import time
@@ -52,7 +53,7 @@ start = time.time()
 res = gqm.minimize_loglikelihood(np.zeros(l), np.zeros((l, l)), 0,
                                  stimulus, 1/refresh_rate, spikes,
                                  usegrad=usegrad, debug_grad=debug_grad,
-                                 minimize_disp=True)
+                                 minimize_disp=True, method=method)
 elapsed = time.time()-start
 
 print(f'Time elapsed: {elapsed/60:6.1f} mins')
