@@ -37,9 +37,9 @@ frametimes = frametimes[:lim]
 stimulus = stimulus[:lim]
 spikes = asc.binspikes(rawspikes, frametimes)
 
-usegrad = True
+usegrad = False
 debug_grad = True
-method = 'Newton-CG'
+method = 'CG'
 
 import time
 start = time.time()

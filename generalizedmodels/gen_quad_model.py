@@ -140,7 +140,9 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
         x_temp = xr[i, :]
         sTs[i, :, :] = np.outer(x_temp, x_temp)
 #    import pdb; pdb.set_trace()
-
+    # Stimulus length in seconds, found this empirically.
+    k_correction = x.shape[0]*time_res*x.sum()
+    mu_correction = x.shape[0]**2*time_res
     def gradients(kQmu):
         k, Q, mu = splitpars(kQmu)
         P = np.exp(gqm_in(k, Q, mu)(x))
@@ -154,14 +156,16 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
 #            dLdq += (spikes[i] * np.outer(s,s) - time_res*P[i] * np.outer(s, s))
 #            dLdmu += spikes[i] - time_res * P[i]
         dLdk = spikes @ xr - time_res*(P @ xr)
-
+        dLdk -= k_correction
         # Using einsum to multiply and sum along the desired axis.
         # more detailed explanation here:
         # https://stackoverflow.com/questions/26089893/understanding-numpys-einsum
         dLdq = (np.einsum('ijk,i->jk', sTs, spikes)
                 - time_res*np.einsum('ijk,i->jk', sTs, P))
         dLdmu = spikes.sum() - time_res*np.sum(P)
+        dLdmu -= mu_correction
 #        import pdb; pdb.set_trace()
+
         dL = flattenpars(dLdk, dLdq, dLdmu)
         return -dL
     if debug_grad:
@@ -212,9 +216,10 @@ if __name__ == '__main__':
     filter_length = 40
     frame_rate = 60
     time_res = (1/frame_rate)
-    tstop = 100 # in seconds
+    tstop = 50 # in seconds
     t = np.arange(0, tstop, time_res)
-    np.random.seed(1221)
+#    np.random.seed(12221)
+    np.random.seed(45212) # sum is 0.01 for tstop=500
 
     stim = np.random.normal(size=t.shape)*.2
 
