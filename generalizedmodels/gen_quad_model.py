@@ -124,9 +124,10 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
 #        print('spikes array reshaped while fitting GQM likelihood')
 #        spikes = spikes[filter_length-1:]
         pass
+    N = x.shape[0]
     def loglikelihood(kQmu):
         P = gqm_in(*splitpars(kQmu))
-        return -(np.sum(spikes*P(x) - time_res*np.sum(np.exp(P(x)))))
+        return -(np.sum(spikes*P(x) - time_res*np.sum(np.exp(P(x)))))/N
     # Instead of iterating over each time bin, generate a hankel matrix
     # from the stimulus vector and operate on that using matrix
     # multiplication like so: X @ xh , where X is a vector containing
@@ -158,16 +159,16 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
 #                       time_res*P[i]*s)
 #            dLdq += (spikes[i] * np.outer(s,s) - time_res*P[i] * np.outer(s, s))
 #            dLdmu += spikes[i] - time_res * P[i]
-        dLdk = spikes @ xr - time_res*(P @ xr)
-        dLdk -= k_correction
+        dLdk = (spikes @ xr - time_res*(P @ xr))/N
+#        dLdk -= k_correction
         # Using einsum to multiply and sum along the desired axis.
         # more detailed explanation here:
         # https://stackoverflow.com/questions/26089893/understanding-numpys-einsum
         dLdq = (np.einsum('ijk,i->jk', sTs, spikes)
                 - time_res*np.einsum('ijk,i->jk', sTs, P))
-        dLdq -= q_correction
-        dLdmu = spikes.sum() - time_res*np.sum(P)
-        dLdmu -= mu_correction
+#        dLdq -= q_correction
+        dLdmu = (spikes.sum() - time_res*np.sum(P))/N
+#        dLdmu -= mu_correction
 #        import pdb; pdb.set_trace()
 
         dL = flattenpars(dLdk, dLdq, dLdmu)
