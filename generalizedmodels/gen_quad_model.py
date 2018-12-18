@@ -141,6 +141,10 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
         sTs[i, :, :] = np.outer(x_temp, x_temp)
     # Stimulus length in seconds, found this empirically.
     k_correction = x.shape[0]*time_res*xr.sum(axis=0)
+    plt.plot(np.diag(sTs.sum(axis=0)));plt.title('diag(sTs.sum(axis=0))');plt.show()
+#    import pdb; pdb.set_trace()
+#    q_correction = x.shape[0]*time_res*sTs.sum(axis=0) + np.eye(filter_length)*x.shape[0]
+    q_correction = x.shape[0]*time_res*sTs.sum(axis=0) + np.diag(sTs.sum(axis=0))
     mu_correction = (x.shape[0]-1) * x.shape[0]*time_res
     def gradients(kQmu):
         k, Q, mu = splitpars(kQmu)
@@ -161,6 +165,7 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
         # https://stackoverflow.com/questions/26089893/understanding-numpys-einsum
         dLdq = (np.einsum('ijk,i->jk', sTs, spikes)
                 - time_res*np.einsum('ijk,i->jk', sTs, P))
+        dLdq -= q_correction
         dLdmu = spikes.sum() - time_res*np.sum(P)
         dLdmu -= mu_correction
 #        import pdb; pdb.set_trace()
@@ -220,13 +225,14 @@ if __name__ == '__main__':
     np.random.seed(12221)
 #    np.random.seed(45212) # sum is 0.01 for tstop=500
 
-    stim = np.random.normal(size=t.shape)*.2
+    stim = np.random.normal(size=t.shape)
 
     tmini = t[:filter_length]
 
     mu_in = .01
-    k_in = np.exp(-(tmini-0.12)**2/.002)
+    k_in = np.exp(-(tmini-0.12)**2/.002)*.2
     Q_in, Qks, Qws = makeQ2(tmini)
+    Q_in *= .01
 
     #Q_in = np.zeros(Q_in.shape)
 
@@ -283,6 +289,17 @@ if __name__ == '__main__':
         kda, qda, mda, kdm, qdm, mdm = res
 
         def remdiag(q): return q-np.diag(np.diag(q))
+
+        qdad = np.diag(qda)
+        qdmd = np.diag(qdm)
+        plt.plot(qdad, label='diag(auto Qd)')
+        plt.plot(qdmd, label='diag(manu Qd)')
+        plt.legend(fontsize='x-small')
+        plt.show()
+
+        plt.title('diag(auto Qd- manu Qd)')
+        plt.plot(qdad-qdmd)
+        plt.show()
 
         plt.imshow(remdiag(qda))
         plt.title('Auto grad without diagonal')
