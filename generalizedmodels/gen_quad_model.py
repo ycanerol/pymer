@@ -139,10 +139,9 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
 #        x_temp = x[i:i+filter_length][np.newaxis,:]
         x_temp = xr[i, :]
         sTs[i, :, :] = np.outer(x_temp, x_temp)
-#    import pdb; pdb.set_trace()
     # Stimulus length in seconds, found this empirically.
-    k_correction = x.shape[0]*time_res*x.sum()
-    mu_correction = x.shape[0]**2*time_res
+    k_correction = x.shape[0]*time_res*xr.sum(axis=0)
+    mu_correction = (x.shape[0]-1) * x.shape[0]*time_res
     def gradients(kQmu):
         k, Q, mu = splitpars(kQmu)
         P = np.exp(gqm_in(k, Q, mu)(x))
@@ -216,10 +215,10 @@ if __name__ == '__main__':
     filter_length = 40
     frame_rate = 60
     time_res = (1/frame_rate)
-    tstop = 50 # in seconds
+    tstop = 100 # in seconds
     t = np.arange(0, tstop, time_res)
-#    np.random.seed(12221)
-    np.random.seed(45212) # sum is 0.01 for tstop=500
+    np.random.seed(12221)
+#    np.random.seed(45212) # sum is 0.01 for tstop=500
 
     stim = np.random.normal(size=t.shape)*.2
 
