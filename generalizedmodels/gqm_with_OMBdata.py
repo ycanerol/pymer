@@ -43,6 +43,8 @@ stimulus = stimulus[:lim]
 
 spikes = asc.binspikes(rawspikes, frametimes)
 
+bin_length = np.ediff1d(frametimes).mean()
+
 usegrad = False
 debug_grad = True
 method = 'CG'
@@ -51,7 +53,7 @@ method = 'CG'
 import time
 start = time.time()
 res = gqm.minimize_loglikelihood(np.zeros(l), np.zeros((l, l)), 0,
-                                 stimulus, 1/refresh_rate, spikes,
+                                 stimulus, bin_length, spikes,
                                  usegrad=usegrad, debug_grad=debug_grad,
                                  minimize_disp=True, method=method)
 elapsed = time.time()-start
