@@ -675,10 +675,18 @@ def rolling_window(a, window, preserve_dim=True):
 
     Notes
     -------
-    Equivalent to
+    A similar (but memory inefficient) way of achieving the same thing
+    would be using a hankel matrix. The difference is that hankel matrix
+    will be zero padded at the end.
 
+    >>> import numpy as np
     >>> from scipy.linalg import hankel
-    >>> res = hankel(a)[:, :window]
+    >>> a = np.random.random(size=10000)
+    >>> window = 50
+    >>> h = hankel(a)[:, :window]
+    >>> r = rolling_window(a, window, preserve_dim=True)
+    >>> np.isclose(r[window-1:, :], h[:-window+1, :]).all()
+    True
 
     where ``a`` is a 1D numpy array containing values for the stimulus.
 
