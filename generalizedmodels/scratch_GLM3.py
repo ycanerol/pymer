@@ -44,7 +44,7 @@ mu_guess = spikes.mean()*time_res
 
 #%%
 debug_grad = False
-usegrad = True
+usegrad = False
 method = None
 
 res = glm.minimize_loglhd(k_guess, mu_guess, x, time_res, spikes,
@@ -67,8 +67,9 @@ if not debug_grad:
     axk.legend()
     axk.text(.8, .6, f'mu_real: {mu_real:4.2f}\nmu_res: {mu_res:4.2f}',
              transform=axk.transAxes)
-    axk.text(.98, .7, f'ratetimesdelta: {ratetimesdelta:}\nusegrad: {usegrad:}',
+    axk.text(.98, .7, f'r(t)*Δ: {ratetimesdelta:} \n usegrad: {usegrad:}',
              transform=axk.transAxes, ha='right')
+    axk.set_ylim([-.8, 1.1])
     plf.spineless(axes2, 'tr')
     #plt.savefig('/media/owncloud/20181105_meeting_files/GLMsimulated_filter.pdf',
     #            bbox_inches='tight')
