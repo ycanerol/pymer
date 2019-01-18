@@ -185,8 +185,8 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
     k_correction = x.shape[0]*time_res*xr.sum(axis=0)
     plt.plot(np.diag(sTs.sum(axis=0)));plt.title('diag(sTs.sum(axis=0))');plt.show()
 #    import pdb; pdb.set_trace()
-#    q_correction = x.shape[0]*time_res*sTs.sum(axis=0) + np.eye(filter_length)*x.shape[0]
-    q_correction = x.shape[0]*time_res*sTs.sum(axis=0) + np.diag(sTs.sum(axis=0))
+    q_correction = x.shape[0]*time_res*sTs.sum(axis=0) + np.eye(filter_length)*x.shape[0]
+#    q_correction = x.shape[0]*time_res*sTs.sum(axis=0) + np.diag(sTs.sum(axis=0))
     mu_correction = (x.shape[0]-1) * x.shape[0]*time_res
     def gradients(kQmu):
         """
@@ -268,7 +268,7 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
 #%%
 # If the script is being imported from elsewhere to use the functions, do not run the simulation
 if __name__ == '__main__':
-    filter_length = 40
+    filter_length = 20
     frame_rate = 60
     time_res = (1/frame_rate)
     tstop = 100 # simulation length in seconds
@@ -320,18 +320,20 @@ if __name__ == '__main__':
         axk.plot(k_out, label='k_out')
         axk.legend()
 
-        axk.text(filter_length*.8, 0.5,
-                 f'mu_in:  {mu_in:4.2f}\nmu_out: {mu_out:4.2f}')
+        axk.text(.8, .2,
+                 'mu_in:  {:4.2f}\nmu_out: {:4.2f}'.format(mu_in, mu_out),
+                 transform=axk.transAxes)
 
         axq1 = plt.subplot(223)
         axq2 = plt.subplot(224)
-        axq1.imshow(Q_in)
-        axq2.imshow(Q_out)
+        imq1 = axq1.imshow(Q_in)
+        plt.colorbar(imq1, ax=axq1, format='%.0e')
+        imq2 = axq2.imshow(Q_out)
+        plt.colorbar(imq2, ax=axq2, format='%.0e')
         savepath= '/home/ycan/Documents/meeting_notes/2018-12-05/'
         #plt.savefig(savepath+'simulatedsuccess.pdf')
         #plt.savefig(savepath+'simulatedsuccess.png')
         plt.show()
-
 
         w_in, v_in = eigh(Q_in)
         w_out, v_out = eigh(Q_out)
