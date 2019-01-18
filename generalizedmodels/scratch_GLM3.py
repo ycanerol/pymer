@@ -32,7 +32,9 @@ x = np.random.normal(size=t.shape)
 
 # Calculate the firing rate and spikes of the neuron given the stimulus
 rate = f(x)
-#rate *= time_res
+ratetimesdelta = True
+if ratetimesdelta:
+    rate *= time_res
 spikes = np.random.poisson(rate)
 
 np.random.seed()
@@ -63,7 +65,10 @@ if not debug_grad:
     axk.plot(t[:filter_length], k_res, label='Predicted')
     axk.set_xlabel('Time[s]')
     axk.legend()
-    print(f'mu_real: {mu_real:4.2f}\nmu_res: {mu_res:4.2f}')
+    axk.text(.8, .6, f'mu_real: {mu_real:4.2f}\nmu_res: {mu_res:4.2f}',
+             transform=axk.transAxes)
+    axk.text(.98, .7, f'ratetimesdelta: {ratetimesdelta:}\nusegrad: {usegrad:}',
+             transform=axk.transAxes, ha='right')
     plf.spineless(axes2, 'tr')
     #plt.savefig('/media/owncloud/20181105_meeting_files/GLMsimulated_filter.pdf',
     #            bbox_inches='tight')
