@@ -48,7 +48,9 @@ for i, cluster in enumerate(clusters):
         spikes = asc.binspikes(spikes, frametimes)
 
         res = glm.minimize_loglhd(stas[i, j, :], 0, stimulus[j, :],
-                                  frame_dur, spikes)
+                                  frame_dur, spikes,
+                                  usegrad=False,
+                                  method='CG')
         k_pred = res['x'][:-1]
         mu_pred = res['x'][-1]
 

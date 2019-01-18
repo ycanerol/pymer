@@ -129,12 +129,12 @@ def glm_fr(k, mu):
 
 
 def minimize_loglhd(k_initial, mu_initial, x, time_res, spikes, usegrad=True,
-                    debug_grad=False, **kwargs):
+                    debug_grad=False, method='Newton-CG', **kwargs):
 
-    minimizekwargs = {'method':'CG',
+    minimizekwargs = {'method':method,
                       'tol':1e-1,
 #                      'options':{'disp':True},
-                      }
+                     }
     minimizekwargs.update(**kwargs)
 
     def loglhd(kmu):
@@ -177,4 +177,3 @@ def normalizestas(stas):
     b = np.abs(stas).max(axis=1)
     stas_normalized = stas / b.repeat(stas.shape[1]).reshape(stas.shape)
     return stas_normalized
-

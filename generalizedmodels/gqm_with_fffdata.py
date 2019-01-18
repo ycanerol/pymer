@@ -56,7 +56,7 @@ print(f'Time elapsed: {elapsed/60:6.1f} mins')
 if not debug_grad:
     k_out, Q_out, mu_out = gqm.splitpars(res.x)
 
-    savepath = '/home/ycan/Documents/meeting_notes/2018-12-05/'
+#    savepath = '/home/ycan/Documents/meeting_notes/2018-12-05/'
 
 
     fig = plt.figure(figsize=(7,5))

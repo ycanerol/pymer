@@ -23,7 +23,8 @@ np.random.seed(1221)
 
 # Initialize model neuron
 k_real = np.exp(-(t[:filter_length]-.14)**2/.002)-np.exp(-(t[:filter_length]-.17)**2/.001)
-mu_real = 5
+#k_real *= .5
+mu_real = .01
 f = glm.glm_fr(k_real, mu_real)
 
 # Generate stimulus
@@ -31,6 +32,7 @@ x = np.random.normal(size=t.shape)
 
 # Calculate the firing rate and spikes of the neuron given the stimulus
 rate = f(x)
+#rate *= time_res
 spikes = np.random.poisson(rate)
 
 np.random.seed()
@@ -40,11 +42,18 @@ mu_guess = spikes.mean()*time_res
 
 #%%
 debug_grad = False
+usegrad = True
+method = None
+
 res = glm.minimize_loglhd(k_guess, mu_guess, x, time_res, spikes,
-                          usegrad=True,
+                          usegrad=usegrad,
                           debug_grad=debug_grad,
-                          )
-#%
+                          method=method,
+                          options={'disp':True},
+                          tol=1e-1,
+                         )
+
+#%%
 if not debug_grad:
     k_res, mu_res = res['x'][:-1], res['x'][-1]
     fig2, axes2 = plt.subplots(1, 1)
