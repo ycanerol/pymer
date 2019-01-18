@@ -17,6 +17,9 @@ def conv(k, x):
 
 
 def conv2d_old(Q, x):
+    """
+    Calculate the quadratic form. Equivalent to con2d(), but slower.
+    """
     l = Q.shape[0]
     out = np.zeros((x.shape[0]-l+1))
     for i in range(x.shape[0]-l+1):
@@ -43,6 +46,7 @@ def conv2d(Q, x, optimize='greedy'):
     # Stack copies of Q along a new axis without copying in memory.
     Qb = np.broadcast_to(Q, (x.shape[0], *Q.shape))
     return np.einsum('ij,ijk,ki->i', xr, Qb, xr.T, optimize=optimize)
+#    return 0
 
 
 #%%
@@ -74,19 +78,25 @@ def gqm_in(k, Q, mu):
     Given a set of parameters,
     calculates the time series that go into exponential function
     """
-#    k, Q, mu = splitpars(kQmu)
     def f(x):
         return conv(k, x) + conv2d(Q, x) + mu
     return f
 
 
 def gqm_neuron(k, Q, mu):
+    """
+    Given a set of filters, return the firing rate of a neuron that would respond
+    to a stimulus
+    """
     def fr(x):
         return np.exp(gqm_in(k, Q, mu)(x))
     return fr
 
 
 def makeQ(t):
+    """
+    Quadratic filter example
+    """
     x, y = np.meshgrid(t, t)
     Q = (-(x-0.18)**2/205) + (-(y-0.4)**2/415)
     return Q
@@ -94,6 +104,9 @@ def makeQ(t):
 
 #%%
 def makeQ2(t):
+    """
+    Quadratic filter example 2
+    """
     k1 = np.exp(-(t-0.12)**2/.0052)
     k2 = np.exp(-(t-.17)**2/.0023)-np.exp(-(t-.27)**2/.01)
     k3 = np.exp(-(t-0.32)**2/.004)
@@ -111,6 +124,33 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
                            x, time_res, spikes, debug_grad=False,
                            usegrad=True, method='CG', minimize_disp=False,
                            **kwargs):
+    """
+    Calculate the filters that minimize the log likelihood function for a
+    given set of spikes and stimulus.
+
+    Parameters
+    --------
+    k_initial, Q_initial, mu_initial:
+        Initial guesses for the parameters.
+    x:
+        The stimulus
+    time_res:
+        Length of each bin (reffered also as Delta)
+    spikes:
+        Binned spikes, must have the same shape as the stimulus
+    debug_grad:
+        Whether to calculate and plot the gradients in the first iteration
+        Setting it to True will change the returned values.
+    usegrad:
+        Whether to use gradients for optimiziation. If set to False, only
+        approximated gradients will be used with the appropriate optimization
+        method.
+    method:
+        Optimization method to use, see the Notes section in the  documentation of
+        scipy.minimize for a full list.
+    minimize_disp:
+        Whether to print the convergence messages of the optimization function
+    """
     kQmu_initial = flattenpars(k_initial, Q_initial, mu_initial)
 
     # Infer the filter length from the shape of the initial guesses and
@@ -118,13 +158,12 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
     global filter_length
     if filter_length is None:
         filter_length = k_initial.shape[0]
-    # Trim away the first filter_length elements to align spikes array
-    # with the output of the convolution operations
-    if spikes.shape[0] == x.shape[0]:
-#        print('spikes array reshaped while fitting GQM likelihood')
-#        spikes = spikes[filter_length-1:]
-        pass
+
     def loglikelihood(kQmu):
+        """
+        Define the likelihood function for GQM
+        """
+        # Star before an argument expands (or unpacks) the values
         P = gqm_in(*splitpars(kQmu))
         return -(np.sum(spikes*P(x) - time_res*np.sum(np.exp(P(x)))))
     # Instead of iterating over each time bin, generate a hankel matrix
@@ -133,13 +172,16 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
     # some number for each time bin.
 
 #    xh = hankel(x)[:, :filter_length]
+    # Instead of iterating over each time bin, use the rolling window function
+    # The expression in the brackets inverts the array.
     xr = asc.rolling_window(x, filter_length)[:, ::-1]
+    # Initialize a 3D numpy array to keep outer products
     sTs = np.zeros((spikes.shape[0], filter_length, filter_length))
     for i in range(spikes.shape[0]-filter_length):
 #        x_temp = x[i:i+filter_length][np.newaxis,:]
         x_temp = xr[i, :]
         sTs[i, :, :] = np.outer(x_temp, x_temp)
-    # Stimulus length in seconds, found this empirically.
+    # Empirically found correction terms for the gradients.
     k_correction = x.shape[0]*time_res*xr.sum(axis=0)
     plt.plot(np.diag(sTs.sum(axis=0)));plt.title('diag(sTs.sum(axis=0))');plt.show()
 #    import pdb; pdb.set_trace()
@@ -147,8 +189,12 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
     q_correction = x.shape[0]*time_res*sTs.sum(axis=0) + np.diag(sTs.sum(axis=0))
     mu_correction = (x.shape[0]-1) * x.shape[0]*time_res
     def gradients(kQmu):
+        """
+        Calculate gradients for the log-likelihood function
+        """
         k, Q, mu = splitpars(kQmu)
         P = np.exp(gqm_in(k, Q, mu)(x))
+#        Slow way of calculating the gradients
 #        dLdk = np.zeros(k.shape)
 #        dLdq = np.zeros(Q.shape)
 #        dLdmu = 0
@@ -158,6 +204,7 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
 #                       time_res*P[i]*s)
 #            dLdq += (spikes[i] * np.outer(s,s) - time_res*P[i] * np.outer(s, s))
 #            dLdmu += spikes[i] - time_res * P[i]
+        # Fast way of calculating gradients using rolling window and einsum
         dLdk = spikes @ xr - time_res*(P @ xr)
         dLdk -= k_correction
         # Using einsum to multiply and sum along the desired axis.
@@ -173,9 +220,11 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
         dL = flattenpars(dLdk, dLdq, dLdmu)
         return -dL
     if debug_grad:
+        # Epsilon value to use when approximating the gradient
         eps = 1e-10
         ap_grad = approx_fprime(kQmu_initial, loglikelihood, eps)
         man_grad = gradients(kQmu_initial)
+        # Split the auto and manual gradients into k, q and mu
         kda, qda, mda = splitpars(ap_grad)
         kdm, qdm, mdm = splitpars(man_grad)
         diff = ap_grad - man_grad
@@ -204,7 +253,8 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
         plt.show()
 #        import pdb; pdb.set_trace();
         return kda, qda, mda, kdm, qdm, mdm
-
+#     If debug_grad is True, the function returns on the previous line, rest of the minimize_loglhd function
+    # is not executed
     minimizekwargs = {'options':{'disp':minimize_disp}}
     if usegrad:
         minimizekwargs.update({'jac':gradients})
@@ -216,12 +266,14 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
 
 
 #%%
+# If the script is being imported from elsewhere to use the functions, do not run the simulation
 if __name__ == '__main__':
     filter_length = 40
     frame_rate = 60
     time_res = (1/frame_rate)
-    tstop = 100 # in seconds
+    tstop = 100 # simulation length in seconds
     t = np.arange(0, tstop, time_res)
+    # Set the seed for PRNG for reproducibility
     np.random.seed(12221)
 #    np.random.seed(45212) # sum is 0.01 for tstop=500
 
@@ -236,16 +288,18 @@ if __name__ == '__main__':
 
     #Q_in = np.zeros(Q_in.shape)
 
-
     f = gqm_neuron(k_in, Q_in, mu_in)
     rate = f(stim)
 
     spikes = np.random.poisson(rate)
     plt.plot(spikes)
     plt.show()
+    print(spikes.sum(), ' spikes generated')
 
+    # Change the options here
     debug_grad = True
     minimize_disp = True
+    usegrad = False
 
     #%%
     import time
@@ -253,6 +307,7 @@ if __name__ == '__main__':
     #res = minimize_loglikelihood(k_in, Q_in, mu_in, stim, time_res, spikes)
     res = minimize_loglikelihood(np.zeros(k_in.shape), np.zeros(Q_in.shape), 0,
                                  stim, time_res, spikes,
+                                 usegrad=usegrad,
                                  debug_grad=debug_grad, minimize_disp=minimize_disp)
     elapsed = time.time()-start
     print(f'Time elapsed: {elapsed/60:6.1f} mins')
@@ -288,7 +343,11 @@ if __name__ == '__main__':
     else:
         kda, qda, mda, kdm, qdm, mdm = res
 
-        def remdiag(q): return q-np.diag(np.diag(q))
+        def remdiag(q):
+            """
+            Remove the diagonal for a given matrix.
+            """
+            return q-np.diag(np.diag(q))
 
         qdad = np.diag(qda)
         qdmd = np.diag(qdm)
@@ -297,8 +356,8 @@ if __name__ == '__main__':
         plt.legend(fontsize='x-small')
         plt.show()
 
-        plt.title('diag(auto Qd- manu Qd)')
         plt.plot(qdad-qdmd)
+        plt.title('diag(auto Qd- manu Qd)')
         plt.show()
 
         plt.imshow(remdiag(qda))
@@ -310,7 +369,3 @@ if __name__ == '__main__':
         plt.title('Manual grad without diagonal')
         plt.colorbar()
         plt.show()
-
-
-
-
