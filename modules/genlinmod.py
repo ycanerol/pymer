@@ -155,7 +155,7 @@ def minimize_loglhd(k_initial, mu_initial, x, time_res, spikes, usegrad=True,
 #            dldk2 -= time_res*np.exp(nlt_in[i])*xr[i, :]
 #        assert np.isclose(dldk, dldk2).all()
 #        import pdb; pdb.set_trace()
-        dldm = spikes.sum() - time_res*nlt_in.sum()
+        dldm = spikes.sum() - time_res*np.exp(nlt_in).sum()
         dl = -np.array([*dldk, dldm])
         return dl
 
