@@ -121,8 +121,8 @@ def makeQ2(t):
 from scipy.optimize import check_grad, approx_fprime
 
 def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
-                           x, time_res, spikes, debug_grad=False,
-                           usegrad=True, method='CG', minimize_disp=False,
+                           x, time_res, spikes, usegrad=True,
+                           debug_grad=False, method='CG', minimize_disp=False,
                            **kwargs):
     """
     Calculate the filters that minimize the log likelihood function for a
@@ -135,16 +135,16 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
     x:
         The stimulus
     time_res:
-        Length of each bin (reffered also as Delta)
+        Length of each bin (referred also as Delta, frame_duration)
     spikes:
         Binned spikes, must have the same shape as the stimulus
-    debug_grad:
-        Whether to calculate and plot the gradients in the first iteration
-        Setting it to True will change the returned values.
     usegrad:
         Whether to use gradients for optimiziation. If set to False, only
         approximated gradients will be used with the appropriate optimization
         method.
+    debug_grad:
+        Whether to calculate and plot the gradients in the first iteration
+        Setting it to True will change the returned values.
     method:
         Optimization method to use, see the Notes section in the  documentation of
         scipy.minimize for a full list.

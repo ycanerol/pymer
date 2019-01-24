@@ -130,7 +130,31 @@ def glm_fr(k, mu):
 
 def minimize_loglhd(k_initial, mu_initial, x, time_res, spikes, usegrad=True,
                     debug_grad=False, method='Newton-CG', **kwargs):
+    """
+    Calculate the filters that minimize the log likelihood function for a
+    given set of spikes and stimulus.
 
+    Parameters
+    --------
+    k_initial, mu_initial:
+        Initial guesses for the parameters.
+    x:
+        The stimulus
+    time_res:
+        Length of each bin (referred also as Delta, frame_duration)
+    spikes:
+        Binned spikes, must have the same shape as the stimulus
+    usegrad:
+        Whether to use gradients for optimiziation. If set to False, only
+        approximated gradients will be used with the appropriate optimization
+        method.
+    debug_grad:
+        Whether to calculate and plot the gradients in the first iteration
+        Setting it to True will change the returned values.
+    method:
+        Optimization method to use, see the Notes section in the  documentation of
+        scipy.minimize for a full list.
+    """
     minimizekwargs = {'method':method,
                       'tol':1e-1,
 #                      'options':{'disp':True},
@@ -173,7 +197,9 @@ def minimize_loglhd(k_initial, mu_initial, x, time_res, spikes, usegrad=True,
 
 
 def normalizestas(stas):
-    stas = np.array(stas)
-    b = np.abs(stas).max(axis=1)
-    stas_normalized = stas / b.repeat(stas.shape[1]).reshape(stas.shape)
-    return stas_normalized
+    #This function is obsolete, make sure it's not used
+    raise ValueError('Normalization of STAs should not be used')
+#    stas = np.array(stas)
+#    b = np.abs(stas).max(axis=1)
+#    stas_normalized = stas / b.repeat(stas.shape[1]).reshape(stas.shape)
+#    return stas_normalized
