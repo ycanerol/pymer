@@ -21,8 +21,18 @@ tstop = 500 # in seconds
 t = np.arange(0, tstop, time_res)
 np.random.seed(1221)
 
+#%%
 # Initialize model neuron
 k_real = np.exp(-(t[:filter_length]-.14)**2/.002)-np.exp(-(t[:filter_length]-.17)**2/.001)
+
+# Scale free k
+filt_tmax = t[filter_length]
+k_real_sf = (np.exp(-(t[:filter_length]-filt_tmax*.215)**2/(filt_tmax/200))
+            -np.exp(-(t[:filter_length]-filt_tmax*.255)**2/(filt_tmax/400)))
+#plt.plot(k_real); plt.plot(k_real_sf); plt.show()
+
+k_real = k_real_sf
+#%%
 #k_real *= .5
 mu_real = .01
 f = glm.glm_fr(k_real, mu_real)
@@ -44,7 +54,7 @@ mu_guess = spikes.mean()*time_res
 
 #%%
 debug_grad = False
-usegrad = False
+usegrad = True
 method = None
 
 res = glm.minimize_loglhd(k_guess, mu_guess, x, time_res, spikes,

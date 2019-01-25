@@ -9,6 +9,7 @@ import datetime as dt
 
 import analysis_scripts as asc
 import iofuncs as iof
+import plotfuncs as plf
 
 import genlinmod as glm
 #from scratch_GLM2 import conv, minimize_loglhd
@@ -35,11 +36,14 @@ clusters = data['clusters']
 #stas_normalized = a / stas_normalized.repeat(stas.shape[1]).reshape(stas.shape)
 frametimes = asc.ft_nblinks(exp_name, stim_nr)[1]
 
-stas = normalizestas(data['stas'])
+#stas = normalizestas(data['stas'])
+stas = np.array(data['stas'])
 
-predstas = stas.copy()
+predstas = np.zeros(stas.shape)
 predmus = np.zeros(stas.shape[0])
 start = dt.datetime.now()
+
+allspikes = np.zeros((stas.shape[0], frametimes.shape[0]), dtype=np.int8)
 
 for i, cluster in enumerate(clusters):
 
@@ -51,6 +55,7 @@ for i, cluster in enumerate(clusters):
 
     spikes = asc.read_raster(exp_name, stim_nr, *cluster)
     spikes = asc.binspikes(spikes, frametimes)
+    allspikes[i, :] = spikes
 
     res = glm.minimize_loglhd(np.zeros(sta.shape), 0, stimulus,
                               frame_dur, spikes)
@@ -67,7 +72,7 @@ for i, cluster in enumerate(clusters):
     #print(f'Predicted baseline firing rate: {mu_pred:4.2f}')
     #print(f'Average spike per time bin: {spikes.mean()/frame_dur:4.2f}')
 
-predstas = normalizestas(predstas)
+#predstas = normalizestas(predstas)
 
 elapsed = dt.datetime.now()-start
 print(f'\nTook {elapsed.total_seconds()/60:4.2f} minutes')
@@ -85,7 +90,7 @@ ax_pred = plt.subplot(1, 3, 2)
 ax_pred.imshow(predstas[:lim], **imshowarg)
 ax_pred.set_title('Predicted with\n log-likelihood maximization')
 ax_diff = plt.subplot(1, 3, 3)
-ax_diff.imshow((stas-predstas)[:lim], vmin=-1, vmax=1, **imshowarg)
+im = ax_diff.imshow((stas-predstas)[:lim], vmin=-1, vmax=1, **imshowarg)
 ax_diff.set_title('Difference')
 ax_diff.set_xticklabels([''])
 ax_diff.set_yticklabels([''])
