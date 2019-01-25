@@ -99,3 +99,86 @@ ax_pred.set_xticklabels([''])
 #plt.suptitle(f'{exp_name} {iof.getstimname(exp_name, stim_nr)}')
 plt.subplots_adjust(top=.85)
 #plt.savefig('/media/owncloud/20181105_meeting_files/likelihood_fff.pdf', bbox_inches='tight')
+
+plt.show()
+#%%
+predspikes = np.zeros(allspikes.shape, dtype=np.int8)-1
+for i in range (clusters.shape[0]):
+    pred_fr = glm.glm_fr(predstas[i, :], predmus[i], frame_dur)(stimulus)
+    predspikes[i] = np.random.poisson(pred_fr)
+#    plt.plot(allspikes[i, :], lw=.6)
+#    plt.plot(predspikes[i], lw=.6)
+#    plt.title('Cell {:3.0f}\nmu: {:5.3f}'.format(i, predmus[i]))
+#    plt.show()
+#%%
+# Use this with %matplotlib qt to be able to scroll around
+sl = slice(5000, 6500)
+#sl = slice(None)
+imshowkwargs = {'vmin':0, 'vmax':allspikes.max(),
+#                'cmap':'Greys_r',
+                'cmap':'magma',
+                }
+plt.figure()
+ax_rsp = plt.subplot(311)
+ax_rsp.matshow(allspikes[:, sl], **imshowkwargs)
+
+ax_psp = plt.subplot(312, sharex=ax_rsp, sharey=ax_rsp)
+im = ax_psp.matshow(predspikes[:, sl], **imshowkwargs)
+im.cmap.set_over('r')
+im.cmap.set_under('k')
+ax_stim = plt.subplot(313, sharex=ax_rsp)
+ax_stim.plot(stimulus[sl], lw=.8)
+plf.colorbar(im, ax=ax_stim, size='1%')
+plt.tight_layout()
+plt.show()
+
+
+#%%
+avgspikes = allspikes.mean(axis=1)
+avgspikes_pred = predspikes.mean(axis=1)
+
+
+plt.figure()
+ax1 = plt.gca()
+ax1.scatter(avgspikes, avgspikes_pred)
+ax1.set_xlabel('Avg spike nr per time bin')
+ax1.set_ylabel('Predicted spike nr per time bin')
+ax1.plot([0, 1], [0, 1], 'r--', alpha=.5)
+plt.show()
+
+plt.figure()
+ax2 = plt.gca()
+ax2.scatter(avgspikes, predmus)
+ax2.set_xlabel('Avg spike nr per time bin')
+ax2.set_ylabel('Predicted mu')
+ax2.plot([0, 1], [0, 1], 'r--', alpha=.5)
+plt.show()
+
+
+plt.figure()
+ax3 = plt.gca()
+ax3.scatter(avgspikes, np.exp(predmus))
+ax3.set_xlabel('Avg spike nr per time bin')
+ax3.set_ylabel('exp(mu)')
+ax3.plot([0, 1], [0, 1], 'r--', alpha=.5)
+plt.show()
+
+plt.figure()
+ax4 = plt.gca()
+ax4.scatter(avgspikes, np.log(predmus))
+ax4.set_xlabel('Avg spike nr per time bin')
+ax4.set_ylabel('log(mu)')
+ax4.plot([0, 1], [0, 1], 'r--', alpha=.5)
+plt.show()
+
+
+
+#%%
+import seaborn as sns
+
+sns.jointplot(x=avgspikes, y=avgspikes_pred, kind='scatter',
+              xlim=[0, .8], ylim=[0, .8],
+              marginal_kws={'bins':20, 'rug':False})
+plt.show()
+
+
