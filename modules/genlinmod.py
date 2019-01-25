@@ -157,7 +157,7 @@ def minimize_loglhd(k_initial, mu_initial, x, time_res, spikes, usegrad=True,
         scipy.minimize for a full list.
     """
     minimizekwargs = {'method':method,
-                      'tol':1e-1,
+                      'tol':1e-3,
 #                      'options':{'disp':True},
                      }
     minimizekwargs.update(**kwargs)
