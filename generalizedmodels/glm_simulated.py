@@ -8,7 +8,6 @@ Implementing jacobian for GLM, to help troubleshoot GQM
 
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.optimize import minimize
 import plotfuncs as plf
 
 import genlinmod as glm
@@ -34,17 +33,15 @@ k_real_sf = (np.exp(-(t[:filter_length]-filt_tmax*.215)**2/(filt_tmax/200))
 k_real = k_real_sf
 #%%
 #k_real *= .5
-mu_real = .01
-f = glm.glm_fr(k_real, mu_real)
+mu_real = .7
+f = glm.glm_fr(k_real, mu_real, time_res)
 
 # Generate stimulus
 x = np.random.normal(size=t.shape)
 
 # Calculate the firing rate and spikes of the neuron given the stimulus
 rate = f(x)
-ratetimesdelta = True
-if ratetimesdelta:
-    rate *= time_res
+
 spikes = np.random.poisson(rate)
 
 np.random.seed()
@@ -77,12 +74,21 @@ if not debug_grad:
     axk.legend()
     axk.text(.8, .6, f'mu_real: {mu_real:4.2f}\nmu_res: {mu_res:4.2f}',
              transform=axk.transAxes)
-    axk.text(.98, .7, f'r(t)*Δ: {ratetimesdelta:} \n usegrad: {usegrad:}',
+    axk.text(.98, .7, f'usegrad: {usegrad:}',
              transform=axk.transAxes, ha='right')
     axk.set_ylim([-.8, 1.1])
     plf.spineless(axes2, 'tr')
     #plt.savefig('/media/owncloud/20181105_meeting_files/GLMsimulated_filter.pdf',
     #            bbox_inches='tight')
+    plt.show()
+
+
+    plt.figure()
+    pred_fr = glm.glm_fr(k_res, mu_res, time_res)(x)
+
+    plt.plot(rate, lw=.6, label='Real firing rate')
+    plt.plot(pred_fr, lw=.6, label='Predicted firing rate')
+#    plt.plot(rate/time_res, lw=.6, label='rate/delta')
     plt.show()
 else:
     auto, manu = res

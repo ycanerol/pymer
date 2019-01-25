@@ -119,13 +119,14 @@ def conv(k, x):
     return np.convolve(k, x, 'full')[:-k.shape[0]+1]
 
 
-def glm_fr(k, mu):
+def glm_fr(k, mu, time_res):
     """
     Return a function for the firing rate of a GLM neuron,
     given a filter and baseline firing rate.
+
+    Note that the result is scaled by the length of the time bins.
     """
-    return lambda x:np.exp((conv(k, x) + mu)) # exponential
-#    return lambda x:3/(1+np.exp(-(conv(k, x) + mu))) # logistic
+    return lambda x:np.exp((conv(k, x) + mu))*time_res # exponential
 
 
 def minimize_loglhd(k_initial, mu_initial, x, time_res, spikes, usegrad=True,
