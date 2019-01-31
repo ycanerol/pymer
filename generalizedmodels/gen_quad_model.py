@@ -83,13 +83,15 @@ def gqm_in(k, Q, mu):
     return f
 
 
-def gqm_neuron(k, Q, mu):
+def gqm_neuron(k, Q, mu, time_res):
     """
     Given a set of filters, return the firing rate of a neuron that would respond
     to a stimulus
+
+    The output is scaled by the length of time bins
     """
     def fr(x):
-        return np.exp(gqm_in(k, Q, mu)(x))
+        return np.exp(gqm_in(k, Q, mu)(x))*time_res
     return fr
 
 
@@ -288,7 +290,7 @@ if __name__ == '__main__':
 
     #Q_in = np.zeros(Q_in.shape)
 
-    f = gqm_neuron(k_in, Q_in, mu_in)
+    f = gqm_neuron(k_in, Q_in, mu_in, time_res)
     rate = f(stim)
 
     spikes = np.random.poisson(rate)

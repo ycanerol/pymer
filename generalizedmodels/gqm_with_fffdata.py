@@ -102,7 +102,7 @@ if not debug_grad:
     #plt.savefig(savepath+'gqm_fff.png', bbox_inches = 'tight', pad_inches = 0.3)
     plt.show()
 
-    model = gqm.gqm_neuron(k_out, Q_out, mu_out)(stimulus)
+    model = gqm.gqm_neuron(k_out, Q_out, mu_out,bin_length)(stimulus)
     axfr = plt.subplot(211)
     axfr.plot(model[:600], color='C1')
     axfr.set_title('GQM model, rate')
