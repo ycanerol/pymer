@@ -18,7 +18,7 @@ def conv(k, x):
 
 def conv2d_old(Q, x):
     """
-    Calculate the quadratic form. Equivalent to con2d(), but slower.
+    Calculate the quadratic form. Equivalent to conv2d(), but slower.
     """
     l = Q.shape[0]
     out = np.zeros((x.shape[0]-l+1))
@@ -266,12 +266,11 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
                    method=method, **minimizekwargs)
     return res
 
-
 #%%
 # If the script is being imported from elsewhere to use the functions, do not run the simulation
 if __name__ == '__main__':
     filter_length = 20
-    frame_rate = 60
+    frame_rate = 30
     time_res = (1/frame_rate)
     tstop = 100 # simulation length in seconds
     t = np.arange(0, tstop, time_res)
@@ -286,7 +285,7 @@ if __name__ == '__main__':
     mu_in = .01
     k_in = np.exp(-(tmini-0.12)**2/.002)*.2
     Q_in, Qks, Qws = makeQ2(tmini)
-    Q_in *= .01
+    Q_in *= .25
 
     #Q_in = np.zeros(Q_in.shape)
 
@@ -299,7 +298,7 @@ if __name__ == '__main__':
     print(spikes.sum(), ' spikes generated')
 
     # Change the options here
-    debug_grad = True
+    debug_grad = False
     minimize_disp = True
     usegrad = False
 
