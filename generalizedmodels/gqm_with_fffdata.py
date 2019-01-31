@@ -38,9 +38,9 @@ stimulus = stimulus[:lim]
 spikes = asc.binspikes(rawspikes, frametimes)
 
 bin_length = np.ediff1d(frametimes).mean()
-usegrad = True
-debug_grad = True
-method = 'Newton-CG'
+usegrad = False
+debug_grad = False
+method = 'CG'
 minimize_disp = True
 
 import time
@@ -103,12 +103,15 @@ if not debug_grad:
     plt.show()
 
     model = gqm.gqm_neuron(k_out, Q_out, mu_out,bin_length)(stimulus)
-    axfr = plt.subplot(211)
-    axfr.plot(model[:600], color='C1')
+    axfr = plt.subplot(311)
+    axfr.plot(model, color='C1')
     axfr.set_title('GQM model, rate')
-    axsp = plt.subplot(212)
+    axsp = plt.subplot(312, sharex=axfr)
     axsp.set_title('Spikes')
-    axsp.plot(spikes[:600])
+    axsp.plot(spikes)
+    axspm = plt.subplot(313, sharex=axfr)
+    axspm.set_title('Model spikes')
+    axspm.plot(np.random.poisson(model))
 
     plt.show()
 else:
