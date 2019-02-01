@@ -185,7 +185,6 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
         sTs[i, :, :] = np.outer(x_temp, x_temp)
     # Empirically found correction terms for the gradients.
     k_correction = x.shape[0]*time_res*xr.sum(axis=0)
-    plt.plot(np.diag(sTs.sum(axis=0)));plt.title('diag(sTs.sum(axis=0))');plt.show()
 #    import pdb; pdb.set_trace()
     q_correction = x.shape[0]*time_res*sTs.sum(axis=0) + np.eye(filter_length)*x.shape[0]
 #    q_correction = x.shape[0]*time_res*sTs.sum(axis=0) + np.diag(sTs.sum(axis=0))
@@ -262,7 +261,7 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
         minimizekwargs.update({'jac':gradients})
     minimizekwargs.update(kwargs)
 
-    res = minimize(loglikelihood, kQmu_initial, tol=1e-3,
+    res = minimize(loglikelihood, kQmu_initial, tol=1e-5,
                    method=method, **minimizekwargs)
     return res
 
@@ -282,7 +281,7 @@ if __name__ == '__main__':
 
     tmini = t[:filter_length]
 
-    mu_in = .01
+    mu_in = .21
     k_in = np.exp(-(tmini-0.12)**2/.002)*.3
     Q_in, Qks, Qws = makeQ2(tmini)
     Q_in *= .3
@@ -298,7 +297,7 @@ if __name__ == '__main__':
     print(spikes.sum(), ' spikes generated')
 
     # Change the options here
-    debug_grad = True
+    debug_grad = False
     minimize_disp = True
     usegrad = True
 

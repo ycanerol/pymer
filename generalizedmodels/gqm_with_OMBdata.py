@@ -31,7 +31,6 @@ filter_length = l = data['filter_length']
 refresh_rate = asc.read_spikesheet(exp_name)[1]['refresh_rate']
 
 i = 0
-l = 20
 
 # Limit the amount of data that will be loaded
 lim = None
@@ -45,9 +44,9 @@ spikes = asc.binspikes(rawspikes, frametimes)
 
 bin_length = np.ediff1d(frametimes).mean()
 
-usegrad = False
-debug_grad = True
-method = 'CG'
+usegrad = True
+debug_grad = False
+method = 'Newton-CG'
 
 
 import time

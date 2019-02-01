@@ -26,8 +26,6 @@ frametimes = asc.ft_nblinks(exp_name, stim_nr)[1]
 filter_length = l = data['filter_length']
 refresh_rate = asc.read_spikesheet(exp_name)[1]['refresh_rate']
 
-l = 20  # Manually trim to speed up
-
 i = 2
 lim = None
 
@@ -38,9 +36,9 @@ stimulus = stimulus[:lim]
 spikes = asc.binspikes(rawspikes, frametimes)
 
 bin_length = np.ediff1d(frametimes).mean()
-usegrad = False
+usegrad = True
 debug_grad = False
-method = 'CG'
+method = 'Newton-CG'
 minimize_disp = True
 
 import time
@@ -84,7 +82,7 @@ if not debug_grad:
 
     axv.set_title('Eigenvalues of Q')
 
-    k_plotlim = 20
+    k_plotlim = filter_length
 
     axv.plot(w_out, 'ko',)
     eiginds = [0, 1, l-2, l-1]
