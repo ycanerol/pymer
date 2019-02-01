@@ -167,7 +167,7 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
         """
         # Star before an argument expands (or unpacks) the values
         P = gqm_in(*splitpars(kQmu))
-        return -(np.sum(spikes*P(x) - time_res*np.sum(np.exp(P(x)))))
+        return -np.sum(spikes*P(x)) + time_res*np.sum(np.exp(P(x)))
     # Instead of iterating over each time bin, generate a hankel matrix
     # from the stimulus vector and operate on that using matrix
     # multiplication like so: X @ xh , where X is a vector containing
@@ -208,15 +208,15 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
 #            dLdmu += spikes[i] - time_res * P[i]
         # Fast way of calculating gradients using rolling window and einsum
         dLdk = spikes @ xr - time_res*(P @ xr)
-        dLdk -= k_correction
+#        dLdk -= k_correction
         # Using einsum to multiply and sum along the desired axis.
         # more detailed explanation here:
         # https://stackoverflow.com/questions/26089893/understanding-numpys-einsum
         dLdq = (np.einsum('ijk,i->jk', sTs, spikes)
                 - time_res*np.einsum('ijk,i->jk', sTs, P))
-        dLdq -= q_correction
+#        dLdq -= q_correction
         dLdmu = spikes.sum() - time_res*np.sum(P)
-        dLdmu -= mu_correction
+#        dLdmu -= mu_correction
 #        import pdb; pdb.set_trace()
 
         dL = flattenpars(dLdk, dLdq, dLdmu)
@@ -262,7 +262,7 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
         minimizekwargs.update({'jac':gradients})
     minimizekwargs.update(kwargs)
 
-    res = minimize(loglikelihood, kQmu_initial, tol=1e-1,
+    res = minimize(loglikelihood, kQmu_initial, tol=1e-3,
                    method=method, **minimizekwargs)
     return res
 
@@ -283,9 +283,9 @@ if __name__ == '__main__':
     tmini = t[:filter_length]
 
     mu_in = .01
-    k_in = np.exp(-(tmini-0.12)**2/.002)*.2
+    k_in = np.exp(-(tmini-0.12)**2/.002)*.3
     Q_in, Qks, Qws = makeQ2(tmini)
-    Q_in *= .25
+    Q_in *= .3
 
     #Q_in = np.zeros(Q_in.shape)
 
@@ -298,9 +298,9 @@ if __name__ == '__main__':
     print(spikes.sum(), ' spikes generated')
 
     # Change the options here
-    debug_grad = False
+    debug_grad = True
     minimize_disp = True
-    usegrad = False
+    usegrad = True
 
     #%%
     import time
