@@ -11,7 +11,7 @@ import analysis_scripts as asc
 
 filter_length = None
 
-#%%
+
 def conv(k, x):
     return np.convolve(k, x, 'full')[:-k.shape[0]+1]
 
@@ -46,10 +46,7 @@ def conv2d(Q, x, optimize='greedy'):
     # Stack copies of Q along a new axis without copying in memory.
     Qb = np.broadcast_to(Q, (x.shape[0], *Q.shape))
     return np.einsum('ij,ijk,ki->i', xr, Qb, xr.T, optimize=optimize)
-#    return 0
 
-
-#%%
 
 def flattenpars(k, Q, mu):
     """
@@ -168,55 +165,29 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
         # Star before an argument expands (or unpacks) the values
         P = gqm_in(*splitpars(kQmu))
         return -np.sum(spikes*P(x)) + time_res*np.sum(np.exp(P(x)))
-    # Instead of iterating over each time bin, generate a hankel matrix
-    # from the stimulus vector and operate on that using matrix
-    # multiplication like so: X @ xh , where X is a vector containing
-    # some number for each time bin.
 
-#    xh = hankel(x)[:, :filter_length]
     # Instead of iterating over each time bin, use the rolling window function
     # The expression in the brackets inverts the array.
     xr = asc.rolling_window(x, filter_length)[:, ::-1]
     # Initialize a 3D numpy array to keep outer products
     sTs = np.zeros((spikes.shape[0], filter_length, filter_length))
     for i in range(spikes.shape[0]-filter_length):
-#        x_temp = x[i:i+filter_length][np.newaxis,:]
         x_temp = xr[i, :]
         sTs[i, :, :] = np.outer(x_temp, x_temp)
-    # Empirically found correction terms for the gradients.
-    k_correction = x.shape[0]*time_res*xr.sum(axis=0)
-#    import pdb; pdb.set_trace()
-    q_correction = x.shape[0]*time_res*sTs.sum(axis=0) + np.eye(filter_length)*x.shape[0]
-#    q_correction = x.shape[0]*time_res*sTs.sum(axis=0) + np.diag(sTs.sum(axis=0))
-    mu_correction = (x.shape[0]-1) * x.shape[0]*time_res
     def gradients(kQmu):
         """
         Calculate gradients for the log-likelihood function
         """
         k, Q, mu = splitpars(kQmu)
         P = np.exp(gqm_in(k, Q, mu)(x))
-#        Slow way of calculating the gradients
-#        dLdk = np.zeros(k.shape)
-#        dLdq = np.zeros(Q.shape)
-#        dLdmu = 0
-#        for i in range(filter_length, x_mini.shape[0]):
-#            s = x[i:i+filter_length]
-#            dLdk += (spikes[i] * s -
-#                       time_res*P[i]*s)
-#            dLdq += (spikes[i] * np.outer(s,s) - time_res*P[i] * np.outer(s, s))
-#            dLdmu += spikes[i] - time_res * P[i]
         # Fast way of calculating gradients using rolling window and einsum
         dLdk = spikes @ xr - time_res*(P @ xr)
-#        dLdk -= k_correction
         # Using einsum to multiply and sum along the desired axis.
         # more detailed explanation here:
         # https://stackoverflow.com/questions/26089893/understanding-numpys-einsum
         dLdq = (np.einsum('ijk,i->jk', sTs, spikes)
                 - time_res*np.einsum('ijk,i->jk', sTs, P))
-#        dLdq -= q_correction
         dLdmu = spikes.sum() - time_res*np.sum(P)
-#        dLdmu -= mu_correction
-#        import pdb; pdb.set_trace()
 
         dL = flattenpars(dLdk, dLdq, dLdmu)
         return -dL
@@ -268,8 +239,8 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
 #%%
 # If the script is being imported from elsewhere to use the functions, do not run the simulation
 if __name__ == '__main__':
-    filter_length = 20
-    frame_rate = 30
+    filter_length = 40
+    frame_rate = 60
     time_res = (1/frame_rate)
     tstop = 100 # simulation length in seconds
     t = np.arange(0, tstop, time_res)
@@ -281,10 +252,10 @@ if __name__ == '__main__':
 
     tmini = t[:filter_length]
 
-    mu_in = .21
+    mu_in = .01
     k_in = np.exp(-(tmini-0.12)**2/.002)*.3
     Q_in, Qks, Qws = makeQ2(tmini)
-    Q_in *= .3
+    Q_in *= .25
 
     #Q_in = np.zeros(Q_in.shape)
 
@@ -330,7 +301,7 @@ if __name__ == '__main__':
         plt.colorbar(imq1, ax=axq1, format='%.0e')
         imq2 = axq2.imshow(Q_out)
         plt.colorbar(imq2, ax=axq2, format='%.0e')
-        savepath= '/home/ycan/Documents/meeting_notes/2018-12-05/'
+        savepath = '/home/ycan/Documents/meeting_notes/2018-12-05/'
         #plt.savefig(savepath+'simulatedsuccess.pdf')
         #plt.savefig(savepath+'simulatedsuccess.png')
         plt.show()
