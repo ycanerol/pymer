@@ -5,7 +5,7 @@
 """
 import matplotlib.pyplot as plt
 import numpy as np
-from scipy.linalg import hankel, eigh
+from scipy.linalg import eigh
 from scipy.optimize import minimize
 import analysis_scripts as asc
 
@@ -117,11 +117,9 @@ def makeQ2(t):
     return Q, ks, ws
 
 
-from scipy.optimize import check_grad, approx_fprime
-
 def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
                            x, time_res, spikes, usegrad=True,
-                           debug_grad=False, method='CG', minimize_disp=False,
+                           method='CG', minimize_disp=False,
                            **kwargs):
     """
     Calculate the filters that minimize the log likelihood function for a
@@ -141,9 +139,6 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
         Whether to use gradients for optimiziation. If set to False, only
         approximated gradients will be used with the appropriate optimization
         method.
-    debug_grad:
-        Whether to calculate and plot the gradients in the first iteration
-        Setting it to True will change the returned values.
     method:
         Optimization method to use, see the Notes section in the  documentation of
         scipy.minimize for a full list.
@@ -191,42 +186,7 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
 
         dL = flattenpars(dLdk, dLdq, dLdmu)
         return -dL
-    if debug_grad:
-        # Epsilon value to use when approximating the gradient
-        eps = 1e-10
-        ap_grad = approx_fprime(kQmu_initial, loglikelihood, eps)
-        man_grad = gradients(kQmu_initial)
-        # Split the auto and manual gradients into k, q and mu
-        kda, qda, mda = splitpars(ap_grad)
-        kdm, qdm, mdm = splitpars(man_grad)
-        diff = ap_grad - man_grad
-        k_diff, Q_diff, mu_diff = splitpars(diff)
-        print('Gradient diff L2 norm', np.sum(diff**2))
-        plt.figure(figsize=(7, 10))
-        axk = plt.subplot(411)
-        axk.plot(kda, label='Auto grad')
-        axk.plot(kdm, label='Manual grad')
-        axk.legend()
-        axkdif = plt.subplot(412)
-        axkdif.plot(k_diff, 'k', label='auto - manual gradient')
-        axkdif.legend()
-        axqa = plt.subplot(425)
-        imqa = axqa.imshow(qda)
-        axqa.set_title('Auto grad Q')
-        plt.colorbar(imqa)
-        axqm = plt.subplot(426)
-        axqm.set_title('Manual grad Q')
-        imqm = axqm.imshow(qdm)
-        plt.colorbar(imqm)
-        axqdif = plt.subplot(427)
-        imqdif = axqdif.imshow(Q_diff)
-        plt.colorbar(imqdif)
-        plt.suptitle(f'Difference of numerical and explicit gradients, mu_diff: {mu_diff:11.2f}')
-        plt.show()
-#        import pdb; pdb.set_trace();
-        return kda, qda, mda, kdm, qdm, mdm
-#     If debug_grad is True, the function returns on the previous line, rest of the minimize_loglhd function
-    # is not executed
+
     minimizekwargs = {'options':{'disp':minimize_disp}}
     if usegrad:
         minimizekwargs.update({'jac':gradients})
@@ -245,19 +205,16 @@ if __name__ == '__main__':
     tstop = 100 # simulation length in seconds
     t = np.arange(0, tstop, time_res)
     # Set the seed for PRNG for reproducibility
-    np.random.seed(12221)
-#    np.random.seed(45212) # sum is 0.01 for tstop=500
+    np.random.seed(1221)
 
     stim = np.random.normal(size=t.shape)
 
     tmini = t[:filter_length]
 
-    mu_in = .01
-    k_in = np.exp(-(tmini-0.12)**2/.002)*.3
+    mu_in = .3
+    k_in = np.exp(-(tmini-0.12)**2/.002)*.5
     Q_in, Qks, Qws = makeQ2(tmini)
-    Q_in *= .25
-
-    #Q_in = np.zeros(Q_in.shape)
+    Q_in *= .14
 
     f = gqm_neuron(k_in, Q_in, mu_in, time_res)
     rate = f(stim)
@@ -268,7 +225,6 @@ if __name__ == '__main__':
     print(spikes.sum(), ' spikes generated')
 
     # Change the options here
-    debug_grad = False
     minimize_disp = True
     usegrad = True
 
@@ -279,66 +235,36 @@ if __name__ == '__main__':
     res = minimize_loglikelihood(np.zeros(k_in.shape), np.zeros(Q_in.shape), 0,
                                  stim, time_res, spikes,
                                  usegrad=usegrad,
-                                 debug_grad=debug_grad, minimize_disp=minimize_disp)
+                                 minimize_disp=minimize_disp)
     elapsed = time.time()-start
     print(f'Time elapsed: {elapsed/60:6.1f} mins')
-#%%
-    if not debug_grad:
-        k_out, Q_out, mu_out = splitpars(res.x)
+    #%%
+    k_out, Q_out, mu_out = splitpars(res.x)
 
-        axk = plt.subplot(211)
-        axk.plot(k_in, label='k_in')
-        axk.plot(k_out, label='k_out')
-        axk.legend()
+    axk = plt.subplot(211)
+    axk.plot(k_in, label='k_in')
+    axk.plot(k_out, label='k_out')
+    axk.legend()
 
-        axk.text(.8, .2,
-                 'mu_in:  {:4.2f}\nmu_out: {:4.2f}'.format(mu_in, mu_out),
-                 transform=axk.transAxes)
+    axk.text(.8, .2,
+             'mu_in:  {:4.2f}\nmu_out: {:4.2f}'.format(mu_in, mu_out),
+             transform=axk.transAxes)
 
-        axq1 = plt.subplot(223)
-        axq2 = plt.subplot(224)
-        imq1 = axq1.imshow(Q_in)
-        plt.colorbar(imq1, ax=axq1, format='%.0e')
-        imq2 = axq2.imshow(Q_out)
-        plt.colorbar(imq2, ax=axq2, format='%.0e')
-        savepath = '/home/ycan/Documents/meeting_notes/2018-12-05/'
-        #plt.savefig(savepath+'simulatedsuccess.pdf')
-        #plt.savefig(savepath+'simulatedsuccess.png')
-        plt.show()
+    axq1 = plt.subplot(223)
+    axq2 = plt.subplot(224)
+    imq1 = axq1.imshow(Q_in)
+    plt.colorbar(imq1, ax=axq1, format='%.0e')
+    imq2 = axq2.imshow(Q_out)
+    plt.colorbar(imq2, ax=axq2, format='%.0e')
+    savepath = '/home/ycan/Documents/meeting_notes/2018-12-05/'
+    #plt.savefig(savepath+'simulatedsuccess.pdf')
+    #plt.savefig(savepath+'simulatedsuccess.png')
+    plt.show()
 
-        w_in, v_in = eigh(Q_in)
-        w_out, v_out = eigh(Q_out)
+    w_in, v_in = eigh(Q_in)
+    w_out, v_out = eigh(Q_out)
 
-        [plt.plot(Qk*Qw, color='C1') for Qk, Qw in zip(Qks, Qws)]
-        plt.plot(v_in[:, [0, -2, -1]], color='C0')
-        plt.plot(v_out[:, [0, -2, -1]], color='C2')
-        plt.show()
-    else:
-        kda, qda, mda, kdm, qdm, mdm = res
-
-        def remdiag(q):
-            """
-            Remove the diagonal for a given matrix.
-            """
-            return q-np.diag(np.diag(q))
-
-        qdad = np.diag(qda)
-        qdmd = np.diag(qdm)
-        plt.plot(qdad, label='diag(auto Qd)')
-        plt.plot(qdmd, label='diag(manu Qd)')
-        plt.legend(fontsize='x-small')
-        plt.show()
-
-        plt.plot(qdad-qdmd)
-        plt.title('diag(auto Qd- manu Qd)')
-        plt.show()
-
-        plt.imshow(remdiag(qda))
-        plt.title('Auto grad without diagonal')
-        plt.colorbar()
-        plt.show()
-
-        plt.imshow(remdiag(qdm))
-        plt.title('Manual grad without diagonal')
-        plt.colorbar()
-        plt.show()
+    [plt.plot(Qk*Qw, color='C1') for Qk, Qw in zip(Qks, Qws)]
+    plt.plot(v_in[:, [0, -2, -1]], color='C0')
+    plt.plot(v_out[:, [0, -2, -1]], color='C2')
+    plt.show()

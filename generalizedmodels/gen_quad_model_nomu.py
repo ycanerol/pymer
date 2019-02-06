@@ -108,7 +108,7 @@ def makeQ2(t):
 from scipy.optimize import check_grad, approx_fprime
 
 def minimize_loglikelihood(k_initial, Q_initial,
-                           x, time_res, spikes, debug_grad=False,
+                           x, time_res, spikes,
                            usegrad=True, method='CG', minimize_disp=False,
                            **kwargs):
     kQ_initial = flattenpars(k_initial, Q_initial)
@@ -169,38 +169,6 @@ def minimize_loglikelihood(k_initial, Q_initial,
 
         dL = flattenpars(dLdk, dLdq)
         return -dL
-    if debug_grad:
-        eps = 1e-10
-        ap_grad = approx_fprime(kQ_initial, loglikelihood, eps)
-        man_grad = gradients(kQ_initial)
-        kda, qda = splitpars(ap_grad)
-        kdm, qdm = splitpars(man_grad)
-        diff = ap_grad - man_grad
-        k_diff, Q_diff = splitpars(diff)
-        print('Gradient diff L2 norm', np.sum(diff**2))
-        plt.figure(figsize=(7, 10))
-        axk = plt.subplot(411)
-        axk.plot(kda, label='Auto grad')
-        axk.plot(kdm, label='Manual grad')
-        axk.legend()
-        axkdif = plt.subplot(412)
-        axkdif.plot(k_diff, 'k', label='auto - manual gradient')
-        axkdif.legend()
-        axqa = plt.subplot(425)
-        imqa = axqa.imshow(qda)
-        axqa.set_title('Auto grad Q')
-        plt.colorbar(imqa)
-        axqm = plt.subplot(426)
-        axqm.set_title('Manual grad Q')
-        imqm = axqm.imshow(qdm)
-        plt.colorbar(imqm)
-        axqdif = plt.subplot(427)
-        imqdif = axqdif.imshow(Q_diff)
-        plt.colorbar(imqdif)
-        plt.suptitle(f'Difference of numerical and explicit gradients')
-        plt.show()
-#        import pdb; pdb.set_trace();
-        return kda, qda, kdm, qdm
 
     minimizekwargs = {'options':{'disp':minimize_disp}}
     if usegrad:
@@ -241,7 +209,6 @@ if __name__ == '__main__':
     plt.plot(spikes)
     plt.show()
 
-    debug_grad = True
     minimize_disp = True
 
     #%%
@@ -250,61 +217,31 @@ if __name__ == '__main__':
     #res = minimize_loglikelihood(k_in, Q_in, u_in, stim, time_res, spikes)
     res = minimize_loglikelihood(np.zeros(k_in.shape), np.zeros(Q_in.shape),
                                  stim, time_res, spikes,
-                                 debug_grad=debug_grad, minimize_disp=minimize_disp)
+                                 minimize_disp=minimize_disp)
     elapsed = time.time()-start
     print(f'Time elapsed: {elapsed/60:6.1f} mins')
-#%%
-    if not debug_grad:
-        k_out, Q_out = splitpars(res.x)
+    #%%
+    k_out, Q_out = splitpars(res.x)
 
-        axk = plt.subplot(211)
-        axk.plot(k_in, label='k_in')
-        axk.plot(k_out, label='k_out')
-        axk.legend()
+    axk = plt.subplot(211)
+    axk.plot(k_in, label='k_in')
+    axk.plot(k_out, label='k_out')
+    axk.legend()
 
-        axq1 = plt.subplot(223)
-        axq2 = plt.subplot(224)
-        axq1.imshow(Q_in)
-        axq2.imshow(Q_out)
-        savepath= '/home/ycan/Documents/meeting_notes/2019-01-16/'
-        #plt.savefig(savepath+'simulatedsuccess.pdf')
-        #plt.savefig(savepath+'simulatedsuccess.png')
-        plt.show()
-
-
-        w_in, v_in = eigh(Q_in)
-        w_out, v_out = eigh(Q_out)
-
-        [plt.plot(Qk*Qw, color='C1') for Qk, Qw in zip(Qks, Qws)]
-        plt.plot(v_in[:, [0, -2, -1]], color='C0')
-        plt.plot(v_out[:, [0, -2, -1]], color='C2')
-        plt.show()
-    else:
-        kda, qda, kdm, qdm = res
-
-        def remdiag(q): return q-np.diag(np.diag(q))
-
-        qdad = np.diag(qda)
-        qdmd = np.diag(qdm)
-        plt.plot(qdad, label='diag(auto Qd)')
-        plt.plot(qdmd, label='diag(manu Qd)')
-        plt.legend(fontsize='x-small')
-        plt.show()
-
-        plt.plot(qdad-qdmd)
-        plt.title('diag(auto Qd- manu Qd)')
-        plt.show()
-
-        plt.imshow(remdiag(qda))
-        plt.title('Auto grad without diagonal')
-        plt.colorbar()
-        plt.show()
-
-        plt.imshow(remdiag(qdm))
-        plt.title('Manual grad without diagonal')
-        plt.colorbar()
-        plt.show()
+    axq1 = plt.subplot(223)
+    axq2 = plt.subplot(224)
+    axq1.imshow(Q_in)
+    axq2.imshow(Q_out)
+    savepath= '/home/ycan/Documents/meeting_notes/2019-01-16/'
+    #plt.savefig(savepath+'simulatedsuccess.pdf')
+    #plt.savefig(savepath+'simulatedsuccess.png')
+    plt.show()
 
 
+    w_in, v_in = eigh(Q_in)
+    w_out, v_out = eigh(Q_out)
 
-
+    [plt.plot(Qk*Qw, color='C1') for Qk, Qw in zip(Qks, Qws)]
+    plt.plot(v_in[:, [0, -2, -1]], color='C0')
+    plt.plot(v_out[:, [0, -2, -1]], color='C2')
+    plt.show()

@@ -130,7 +130,7 @@ def glm_fr(k, mu, time_res):
 
 
 def minimize_loglhd(k_initial, mu_initial, x, time_res, spikes, usegrad=True,
-                    debug_grad=False, method='Newton-CG', **kwargs):
+                    method='Newton-CG', **kwargs):
     """
     Calculate the filters that minimize the log likelihood function for a
     given set of spikes and stimulus.
@@ -186,12 +186,7 @@ def minimize_loglhd(k_initial, mu_initial, x, time_res, spikes, usegrad=True,
 
     if usegrad:
         minimizekwargs.update({'jac':grad})
-    if debug_grad:
-        from scipy.optimize import check_grad, approx_fprime
-        kmu = [*k_initial, mu_initial]
-        auto = lambda a: approx_fprime(a, loglhd, 1e-2)
-        manu = lambda a: grad(a)
-        return auto, manu
+
     res = minimize(loglhd, [*k_initial, mu_initial], **minimizekwargs)
 
     return res
