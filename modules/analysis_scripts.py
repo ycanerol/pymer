@@ -709,7 +709,9 @@ def rolling_window(a, window, preserve_dim=True):
 
     """
     if preserve_dim:
-        a = np.concatenate((np.zeros(window-1), a))
+#        a = np.concatenate((np.zeros(window-1), a))
+        # Same thing for arbitrary number of dimensions
+        a = np.concatenate((np.zeros((*a.shape[:-1], window-1)), a), axis=-1)
     if window < 1:
         raise ValueError("`window` must be at least 1.")
     if window > a.shape[-1]:
