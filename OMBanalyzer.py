@@ -28,20 +28,23 @@ def calc_covar(stim_small):
 
 def q_nlt_recovery(spikes, generator, nr_bins=20):
     """
-    Calculate nonlinearities from
+    Calculate nonlinearities from the spikes and the generator signal.
+    Bins for the generator are defined such that they contain equal number
+    of samples. Since there are fewer samples for more extreme values of the
+    generator signal, bins get wider.
     """
-    # Define the quantiles we want to use for binning.
-    # endpoint and [1:] are used to exclude outermost bins because
-    # sometimes they cause bugs (e.g. nonlinearity is zero for some cells)
-    quantiles = np.linspace(0, 1, nr_bins+1, endpoint=False)[1:]
+
+    quantiles = np.linspace(0, 1, nr_bins+1)
+
     quantile_bins = mquantiles(generator, prob=quantiles)
     bindices = np.digitize(generator, quantile_bins)
     # Returns which bin each should go
-    spikecount_in_bins = np.array([])
+    spikecount_in_bins = np.full(nr_bins, np.nan)
     for i in range(nr_bins):  # Sorts values into bins
-        spikecount_in_bins = np.append(spikecount_in_bins,
-                                       (np.average(spikes[np.where
-                                                          (bindices == i)])))
+        spikecount_in_bins[i] = spikes[bindices == i+1].mean()
+    # Use the middle point of adjacent bins instead of the edges
+    # Note that this decrasese the length of the array by one
+    quantile_bins = (quantile_bins[1:]+quantile_bins[:-1])/2
     return quantile_bins, spikecount_in_bins
 
 
@@ -198,8 +201,9 @@ def OMBanalyzer(exp_name, stimnr, plotall=False, nr_bins=20):
         ax3.plot(eigvals_y[i, :], 'o', markerfacecolor='C1', markersize=4,
                  markeredgewidth=0)
         ax4 = plt.subplot(2, 3, 5)
-        ax4.plot(bins_x[i, :], spikecount_x[i, :])
-        ax4.plot(bins_y[i, :], spikecount_y[i, :])
+        ax4.plot(bins_x[i, :], spikecount_x[i, :]/frame_duration)
+        ax4.plot(bins_y[i, :], spikecount_y[i, :]/frame_duration)
+        ax4.set_ylabel('Firing rate [Hz]')
         ax4.set_title('Nonlinearities', size='small')
         plf.spineless([ax1, ax2, ax3, ax4], 'tr')
         ax5 = plt.subplot(2, 3, 6, projection='polar')
