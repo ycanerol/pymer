@@ -649,11 +649,14 @@ def ft_nblinks(exp_name, stimulusnr, nblinks=None, refresh_rate=None):
     return filter_length, frametimings
 
 
-def rolling_window(a, window):
+def rolling_window(a, window, preserve_dim=True):
     """
 
     Make an ndarray with a rolling window of the last dimension,
     this is useful for replacing for loops with numpy operations.
+
+    By default adds zeros to the beginning of the array to preserve
+    the dimension (otherwise the array returned has a-window+1 rows).
 
     Parameters
     ----------
@@ -661,6 +664,9 @@ def rolling_window(a, window):
         Array to add rolling window to
     window : int
         Size of rolling window
+    preserve_dim : bool
+        Whether return an array with the same number of rows as a. This is
+        done by adding zeros to the beginning of a. Default is True.
 
     Returns
     -------
@@ -669,10 +675,18 @@ def rolling_window(a, window):
 
     Notes
     -------
-    Equivalent to
+    A similar (but memory inefficient) way of achieving the same thing
+    would be using a hankel matrix. The difference is that hankel matrix
+    will be zero padded at the end.
 
+    >>> import numpy as np
     >>> from scipy.linalg import hankel
-    >>> res = hankel(a)[:-window+1, :window]
+    >>> a = np.random.random(size=10000)
+    >>> window = 50
+    >>> h = hankel(a)[:, :window]
+    >>> r = rolling_window(a, window, preserve_dim=True)
+    >>> np.isclose(r[window-1:, :], h[:-window+1, :]).all()
+    True
 
     where ``a`` is a 1D numpy array containing values for the stimulus.
 
@@ -694,6 +708,10 @@ def rolling_window(a, window):
     Taken from https://stackoverflow.com/a/4924433/9205838
 
     """
+    if preserve_dim:
+#        a = np.concatenate((np.zeros(window-1), a))
+        # Same thing for arbitrary number of dimensions
+        a = np.concatenate((np.zeros((*a.shape[:-1], window-1)), a), axis=-1)
     if window < 1:
         raise ValueError("`window` must be at least 1.")
     if window > a.shape[-1]:
