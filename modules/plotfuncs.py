@@ -6,10 +6,17 @@ Created on Tue Nov 14 13:37:25 2017
 @author: ycan
 """
 import os
+
+import numpy as np
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import numpy as np
+from matplotlib import animation
+from matplotlib.widgets import Slider
+
 import iofuncs as iof
+
+interactive_backends = ['Qt', 'Tk']
 
 
 def spineless(axes, which='trlb'):
@@ -185,6 +192,7 @@ def colorbar(mappable, size='5%', **kwargs):
     cb.ax.tick_params(length=0)
     return cb
 
+
 def drawonoff(ax, preframedur, stimdur, h=1, contrast=1):
     """
     Draws rectangles on plot to represent different parts of
@@ -287,6 +295,7 @@ def stashow(sta, ax=None, cbar=True, **kwargs):
         colorbar(im, **cbarkw)
     return im
 
+
 def subplottext(text, axis, x=-.3, y=1.1, **kwargs):
     textkwargs = {'transform':axis.transAxes,
                   'fontsize':12,
@@ -295,6 +304,7 @@ def subplottext(text, axis, x=-.3, y=1.1, **kwargs):
                   'ha':'right'}
     textkwargs.update(kwargs)
     axis.text(x, y, text, **textkwargs)
+
 
 def addarrowaxis(ax, x=0.5, y=0.5, dx=.1, dy=.2, xtext='',
                  ytext='', xtextoffset=0.02, ytextoffset=.032,
@@ -327,3 +337,150 @@ def addarrowaxis(ax, x=0.5, y=0.5, dx=.1, dy=.2, xtext='',
         fontsize=fontsize, va='top')
     ax.text(x - ytextoffset, y, ytext, rotation=90, transform=ax.transAxes,
         fontsize=fontsize, ha='left', va='bottom')
+
+
+def absmax(arr, **kwargs):
+    """
+    Return the furthest value from zero in a given array. Useful for
+    defining the colormap for STAs.
+    """
+    return np.nanmax(np.abs(arr), **kwargs)
+
+
+def absmin(arr, **kwargs):
+    """
+    Return the multiplicative inverse of the furthest value
+    from zero in a given array. Useful for defining the colormap for STAs.
+    """
+    return -absmax(arr, **kwargs)
+
+
+def playsta(sta, frame_duration=None, cmap=None, centerzero=True, **kwargs):
+    """
+    Create a looped animation for a single STA with 3 dimensions.
+
+    Parameters
+    ---------
+    cmap:
+        Colormap to be used. Defaults to the specified colormap in the
+        config file.
+    centerzero:
+        Center the colormap around zero if True.
+    interval:
+        Frame rate for the animation in ms.
+    repeat_delay:
+        Time to wait before the animation is repeated in ms.
+
+    Note
+    ----
+    The returned animation can be saved like so:
+
+    >>> ani = playsta(sta)
+    >>> ani.save('wheretosave/sta.gif', writer='imagemagick', fps=10)
+    """
+
+    backend = mpl.get_backend()
+    if not backend[:2] in interactive_backends:
+        raise ValueError('Switch to an interactive backend (e.g. Qt) to see'
+                         ' the animation.')
+    if cmap is None:
+        cmap = iof.config('colormap')
+    if centerzero:
+        vmax = absmax(sta)
+        vmin = absmin(sta)
+    else:
+        vmax, vmin = sta.max(), sta.min()
+    ims = []
+    fig = plt.figure()
+    ax = plt.gca()
+    for i in range(sta.shape[-1]):
+        im = ax.imshow(sta[:, :, i], animated=True,
+                        cmap=cmap, vmin=vmin, vmax=vmax)
+
+        ims.append([im]) # Needs to be a list of lists
+    ani = animation.ArtistAnimation(fig, ims, **kwargs)
+
+    return ani
+
+
+def multistabrowser(stas, frame_duration=None, cmap=None, centerzero=True):
+    """
+    Returns an interactive plot to browse multiple spatiotemporal
+    STAs at the same time. Requires an interactive matplotlib backend.
+
+    Parameters
+    --------
+    stas:
+        Numpy array containing STAs. First dimension should index individual cells,
+        last dimension should index time.
+        Alternatively, this could be a list of numpy arrays.
+    frame_duration:
+      Time between each frame. (optional)
+    cmap:
+      Colormap to use.
+    centerzero:
+      Whether to center the colormap around zero for diverging colormaps.
+
+    Example
+    ------
+    >>> print(stas.shape) # (nrcells, xpixels, ypixels, time)
+    (36, 75, 100, 40)
+    >>> fig, slider = stabrowser(stas, frame_duration=1/60)
+
+    Notes
+    -----
+    When calling the function, the slider is returned to prevent the reference
+    to it getting destroyed and to keep it interactive.
+    The dummy variable `_` can also be used.
+    """
+    backend = mpl.get_backend()
+    if not backend[:2] in interactive_backends:
+        raise ValueError('Switch to an interactive backend (e.g. Qt) to see'
+                         ' the animation.')
+    if isinstance(stas, list):
+        stas = np.array(stas)
+
+    if cmap is None:
+        cmap = iof.config('colormap')
+    if centerzero:
+        vmax = absmax(stas)
+        vmin = absmin(stas)
+    else:
+        vmax, vmin = stas.max(), stas.min()
+
+    imshowkwargs = dict(cmap=cmap, vmax=vmax, vmin=vmin)
+
+    rows, cols = numsubplots(stas.shape[0])
+    fig, axes = plt.subplots(rows, cols, sharex=True, sharey=True)
+
+    initial_frame = 5
+
+    axsl = fig.add_axes([0.25, 0.05, 0.65, 0.03])
+    # For the slider to remain interactive, a reference to it should
+    # be kept, so it set to a variable and is returned by the function
+    slider_t = Slider(axsl, 'Frame before spike',
+                      0, stas.shape[-1]-1,
+                      valinit=initial_frame,
+                      valstep=1,
+                      valfmt='%2.0f')
+
+    def update(frame):
+        frame = int(frame)
+        for i in range(rows):
+            for j in range(cols):
+                im = axes[i, j].get_images()[0]
+                im.set_data(stas[i*rows+j, ..., frame])
+        if frame_duration is not None:
+            fig.suptitle(f'{frame*frame_duration*1000:4.0f} ms')
+        fig.canvas.draw_idle()
+
+    slider_t.on_changed(update)
+
+    for i in range(rows):
+        for j in range(cols):
+            ax = axes[i, j]
+            ax.imshow(stas[i*rows+j, ..., initial_frame], **imshowkwargs)
+            ax.set_axis_off()
+    plt.tight_layout()
+    plt.subplots_adjust(wspace=.01, hspace=.01)
+    return fig, slider_t
