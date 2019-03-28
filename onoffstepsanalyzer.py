@@ -6,11 +6,41 @@ Created on Thu Nov 30 18:18:03 2017
 @author: ycan
 """
 import os
+import warnings
 import numpy as np
 import matplotlib.pyplot as plt
 import analysis_scripts as asc
 import plotfuncs as plf
 import iofuncs as iof
+
+
+def stim_prefr_durations_frametimes(frametimes, nr_per=4):
+    """
+    Returns the average duration for each period in the stimulus from
+    frametimes.
+
+    Parameters
+    --------
+    frametimes:
+        Array containing times where the frame was updated.
+    nr_per:
+        Number of periods in one trial. If preframes is not zero, this
+        will be four (grey-white-grey-black). If zero, it will be two
+        (white-black).
+
+    Returns
+    -----
+    trial_durs:
+        The duration for each period, shaped in a (nr_trials x nr_periods)
+        array. The last trial is discarded if it is not complete.
+    """
+    # Calculate each period duration
+    durs = np.ediff1d(frametimes)
+    # Reshape into trial structure, discard incomplete trial at the end
+    durs = durs[:(durs.shape[0]//nr_per)*nr_per];
+    durs = durs.reshape((durs.shape[0]//nr_per, nr_per));
+
+    return durs
 
 
 def onoffstepsanalyzer(exp_name, stim_nrs):
@@ -48,14 +78,38 @@ def onoffstepsanalyzer(exp_name, stim_nrs):
 
         # Divide by the refresh rate to convert from number of
         # frames to seconds
-        stim_duration = parameters['Nframes']/refresh_rate
+        pars_stim_duration = parameters['Nframes']/refresh_rate
 
-        preframe_duration = parameters.get('preframes',
+        pars_preframe_duration = parameters.get('preframes',
                                                    0)/refresh_rate
+
+        if pars_preframe_duration == 0:
+            nopreframe = True
+            nr_periods = 2
+        else:
+            nopreframe = False
+            nr_periods = 4
+        # The first trial will be discarded by dropping the first four frames
+        # If we don't save the original and re-initialize for each cell,
+        # frametimings will get smaller over time.
+        frametimings_original = asc.readframetimes(exp_dir, stim_nr)
+
+        trial_durs = stim_prefr_durations_frametimes(
+                frametimings_original, nr_per=nr_periods)
+        avg_trial_durs = trial_durs.mean(axis=0)
+
+        if not nopreframe:
+            stim_duration = avg_trial_durs[1::2].mean()
+            preframe_duration = avg_trial_durs[::2].mean()
+        else:
+            stim_duration = avg_trial_durs.mean()
+            preframe_duration = 0
+            warnings.warn('On-off steps analysis with no preframes'
+                          'is not tested, proceed with caution.')
 
         contrast = parameters['contrast']
 
-        total_cycle = (stim_duration+preframe_duration)*2
+        total_cycle = avg_trial_durs.sum()
 
         # Set the bins to be 10 ms
         tstep = 0.01
@@ -89,11 +143,6 @@ def onoffstepsanalyzer(exp_name, stim_nrs):
 
         onoffbias = np.empty(clusters.shape[0])
         baselines = np.empty(clusters.shape[0])
-
-        # The first trial will be discarded by dropping the first four frames
-        # If we don't save the original and re-initialize for each cell,
-        # frametimings will get smaller over time.
-        frametimings_original = asc.readframetimes(exp_dir, stim_nr)
 
         savedir = os.path.join(exp_dir, 'data_analysis', stimname)
         os.makedirs(os.path.join(savedir, 'pdf'), exist_ok=True)
@@ -147,7 +196,6 @@ def onoffstepsanalyzer(exp_name, stim_nrs):
             plt.gca().invert_yaxis()
             ax1.set_xticks([])
             plf.spineless(ax1)
-
 
             # Collect all trials in one array to calculate firing rates
             ras = np.array([])
