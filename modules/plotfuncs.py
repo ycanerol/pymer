@@ -468,8 +468,11 @@ def multistabrowser(stas, frame_duration=None, cmap=None, centerzero=True):
         frame = int(frame)
         for i in range(rows):
             for j in range(cols):
-                im = axes[i, j].get_images()[0]
-                im.set_data(stas[i*rows+j, ..., frame])
+                # Calculate the flattened index, equivalent to i*cols+j
+                flat_idx = np.ravel_multi_index([i, j], (rows, cols))
+                if flat_idx < stas.shape[0]:
+                    im = axes[i, j].get_images()[0]
+                    im.set_data(stas[flat_idx, ..., frame])
         if frame_duration is not None:
             fig.suptitle(f'{frame*frame_duration*1000:4.0f} ms')
         fig.canvas.draw_idle()
@@ -478,8 +481,10 @@ def multistabrowser(stas, frame_duration=None, cmap=None, centerzero=True):
 
     for i in range(rows):
         for j in range(cols):
+            flat_idx = np.ravel_multi_index([i, j], (rows, cols))
             ax = axes[i, j]
-            ax.imshow(stas[i*rows+j, ..., initial_frame], **imshowkwargs)
+            if flat_idx < stas.shape[0]:
+                ax.imshow(stas[i*cols+j, ..., initial_frame], **imshowkwargs)
             ax.set_axis_off()
     plt.tight_layout()
     plt.subplots_adjust(wspace=.01, hspace=.01)
