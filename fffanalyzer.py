@@ -104,7 +104,11 @@ def fffanalyzer(exp_name, stimnrs):
         for i in range(clusters.shape[0]):
             stas[i] = stas[i]/spikenrs[i]
             covars[i] = covars[i]/spikenrs[i]
-            eigvals[i], eigvecs[i] = np.linalg.eigh(covars[i])
+            try:
+                eigvals[i], eigvecs[i] = np.linalg.eigh(covars[i])
+            except np.linalg.LinAlgError:
+                eigvals[i] = np.full((filter_length), np.nan)
+                eigvecs[i] = np.full((filter_length, filter_length), np.nan)
             fig = plt.figure(figsize=(9, 6))
             ax = plt.subplot(111)
             ax.plot(t, stas[i], label='STA')
