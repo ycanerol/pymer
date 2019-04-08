@@ -385,7 +385,7 @@ def playsta(sta, frame_duration=None, cmap=None, centerzero=True, **kwargs):
     return ani
 
 
-def multistabrowser(stas, frame_duration=None, cmap=None, centerzero=True):
+def multistabrowser(stas, frame_duration=None, normalize=True, cmap=None, centerzero=True):
     """
     Returns an interactive plot to browse multiple spatiotemporal
     STAs at the same time. Requires an interactive matplotlib backend.
@@ -398,6 +398,8 @@ def multistabrowser(stas, frame_duration=None, cmap=None, centerzero=True):
         Alternatively, this could be a list of numpy arrays.
     frame_duration:
       Time between each frame. (optional)
+    normalize:
+      Whether to normalize each STA
     cmap:
       Colormap to use.
     centerzero:
@@ -419,6 +421,9 @@ def multistabrowser(stas, frame_duration=None, cmap=None, centerzero=True):
 
     if isinstance(stas, list):
         stas = np.array(stas)
+
+    if normalize:
+        stas = asc.normalize(stas)
 
     if cmap is None:
         cmap = iof.config('colormap')
