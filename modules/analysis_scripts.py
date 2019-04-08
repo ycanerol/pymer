@@ -736,3 +736,42 @@ def absmin(arr, **kwargs):
     and normalizing.
     """
     return -absmax(arr, **kwargs)
+
+
+def normalize(arr, axis_inv=0):
+    """
+    Normalize a given ndarray by dividing to the absolute maximum value
+    along all axes except axis_inv. Useful for normalizing multiple STAs
+    that are in a single numpy array.
+
+    Parameters:
+    --------
+    axis_inv:
+        maxima will be calculated except this axis. For STAs, this would
+        be the axis corespoding to cells. This is the opposite of the
+        axis argument in np.max().
+
+    Example:
+    -------
+    >>> print(stas.shape) # (nrcells, xpixels, ypixels, time)
+    (36, 75, 100, 40)
+    >>> stas.min(), stas.max()
+    (-0.138, 0.171)
+    >>> stas_normalized = normalize(stas, axis_inv=0)
+    >>> stas_normalized.min(), stas_normalized.max()
+    (-1.0, 1.0)
+
+    Notes:
+    -----
+    Note that this is based on absmax; so for an element along axis_inv
+    (i.e. STA of a single cell), one of minimum or maximum will be used.
+    In other words, the range for one STA can be [-1, 0.123] or [-0.123, 1]
+    and not necessarily [-1, 1].
+
+
+    """
+    inverted_axes = tuple(i for i in range(arr.ndim) if i != axis_inv)
+    maxima = absmax(arr, axis=inverted_axes)
+    maxima = maxima.reshape((-1,) + (1,)*(arr.ndim-1))
+    arr_norm = arr/maxima
+    return arr_norm
