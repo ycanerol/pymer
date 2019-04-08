@@ -719,3 +719,20 @@ def rolling_window(a, window, preserve_dim=True):
     shape = a.shape[:-1] + (a.shape[-1] - window + 1, window)
     strides = a.strides + (a.strides[-1],)
     return np.lib.stride_tricks.as_strided(a, shape=shape, strides=strides)
+
+
+def absmax(arr, **kwargs):
+    """
+    Return the furthest value from zero in a given array. Useful for
+    defining the colormap for STAs and normalizing.
+    """
+    return np.nanmax(np.abs(arr), **kwargs)
+
+
+def absmin(arr, **kwargs):
+    """
+    Return the multiplicative inverse of the furthest value
+    from zero in a given array. Useful for defining the colormap for STAs
+    and normalizing.
+    """
+    return -absmax(arr, **kwargs)

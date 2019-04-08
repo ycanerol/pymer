@@ -15,6 +15,7 @@ from matplotlib import animation
 from matplotlib.widgets import Slider
 
 import iofuncs as iof
+import analysis_scripts as asc
 
 interactive_backends = ['Qt', 'Tk']
 
@@ -272,8 +273,8 @@ def stashow(sta, ax=None, cbar=True, **kwargs):
         ax = plt.subplot(111)
         stashow(sta, ax)
     """
-    vmax = np.abs(sta).max()
-    vmin = -vmax
+    vmax = asc.absmax(sta)
+    vmin = asc.absmin(sta)
 
     # Make a dictionary for imshow and colorbar kwargs
     imshowkw = {'cmap': iof.config('colormap'), 'vmin':vmin, 'vmax':vmax}
@@ -339,22 +340,6 @@ def addarrowaxis(ax, x=0.5, y=0.5, dx=.1, dy=.2, xtext='',
         fontsize=fontsize, ha='left', va='bottom')
 
 
-def absmax(arr, **kwargs):
-    """
-    Return the furthest value from zero in a given array. Useful for
-    defining the colormap for STAs.
-    """
-    return np.nanmax(np.abs(arr), **kwargs)
-
-
-def absmin(arr, **kwargs):
-    """
-    Return the multiplicative inverse of the furthest value
-    from zero in a given array. Useful for defining the colormap for STAs.
-    """
-    return -absmax(arr, **kwargs)
-
-
 def playsta(sta, frame_duration=None, cmap=None, centerzero=True, **kwargs):
     """
     Create a looped animation for a single STA with 3 dimensions.
@@ -383,8 +368,8 @@ def playsta(sta, frame_duration=None, cmap=None, centerzero=True, **kwargs):
     if cmap is None:
         cmap = iof.config('colormap')
     if centerzero:
-        vmax = absmax(sta)
-        vmin = absmin(sta)
+        vmax = asc.absmax(sta)
+        vmin = asc.absmin(sta)
     else:
         vmax, vmin = sta.max(), sta.min()
     ims = []
@@ -438,8 +423,8 @@ def multistabrowser(stas, frame_duration=None, cmap=None, centerzero=True):
     if cmap is None:
         cmap = iof.config('colormap')
     if centerzero:
-        vmax = absmax(stas)
-        vmin = absmin(stas)
+        vmax = asc.absmax(stas)
+        vmin = asc.absmin(stas)
     else:
         vmax, vmin = stas.max(), stas.min()
 
