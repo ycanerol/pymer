@@ -125,14 +125,14 @@ def onoffstepsanalyzer(exp_name, stim_nrs):
         # Determine the indices for each period
         a = []
         for i in [onbegin, onend, offbegin, offend]:
-            yo = np.asscalar(np.where(np.abs(t-i) < tstep/2)[0][-1])
+            yo = np.asscalar(np.where(np.abs(t-i) < tstep/1.5)[0][-1])
             a.append(yo)
 
         # To exclude stimulus offset affecting the bias, use
         # last 1 second of preframe period
         prefs = []
         for i in [onbegin-1, onbegin, offbegin-1, offbegin]:
-            yo = np.asscalar(np.where(np.abs(t-i) < tstep/2)[0][-1])
+            yo = np.asscalar(np.where(np.abs(t-i) < tstep/1.5)[0][-1])
             prefs.append(yo)
 
         onper = slice(a[0], a[1])
