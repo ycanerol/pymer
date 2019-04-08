@@ -378,11 +378,8 @@ def playsta(sta, frame_duration=None, cmap=None, centerzero=True, **kwargs):
     >>> ani = playsta(sta)
     >>> ani.save('wheretosave/sta.gif', writer='imagemagick', fps=10)
     """
+    check_interactive_backend()
 
-    backend = mpl.get_backend()
-    if not backend[:2] in interactive_backends:
-        raise ValueError('Switch to an interactive backend (e.g. Qt) to see'
-                         ' the animation.')
     if cmap is None:
         cmap = iof.config('colormap')
     if centerzero:
@@ -433,10 +430,8 @@ def multistabrowser(stas, frame_duration=None, cmap=None, centerzero=True):
     to it getting destroyed and to keep it interactive.
     The dummy variable `_` can also be used.
     """
-    backend = mpl.get_backend()
-    if not backend[:2] in interactive_backends:
-        raise ValueError('Switch to an interactive backend (e.g. Qt) to see'
-                         ' the animation.')
+    check_interactive_backend()
+
     if isinstance(stas, list):
         stas = np.array(stas)
 
@@ -489,3 +484,14 @@ def multistabrowser(stas, frame_duration=None, cmap=None, centerzero=True):
     plt.tight_layout()
     plt.subplots_adjust(wspace=.01, hspace=.01)
     return fig, slider_t
+
+
+def check_interactive_backend():
+    """
+    Check whether the current backend is an interactive one for certain
+    plots.
+    """
+    backend = mpl.get_backend()
+    if not backend[:2] in interactive_backends:
+        raise ValueError('Switch to an interactive backend (e.g. Qt) to see'
+                         ' the animation.')
