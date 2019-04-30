@@ -25,14 +25,18 @@ def spineless(axes, which='trlb'):
     Set the spine visibility quickly in matplotlib.
 
     Parameters:
-        ax: List of axis objects returned by e.g. plt.subplot()
-        which: List of spines to turn off.
+    --------
+    ax:
+        List of axis objects returned by e.g. plt.subplot()
+    which:
+        List of spines to turn off.
 
     Example usage:
-    ax=plt.subplot(111)
-    ax.plot(np.random.randint(5, 10, size=10))
-    spineless(ax, which='trlb')
-    plt.show()
+
+    >>> ax=plt.subplot(111)
+    >>> ax.plot(np.random.randint(5, 10, size=10))
+    >>> spineless(ax, which='trlb')
+    >>> plt.show()
     """
     # Check whether a single axes object is given
     if isinstance(axes, mpl.axes.Axes):
