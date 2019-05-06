@@ -226,7 +226,7 @@ def OMBanalyzer(exp_name, stimnr, plotall=False, nr_bins=20):
                   'ntotal', 'r', 'theta', 'stas',
                   'stc_x', 'stc_y', 'bins_x', 'bins_y', 'nr_bins',
                   'spikecount_x', 'spikecount_y',
-                  'generators_x', 'generators_y']
+                  'generators_x', 'generators_y', 't']
     datadict = {}
 
     for key in keystosave:
