@@ -24,7 +24,7 @@ def loadstim(exp, stim_nr, maxframenr=10000):
     for key, val in sortedstim.items():
         if stim_nr in val:
             stimtype = key
-    if stimtype in ['fff', 'stripeflicker', 'checkerflicker']:
+    if stimtype in ['fff', 'stripeflicker', 'checkerflicker', 'frozennoise']:
         seed = pars.get('seed', -10000)
         bw = pars.get('blackwhite', False)
         filter_length, frametimings = asc.ft_nblinks(exp, stim_nr)
@@ -39,7 +39,7 @@ def loadstim(exp, stim_nr, maxframenr=10000):
             else:
                 randnrs, seed = randpy.gasdev(seed, total_frames)
                 stimulus = np.array(randnrs)
-        elif stimtype == 'checkerflicker':
+        elif stimtype in ['checkerflicker', 'frozennoise']:
             scr_width = metadata['screen_width']
             scr_height = metadata['screen_height']
             stx_h = pars['stixelheight']
