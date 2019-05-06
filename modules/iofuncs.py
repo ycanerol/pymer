@@ -197,7 +197,7 @@ def load(exp_name, stimnr, fname=None):
                         fname)
 
     data_in_dict = {}
-    with np.load(path) as f:
+    with np.load(path, allow_pickle=True) as f:
         # Get all the variable names that were saved
         keys = list(f.keys())
         for key in keys:
