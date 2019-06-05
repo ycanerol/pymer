@@ -141,7 +141,6 @@ for i, cl in enumerate(clusters):
     plt.tight_layout()
     plt.subplots_adjust(top=.85)
     #%%
-    break
     plt.savefig(os.path.join(savedir, clids[i]+'.svg'),
                 bbox_inches = 'tight',
                 pad_inches = 0.3)

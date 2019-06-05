@@ -19,8 +19,8 @@ def normalizestas(stas):
     return stas_normalized
 
 #%%
-exp_name = '20180802'
-stim_nr = 11
+exp_name = '20180710'
+stim_nr = 8
 
 data = iof.load(exp_name, stim_nr)
 stimulus = glm.loadstim(exp_name, stim_nr)
@@ -28,7 +28,8 @@ stimulus = glm.loadstim(exp_name, stim_nr)
 cell_lim = slice(None)
 
 clusters = data['clusters'][cell_lim]
-stas = glm.normalizestas(data['stas'][cell_lim])
+stas = np.array(data['stas'])
+#stas = glm.normalizestas(data['stas'][cell_lim])
 #frame_dur = data['frame_duration']
 
 predstas = stas.copy()
@@ -37,6 +38,7 @@ predmus = np.zeros((stas.shape[0], stas.shape[-1]))
 parameters = asc.read_parameters(exp_name, stim_nr)
 
 _, frametimes = asc.ft_nblinks(exp_name, stim_nr, parameters.get('Nblinks', 2))
+frametimes = frametimes[:-1]
 frame_dur = np.ediff1d(frametimes).mean()
 
 stashape = stas[:, 0, :].shape
@@ -57,8 +59,8 @@ for i, cluster in enumerate(clusters):
         predstas[i, j, :] = k_pred
         predmus[i, j] = mu_pred
 
-stas = normalizestas(stas)
-predstas = normalizestas(predstas)
+#stas = normalizestas(stas)
+#predstas = normalizestas(predstas)
 
 elapsed = dt.datetime.now()-start
 print(f'Took {elapsed.total_seconds()/60:4.2f} minutes')
