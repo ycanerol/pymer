@@ -11,7 +11,7 @@ extremes with color in the middle
 import matplotlib.pyplot as plt
 import numpy as np
 import sys
-sys.path.append('/home/ycan/Documents/scripts/modules/')
+sys.path.append('/home/ycan/repos/pymer/modules/')
 import plotfuncs as plf
 
 

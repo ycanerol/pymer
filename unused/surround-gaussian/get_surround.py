@@ -14,7 +14,7 @@ try:
     import miscfuncs as mf
 except ImportError:
     import sys
-    sys.path.append('/home/ycan/Documents/scripts/modules/')
+    sys.path.append('/home/ycan/repos/pymer/modules/')
     import miscfuncs as mf
 
 files = mf.readexps(directory='/home/ycan/Documents/data/2017-08-02',
