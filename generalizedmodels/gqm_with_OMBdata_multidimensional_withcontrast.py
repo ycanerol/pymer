@@ -20,7 +20,7 @@ from scipy import linalg
 
 from OMBanalyzer import q_nlt_recovery
 
-from scratch_stimulusclass import OMB
+from omb import OMB
 import scratch_matchOMBandchecker as moc
 
 
