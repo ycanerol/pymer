@@ -115,7 +115,7 @@ class OMB(Stimulus):
         filterwidth = filterstd/bgstixel*3
         noiselim = (np.ceil(np.array([pars.squareheight,
                                       pars.squarewidth])/bgstixel)
-                    ).astype(int)
+                   ).astype(int)
 
         # Gaussian filter is applied to the noise field by a for loop in the cpp code,
         # and its norm is
@@ -128,7 +128,7 @@ class OMB(Stimulus):
                               noiselim[0]*noiselim[1])[0],
                              (noiselim[0], noiselim[1]))
         noisefield = (pars.meanintensity
-                    + pars.meanintensity*pars.bgcontrast*randnrs)
+                      + pars.meanintensity*pars.bgcontrast*randnrs)
 
         texturebasic = snd.convolve(noisefield, gfilter)
         texturetiled = snd.convolve(np.tile(noisefield, [3, 3]), gfilter)
@@ -143,7 +143,6 @@ class OMB(Stimulus):
         self.texpars.noiselim = noiselim
         self.texpars.filterwidth = filterwidth
 
-
     def _generatetexture_withloops(self):
         pars = self.pars
         self.texpars_withloop = Parameters()
@@ -153,7 +152,7 @@ class OMB(Stimulus):
         filterwidth = int(filterstd/bgstixel*3)
         noiselim = (np.ceil(np.array([pars.squareheight,
                                       pars.squarewidth])/bgstixel)
-                    ).astype(int)
+                   ).astype(int)
         gfilter = np.zeros((pars.squareheight, pars.squarewidth))
         seed = pars.bggenerationseed
 
@@ -164,7 +163,7 @@ class OMB(Stimulus):
             for j in range(noiselim[1]):
                 rndnr, seed = randpy.gasdev(seed)
                 noisefield[i, j] = meanintensity + meanintensity*pars.bgcontrast*rndnr
-                if (i < filterwidth * 2 + 1 ) and (j < filterwidth * 2 + 1 ):
+                if (i < filterwidth * 2 + 1) and (j < filterwidth * 2 + 1):
                     gfilter[i, j] = np.exp2(-((i - filterwidth)**2 + (j - filterwidth)**2) / (2 * (filterstd / bgstixel)**2))
                     norm += gfilter[i, j]
         for i in range(noiselim[0]):
@@ -173,8 +172,8 @@ class OMB(Stimulus):
                 for ki in range(filterwidth*2 + 1):
                     for kj in range(filterwidth*2 + 1):
                         helper += (noisefield[(i - (ki - filterwidth) + noiselim[0]) % noiselim[0],
-                                             (j - (kj - filterwidth) + noiselim[1]) % noiselim[1]]
-                                    * gfilter[ki, kj])
+                                              (j - (kj - filterwidth) + noiselim[1]) % noiselim[1]]
+                                   * gfilter[ki, kj])
 #                c = 255 * ((helper / norm - meanintensity) * filterstd / bgstixel + meanintensity)
                 c = self._normalizetexture(helper, norm, meanintensity, filterstd, bgstixel)
 
@@ -183,7 +182,6 @@ class OMB(Stimulus):
                         texture[i*bgstixel + gi, j*bgstixel + gj] = c
 
         self.texturewithloops = texture
-
 
     def _normalizetexture(self, texture, norm, meanintensity, filterstd, bgstixel):
         texture = ((texture/norm-meanintensity)*filterstd/bgstixel + meanintensity)
@@ -230,7 +228,6 @@ class OMB(Stimulus):
         plt.show()
         return fig
 
-
     def generatecontrast(self, coord, window=0):
         """
         Returns the contrast value for a particular coordinate throughout
@@ -266,8 +263,7 @@ class OMB(Stimulus):
 
 #%%
 if __name__ == '__main__':
-    import matplotlib.pyplot as plt
-    from matplotlib import animation
+
     exp, ombstimnr = '20180710', 8
     checkerstimnr = 6
     maxframes = 20000
