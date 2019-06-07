@@ -480,6 +480,78 @@ def multistabrowser(stas, frame_duration=None, normalize=True, cmap=None, center
     return fig, slider_t
 
 
+def stabrowser(sta, frame_duration=None, cmap=None, centerzero=True):
+    """
+    Returns an interactive plot to browse an spatiotemporal
+    STA. Requires an interactive matplotlib backend.
+
+    Parameters
+    --------
+    sta:
+        Numpy array containing the STA. Last dimension should index time.
+    frame_duration:
+      Time between each frame. (optional)
+    cmap:
+      Colormap to use.
+    centerzero:
+      Whether to center the colormap around zero for diverging colormaps.
+
+    Example
+    ------
+    >>> print(sta.shape) # (xpixels, ypixels, time)
+    (75, 100, 40)
+    >>> fig, slider = stabrowser(sta, frame_duration=1/60)
+
+    Notes
+    -----
+    When calling the function, the slider is returned to prevent the reference
+    to it getting destroyed and to keep it interactive.
+    The dummy variable `_` can also be used.
+    """
+    check_interactive_backend()
+
+    if cmap is None:
+        cmap = iof.config('colormap')
+    if centerzero:
+        vmax = asc.absmax(sta)
+        vmin = asc.absmin(sta)
+    else:
+        vmax, vmin = sta.max(), sta.min()
+
+    imshowkwargs = dict(cmap=cmap, vmax=vmax, vmin=vmin)
+
+    fig = plt.figure()
+    ax =  fig.add_axes([0.1, 0.1, 0.8, 0.8])
+
+
+    initial_frame = 5
+
+    axsl = fig.add_axes([0.25, 0.05, 0.65, 0.03])
+    # For the slider to remain interactive, a reference to it should
+    # be kept, so it set to a variable and is returned by the function
+    slider_t = Slider(axsl, 'Frame before spike',
+                      0, sta.shape[-1]-1,
+                      valinit=initial_frame,
+                      valstep=1,
+                      valfmt='%2.0f')
+
+    def update(frame):
+        frame = int(frame)
+        im = ax.get_images()[0]
+        im.set_data(sta[..., frame])
+        if frame_duration is not None:
+            fig.suptitle(f'{frame*frame_duration*1000:4.0f} ms')
+        fig.canvas.draw_idle()
+
+    slider_t.on_changed(update)
+
+    ax.imshow(sta[..., initial_frame], **imshowkwargs)
+    ax.set_axis_off()
+    plt.tight_layout()
+    plt.subplots_adjust(wspace=.01, hspace=.01)
+    return fig, slider_t
+
+
 def check_interactive_backend():
     """
     Check whether the current backend is an interactive one for certain
