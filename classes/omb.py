@@ -245,7 +245,7 @@ class OMB(Stimulus):
         # texture goes out of the central region.
         traj = self.bgtraj_clipped
         contrast = np.zeros((window*2+1, window*2+1, self.ntotal))
-        texture = self.texture_flipped
+        texture = self.texture
         for i, ii in enumerate(range(-window, window+1)):
             for j, jj in enumerate(range(-window, window+1)):
                 traj_loop = np.round(traj
