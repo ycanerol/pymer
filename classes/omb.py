@@ -249,7 +249,7 @@ class OMB(Stimulus):
                 traj_loop = np.round(traj
                             + coord[..., None]
                             # HINT: center the texture
-                            #- self.texpars.noiselim[:, None]*1.5
+                            - self.texpars.noiselim[:, None]*1.5
                             + np.array([ii, jj])[..., None]).astype(int)
                 contrast[i, j] = texture[traj_loop[0], traj_loop[1]]
         return contrast
