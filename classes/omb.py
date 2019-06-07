@@ -180,8 +180,10 @@ class OMB(Stimulus):
                 for gi in range(bgstixel):
                     for gj in range(bgstixel):
                         texture[i*bgstixel + gi, j*bgstixel + gj] = c
-
+        # This will be the full size 800x800 with repeats
         self.texturewithloops = texture
+        # Save a smaller version for compatibility
+        self.texturewithloopsmini = texture[::bgstixel, ::bgstixel]
 
     def _normalizetexture(self, texture, norm, meanintensity, filterstd, bgstixel):
         texture = ((texture/norm-meanintensity)*filterstd/bgstixel + meanintensity)
