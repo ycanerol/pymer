@@ -130,7 +130,7 @@ class OMB(Stimulus):
         noisefield = (pars.meanintensity
                       + pars.meanintensity*pars.bgcontrast*randnrs)
 
-        texturebasic = snd.convolve(noisefield, gfilter)
+        texturebasic = snd.convolve(noisefield, gfilter, mode='wrap')
         texturetiled = snd.convolve(np.tile(noisefield, [3, 3]), gfilter)
 
         texturebasic = self._normalizetexture(texturebasic, norm, meanintensity, filterstd, bgstixel)
