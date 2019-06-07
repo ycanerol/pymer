@@ -243,6 +243,7 @@ class OMB(Stimulus):
         # texture goes out of the central region.
         traj = self.bgtraj_clipped
         contrast = np.zeros((window*2+1, window*2+1, self.ntotal))
+        texture = self.texture_flipped
         for i, ii in enumerate(range(-window, window+1)):
             for j, jj in enumerate(range(-window, window+1)):
                 traj_loop = np.round(traj
@@ -250,7 +251,7 @@ class OMB(Stimulus):
                             # HINT: center the texture
                             #- self.texpars.noiselim[:, None]*1.5
                             + np.array([ii, jj])[..., None]).astype(int)
-                contrast[i, j] = self.texture_flipped[traj_loop[0], traj_loop[1]]
+                contrast[i, j] = texture[traj_loop[0], traj_loop[1]]
         return contrast
 
     def regioncontrast(self, coord, window):
