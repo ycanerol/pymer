@@ -389,7 +389,8 @@ def playsta(sta, frame_duration=None, cmap=None, centerzero=True, **kwargs):
     return ani
 
 
-def multistabrowser(stas, frame_duration=None, normalize=True, cmap=None, centerzero=True):
+def multistabrowser(stas, frame_duration=None, normalize=True, cmap=None,
+                    centerzero=True, **kwargs):
     """
     Returns an interactive plot to browse multiple spatiotemporal
     STAs at the same time. Requires an interactive matplotlib backend.
@@ -437,7 +438,7 @@ def multistabrowser(stas, frame_duration=None, normalize=True, cmap=None, center
     else:
         vmax, vmin = stas.max(), stas.min()
 
-    imshowkwargs = dict(cmap=cmap, vmax=vmax, vmin=vmin)
+    imshowkwargs = dict(cmap=cmap, vmax=vmax, vmin=vmin, **kwargs)
 
     rows, cols = numsubplots(stas.shape[0])
     fig, axes = plt.subplots(rows, cols, sharex=True, sharey=True)
@@ -480,7 +481,7 @@ def multistabrowser(stas, frame_duration=None, normalize=True, cmap=None, center
     return fig, slider_t
 
 
-def stabrowser(sta, frame_duration=None, cmap=None, centerzero=True):
+def stabrowser(sta, frame_duration=None, cmap=None, centerzero=True, **kwargs):
     """
     Returns an interactive plot to browse an spatiotemporal
     STA. Requires an interactive matplotlib backend.
@@ -518,7 +519,7 @@ def stabrowser(sta, frame_duration=None, cmap=None, centerzero=True):
     else:
         vmax, vmin = sta.max(), sta.min()
 
-    imshowkwargs = dict(cmap=cmap, vmax=vmax, vmin=vmin)
+    imshowkwargs = dict(cmap=cmap, vmax=vmax, vmin=vmin, **kwargs)
 
     fig = plt.figure()
     ax =  fig.add_axes([0.1, 0.1, 0.8, 0.8])
