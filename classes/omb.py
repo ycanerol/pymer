@@ -291,6 +291,46 @@ class OMB(Stimulus):
                 contrast[i, j] = texture[traj_loop[0], traj_loop[1]]
         return contrast
 
+    def generatecontrastmaxi(self, coord, window=0, pad_length=0):
+        """
+        Generate texture using each pixel, to minimize rounding errors
+
+        although norma apparently does it based on stixels
+
+        coordinate is the bottom (?) left corner
+        window is the full size of the texture (not like radius around)
+        """
+        coord = np.array(coord)
+        # Movement in x direction corresponds to translation in left/right
+        # axis; and y to up/down axis. Since the first index is the row,
+        # we need swap x and y if we want to keep the order (x,y).
+        coord = np.flipud(coord)
+
+        fieldsize = np.array([self.pars.squareheight, self.pars.squarewidth])
+        # Use the clipped trajectory in case the
+        # texture goes out of the central region.
+        traj = np.fmod(self.bgtraj*self.pars.bgstixel, fieldsize[:, None])
+
+        contrast = np.zeros((window, window, self.ntotal+pad_length))
+
+        if pad_length != 0:
+            traj = np.concatenate((np.zeros((2, pad_length)), traj), axis=-1)
+
+        if not hasattr(self, 'texture_withloops'):
+            self._generatetexture_withloops()
+        texture = self.texturewithloopsmaxi
+
+        for i, ii in enumerate(range(window)):
+            for j, jj in enumerate(range(window)):
+                traj_loop = np.round(traj
+                            + coord[..., None]
+                            # HINT: center the texture
+                            + np.array([ii, jj])[..., None]).astype(int)
+                traj_loop = np.fmod(traj_loop, fieldsize[:, None])
+                contrast[i, j] = texture[traj_loop[0], traj_loop[1]]
+#                contrast[i, j, :] = np.take(texture, traj_loop, mode='wrap')
+        return contrast
+
     def regioncontrast(self, coord, window):
         """
         Returns the average contrast values for a group of coordinates.
