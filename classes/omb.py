@@ -266,21 +266,28 @@ class OMB(Stimulus):
         # axis; and y to up/down axis. Since the first index is the row,
         # we need swap x and y if we want to keep the order (x,y).
         coord = np.flipud(coord)
+
+        texture = self.texture_flipped
         # Use the clipped trajectory in case the
         # texture goes out of the central region.
-        traj = self.bgtraj_clipped
-        texture = self.texture
+        traj = self.bgtraj_clipped.copy()
+        # Flip the y axis because texture is also flipped
+        traj[1, :] *= -1
+        # swap x and y
+        traj = np.flipud(traj)
+
         contrast = np.zeros((window*2+1, window*2+1, self.ntotal+pad_length))
         if pad_length != 0:
             traj = np.concatenate((np.zeros((2, pad_length)), traj), axis=-1)
 
         for i, ii in enumerate(range(-window, window+1)):
             for j, jj in enumerate(range(-window, window+1)):
-                traj_loop = np.round(traj
+                traj_loop = np.round(-traj
                             + coord[..., None]
                             # HINT: center the texture
-                            - self.texpars.noiselim[:, None]*1.5
+                            + self.texpars.noiselim[:, None]
                             + np.array([ii, jj])[..., None]).astype(int)
+                traj_loop = np.fmod(traj_loop, texture.shape[0])
                 contrast[i, j] = texture[traj_loop[0], traj_loop[1]]
         return contrast
 
@@ -318,11 +325,12 @@ if __name__ == '__main__':
     for i in range(st.nclusters):
         all_spikes[i, :] = st.binnedspiketimes(i)[:-1]
 
-    # Add a cell that spikes at every bin to find the non-spike triggered average
-    all_spikes = np.vstack((all_spikes, np.ones(all_spikes.shape[-1])))
     stas = np.einsum('abcd,ec->eabd', RW, all_spikes)
-    del RW
     stas /= all_spikes.sum(axis=(-1))[:, np.newaxis, np.newaxis, np.newaxis]
+
+    # Correct for the non-informative parts of the stimulus
+    stas = stas - contrast_avg[None, ..., None]
+
     print(f'{msc.timediff(startime)} elapsed for contrast generation and STA calculation')
     #%%
 #    fig1 = plt.figure(1)
