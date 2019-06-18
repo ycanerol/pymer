@@ -27,9 +27,11 @@ class Stimulus:
     def _getstimtype(self):
         sortedstim = asc.stimulisorter(self.exp)
 
+        stimtype = None
         for key, val in sortedstim.items():
             if self.stimnr in val:
                 stimtype = key
+
         self.stimtype = stimtype
 
     def get_frametimings(self):
