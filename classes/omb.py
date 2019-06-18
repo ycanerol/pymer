@@ -230,11 +230,36 @@ class OMB(Stimulus):
         plt.show()
         return fig
 
-    def generatecontrast(self, coord, window=0):
+    def generatecontrast(self, coord, window=0, pad_length=0):
         """
         Returns the contrast value for a particular coordinate throughout
-        the whole experiment. The coordinates are rounded to be used as
+        the whole experiment, padded with zeros in the beginning to fit
+        the rolling_window function. The coordinates are rounded to be used as
         indices.
+
+        Padding is needed because rolling window reduces the size of the
+        temporal axis by it's "window" parameter. The option "preserve_dims"
+        leads to doubling in memory so we solve it by generating the array
+        with zeros already there.
+
+        Parameters
+        --------
+        coords:
+            The coordinates for the center of the contrast to be generated.
+            Origin should be lower (or upper?) left corner. So the center
+            would be [100, 100] for default OMB parameters.
+
+            Should be a list or numpy array of two elements.
+
+        pad_length:
+            The length of the padding in the beginning, corresponds to the
+            window parameter rolling window function, or filter_length
+            for STA in general.
+
+        window:
+            The resulting array will extend this many pixels in both
+            directions around coord. If zero, size will be a single pixel.
+
         """
         coord = np.array(coord)
         # Movement in x direction corresponds to translation in left/right
@@ -244,8 +269,11 @@ class OMB(Stimulus):
         # Use the clipped trajectory in case the
         # texture goes out of the central region.
         traj = self.bgtraj_clipped
-        contrast = np.zeros((window*2+1, window*2+1, self.ntotal))
         texture = self.texture
+        contrast = np.zeros((window*2+1, window*2+1, self.ntotal+pad_length))
+        if pad_length != 0:
+            traj = np.concatenate((np.zeros((2, pad_length)), traj), axis=-1)
+
         for i, ii in enumerate(range(-window, window+1)):
             for j, jj in enumerate(range(-window, window+1)):
                 traj_loop = np.round(traj
@@ -280,9 +308,11 @@ if __name__ == '__main__':
     from datetime import datetime
     import miscfuncs as msc
     startime = datetime.now()
-    a = st.generatecontrast(st.texpars.noiselim/2, 100)
+    contrast = st.generatecontrast(st.texpars.noiselim/2, 100, 19)
+    contrast_avg = contrast.mean(axis=-1)
+
     # Capitalize name of variable to prevent it from slowing variable exp. down
-    RW = asc.rolling_window(a, st.filter_length)
+    RW = asc.rolling_window(contrast, st.filter_length, preserve_dim=False)
 
     all_spikes = np.zeros((st.nclusters, st.ntotal))
     for i in range(st.nclusters):
