@@ -24,6 +24,9 @@ class Stimulus:
         else:
             self.maxframes_i = None
 
+        self.stim_dir = os.path.join(self.exp_dir, 'data_analysis',
+                                     self.stimname)
+
     def _getstimtype(self):
         sortedstim = asc.stimulisorter(self.exp)
 
