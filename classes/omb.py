@@ -94,8 +94,7 @@ class OMB(Stimulus):
         ysteps = randnrs[1::2]
 
         steps = np.vstack((xsteps, ysteps))
-        # HINT
-#        steps *= -1
+
         steps /= pars.bgstixel
 
         self.bgsteps = steps
@@ -115,7 +114,7 @@ class OMB(Stimulus):
         filterwidth = filterstd/bgstixel*3
         noiselim = (np.ceil(np.array([pars.squareheight,
                                       pars.squarewidth])/bgstixel)
-                   ).astype(int)
+                    ).astype(int)
 
         # Gaussian filter is applied to the noise field by a for loop in the cpp code,
         # and its norm is
@@ -125,7 +124,7 @@ class OMB(Stimulus):
 
         norm = gfilter.sum()
         randnrs = np.reshape(randpy.gasdev(pars.bggenerationseed,
-                              noiselim[0]*noiselim[1])[0],
+                             noiselim[0]*noiselim[1])[0],
                              (noiselim[0], noiselim[1]))
         noisefield = (pars.meanintensity
                       + pars.meanintensity*pars.bgcontrast*randnrs)
@@ -152,7 +151,7 @@ class OMB(Stimulus):
         filterwidth = int(filterstd/bgstixel*3)
         noiselim = (np.ceil(np.array([pars.squareheight,
                                       pars.squarewidth])/bgstixel)
-                   ).astype(int)
+                    ).astype(int)
         gfilter = np.zeros((pars.squareheight, pars.squarewidth))
         seed = pars.bggenerationseed
 
@@ -358,14 +357,13 @@ if __name__ == '__main__':
     contrast = st.generatecontrast(st.texpars.noiselim/2, 100, 19)
     contrast_avg = contrast.mean(axis=-1)
 
-    # Capitalize name of variable to prevent it from slowing variable exp. down
-    RW = asc.rolling_window(contrast, st.filter_length, preserve_dim=False)
+    rw = asc.rolling_window(contrast, st.filter_length, preserve_dim=False)
 
     all_spikes = np.zeros((st.nclusters, st.ntotal))
     for i in range(st.nclusters):
         all_spikes[i, :] = st.binnedspiketimes(i)[:-1]
 
-    stas = np.einsum('abcd,ec->eabd', RW, all_spikes)
+    stas = np.einsum('abcd,ec->eabd', rw, all_spikes)
     stas /= all_spikes.sum(axis=(-1))[:, np.newaxis, np.newaxis, np.newaxis]
 
     # Correct for the non-informative parts of the stimulus
