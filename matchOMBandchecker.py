@@ -45,6 +45,9 @@ def read_and_match_pars(exp, omb_stimnr, chk_stimnr):
     # clipped.
     px_diff //= 2
 
+    # HINT
+    px_diff = px_diff[::-1]
+
     return ombstx, chkstx, px_diff
 
 
@@ -56,7 +59,7 @@ def coord_omb2chk(omb_coord, exp, omb_stimnr, chk_stimnr):
     Parameters
     ------
     omb_coord:
-        (x, y) coordinates in the OMB texturehtop
+        (x, y) coordinates in the OMB texture
 
     omb_stimnr:
         The stimulus number for OMB
