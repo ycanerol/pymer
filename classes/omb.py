@@ -273,7 +273,8 @@ class OMB(Stimulus):
         # swap x and y
         traj = np.flipud(traj)
 
-        contrast = np.zeros((window*2+1, window*2+1, self.ntotal+pad_length))
+        contrast = np.zeros((window*2+1, window*2+1,
+                             self.ntotal+pad_length), dtype=np.float32)
         if pad_length != 0:
             traj = np.concatenate((np.zeros((2, pad_length)), traj), axis=-1)
 
