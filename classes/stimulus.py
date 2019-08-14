@@ -19,10 +19,6 @@ class Stimulus:
         self.refresh_rate = self.metadata['refresh_rate']
         self.sampling_rate = self.metadata['sampling_freq']
         self.maxframes = maxframes
-        if maxframes:
-            self.maxframes_i = maxframes + 1
-        else:
-            self.maxframes_i = None
 
         self.stim_dir = os.path.join(self.exp_dir, 'data_analysis',
                                      self.stimname)
@@ -38,7 +34,7 @@ class Stimulus:
         self.stimtype = stimtype
 
     def get_frametimings(self):
-        frametimings = asc.readframetimes(self.exp, self.stimnr)[:self.maxframes_i]
+        frametimings = asc.readframetimes(self.exp, self.stimnr)[:self.maxframes]
         self.frametimings = frametimings
 
     def readpars(self):
@@ -56,7 +52,7 @@ class Stimulus:
         return asc.read_raster(self.exp, self.stimnr, ch, cl)
 
     def binnedspiketimes(self, i):
-        return asc.binspikes(self.read_raster(i), self.frametimings)[:self.maxframes_i]
+        return asc.binspikes(self.read_raster(i), self.frametimings)[:self.maxframes]
 
 
 class Parameters:

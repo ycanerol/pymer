@@ -62,7 +62,8 @@ def ombtexturesta(exp, ombstimnr, maxframes=10000,
 
     all_spikes = np.zeros((st.nclusters, st.ntotal))
     for i in range(st.nclusters):
-        all_spikes[i, :] = st.binnedspiketimes(i)[:-1]
+        all_spikes[i, :] = st.binnedspiketimes(i)
+
 
     texturestas = np.einsum('abcd,ec->eabd', RW, all_spikes)
     texturestas /= all_spikes.sum(axis=(-1))[:, np.newaxis,

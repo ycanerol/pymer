@@ -54,6 +54,8 @@ class OMB(Stimulus):
                                                      self.stimnr,
                                                      self.pars.nblinks,
                                                      self.refresh_rate)
+        if self.maxframes is None:
+            frametimings = frametimings[:-1]
         self.frametimings = frametimings
         self.filter_length = filter_length
 
@@ -70,7 +72,7 @@ class OMB(Stimulus):
 
     def _generatesteps(self):
         pars = self.pars
-        frametimings = self.frametimings[:-1]
+        frametimings = self.frametimings
         self.frame_duration = np.ediff1d(frametimings).mean()
         if self.maxframes is None:
             ntotal = int(pars.stimframes/pars.nblinks)
@@ -357,7 +359,7 @@ if __name__ == '__main__':
 
     all_spikes = np.zeros((st.nclusters, st.ntotal))
     for i in range(st.nclusters):
-        all_spikes[i, :] = st.binnedspiketimes(i)[:-1]
+        all_spikes[i, :] = st.binnedspiketimes(i)
 
     stas = np.einsum('abcd,ec->eabd', rw, all_spikes)
     stas /= all_spikes.sum(axis=(-1))[:, np.newaxis, np.newaxis, np.newaxis]
