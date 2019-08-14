@@ -12,7 +12,6 @@ import matplotlib.pyplot as plt
 sys.path.append('/home/ycan/repos/pymer/generalizedmodels/')
 
 import gen_quad_model_multidimensional as gqm
-import genlinmod as glm
 import analysis_scripts as asc
 import iofuncs as iof
 import plotfuncs as plf
@@ -24,81 +23,81 @@ from omb import OMB
 import scratch_matchOMBandchecker as moc
 
 
-exp_name = '20180710'
-stim_nr = 8
-checker_stimnr = 6
+#exp_name, stim_nr = '20180710', 8
+#exp_name, stim_nr = 'Kuehn', 13
 
-st = OMB(exp_name, stim_nr)
+st = OMB(exp_name, stim_nr, maxframes=None)
 
-data = iof.load(exp_name, stim_nr)
-stimulus_xy = st.bgsteps
+data = st.read_datafile()
+texturedata = st.read_texture_analysis()
 
+texture_maxi = texturedata['texture_maxi']
 
-gqmlabel= 'GQM_Md_contrast'
-stimulus = stimulus_xy
+stimdim = 3
+
 # Add placeholder contrast row, this will be different for
 # each cell
-stimulus = np.vstack((stimulus_xy, np.zeros(st.ntotal)))
+stimulus = np.zeros((stimdim, st.ntotal))
+stimulus[:2, ...] = st.bgsteps
 
-stimdim = stimulus.shape[0]
+gqmlabel = 'GQM_Md_contrast'
 
 clusters = st.clusters
 
-parameters = asc.read_parameters(exp_name, stim_nr)
-_, frametimes = asc.ft_nblinks(exp_name, stim_nr,
-                               parameters.get('Nblinks', 2))
-frametimes = frametimes[:-1]
-bin_length = np.ediff1d(frametimes).mean()
+parameters = asc.read_parameters(st.exp, st.stimnr)
 
-filter_length = l = data['filter_length']
-refresh_rate = asc.read_spikesheet(exp_name)[1]['refresh_rate']
+fl = st.filter_length
 
-t = np.arange(0, filter_length*bin_length, bin_length)*1000
+t = np.arange(0, st.filter_length*st.frame_duration, st.frame_duration)*1000
 
 savedir = os.path.join(st.exp_dir, 'data_analysis', st.stimname, gqmlabel)
 os.makedirs(savedir, exist_ok=True)
 
-kall = np.zeros((clusters.shape[0], stimdim, l))
-Qall = np.zeros((clusters.shape[0], stimdim, l, l))
+kall = np.zeros((clusters.shape[0], stimdim, fl))
+Qall = np.zeros((clusters.shape[0], stimdim, fl, fl))
 muall = np.zeros((clusters.shape[0]))
 
-eigvals = np.zeros((clusters.shape[0], stimdim, l))
-eigvecs = np.zeros((clusters.shape[0], stimdim, l, l))
-
+eigvals = np.zeros((clusters.shape[0], stimdim, fl))
+eigvecs = np.zeros((clusters.shape[0], stimdim, fl, fl))
 
 clids = plf.clusters_to_ids(clusters)
+cross_corrs = np.zeros(st.nclusters)
 
 for i, cl in enumerate(clusters):
     sta = data['stas'][i]
-    rawspikes = asc.read_raster(exp_name, stim_nr, *clusters[i][:2])
 
-    spikes = asc.binspikes(rawspikes, frametimes)
-
-    usegrad = True
-    method = 'Newton-CG'
+    spikes = st.binnedspiketimes(i)
 
     import time
     start = time.time()
+
     # Calculate the contrast for each cell's receptive field
-    coord = moc.chkmax2ombcoord(i, st.exp, stim_nr, checker_stimnr)
-    stimulus[-1, :] = st.generatecontrast(coord)
-    res = gqm.minimize_loglikelihood(np.zeros((stimdim, l)), np.zeros((stimdim, l, l)), 0,
-                                     stimulus, bin_length, spikes,
-                                     usegrad=usegrad,
-                                     minimize_disp=True, method=method)
+    stimulus[-1, :] = st.generatecontrast(texture_maxi[i])
+
+    res = gqm.minimize_loglikelihood(np.zeros((stimdim, fl)),
+                                     np.zeros((stimdim, fl, fl)), 0,
+                                     stimulus,
+                                     st.frame_duration,
+                                     spikes,
+                                     minimize_disp=True,
+                                     method='BFGS')
     elapsed = time.time()-start
 
-    print(f'Time elapsed: {elapsed/60:6.1f} mins')
+    print(f'Time elapsed: {elapsed/60:6.1f} mins for cell {i}')
     k_out, Q_out, mu_out = gqm.splitpars(res.x)
     kall[i, ...] = k_out
     Qall[i, ...] = Q_out
     muall[i] = mu_out
+
+    firing_rate = gqm.gqm_neuron(k_out, Q_out, mu_out, st.frame_duration)(stimulus)
+    cross_corr = np.corrcoef(spikes, firing_rate)[0, 1]
+    cross_corrs[i] = cross_corr
     #%%
-    fig, axes = plt.subplots(stimdim, 5, figsize=(15,5))
+    fig, axes = plt.subplots(stimdim, 5, figsize=(15, 5))
     plt.rc('font', size=8)
     for j in range(stimdim):
         axk = axes[j, 0]
-        if j<=1:
+        if j <= 1:
             axk.plot(t, sta[j], color='grey', label='STA')
         axk.plot(t, k_out[j, ...], label='k (GQM)')
         axk.legend(fontsize='x-small')
@@ -129,17 +128,17 @@ for i, cl in enumerate(clusters):
         axw.set_xlabel('Time before spike [ms]')
 
         axv.plot(w_out, 'ko')
-        eiginds = [0, 1, l-2, l-1]
+        eiginds = [0, 1, fl-2, fl-1]
 
         for ind, (eigind, w) in enumerate(zip(eiginds, w_out[eiginds])):
             axv.plot(eigind, w, 'o', color=colors[ind])
             axw.plot(t, v_out[:, eigind], color=colors[ind])
 
             generator = np.convolve(eigvecs[i, j, :, eigind], stimulus[j, :],
-                                    mode='full')[:-filter_length+1]
+                                    mode='full')[:-st.filter_length+1]
 
             bins, spikecount = q_nlt_recovery(spikes, generator, nr_bins=40)
-            axn.plot(bins, spikecount/bin_length, color=colors[ind])
+            axn.plot(bins, spikecount/st.frame_duration, color=colors[ind])
 
         # In order to set the legend the same for all components, we supply a
         # list to legend with a single element.
@@ -149,26 +148,26 @@ for i, cl in enumerate(clusters):
         axn.set_xlabel('Stimulus projection')
 
     plt.suptitle(f'{st.exp_foldername}\n'
-              f'{st.stimname}\n'
-              f'{clids[i]} {gqmlabel}')
+                 f'{st.stimname}\n'
+                 f'{clids[i]} {gqmlabel} corr: {cross_corr:4.2f} nsp: {spikes.sum():5.0f}')
     plt.tight_layout()
     plt.subplots_adjust(top=.85)
     #%%
 #    break
     plt.savefig(os.path.join(savedir, clids[i]+'.svg'),
-                bbox_inches = 'tight',
-                pad_inches = 0.3)
+                bbox_inches='tight',
+                pad_inches=0.3)
     plt.show()
 #    break
     #%%
 
-keystosave = ['stimulus', 'Qall', 'kall', 'muall', 'eigvecs', 'eigvals',
-              'bin_length', 'gqmlabel']
+keystosave = ['Qall', 'kall', 'muall', 'eigvecs', 'eigvals',
+              'gqmlabel', "cross_corrs"]
 
 datadict = {}
 
 for key in keystosave:
     datadict[key] = locals()[key]
 
-npzfpath = os.path.join(savedir, str(stim_nr)+'_'+gqmlabel+'_data')
+npzfpath = os.path.join(savedir, str(st.stimnr)+'_'+gqmlabel+'_data')
 np.savez(npzfpath, **datadict)
