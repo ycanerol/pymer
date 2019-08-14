@@ -54,6 +54,9 @@ class Stimulus:
     def binnedspiketimes(self, i):
         return asc.binspikes(self.read_raster(i), self.frametimings)[:self.maxframes]
 
+    def read_datafile(self):
+        return iof.load(self.exp, self.stimnr)
+
 
 class Parameters:
     """
