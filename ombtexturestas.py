@@ -36,7 +36,7 @@ def ombtexturesta(exp, ombstimnr, maxframes=10000,
             Number of the OMB stimulus in the experiment
         maxframes:
             Maximum number of frames that will be used, typically the
-            array contrast containing the contrast is very large and
+            array containing the contrast is very large and
             it is easy to fill the RAM. Refer to OMB.generatecontrast()
             documentation.
         contrast_window:
@@ -85,7 +85,6 @@ def ombtexturesta(exp, ombstimnr, maxframes=10000,
             # Coordinates need to be inverted for display
             ax.plot(*coords[::-1], 'r+', markersize=10, alpha=0.2)
     #%%
-    # for compatibility with rolling window. This will not be needed for GQM.
     contrast_signals = np.empty((st.nclusters, st.ntotal))
     # Calculate the time course of the center(maximal pixel of texture STAs
     stas_center = np.zeros((st.nclusters, st.filter_length))
@@ -106,8 +105,9 @@ def ombtexturesta(exp, ombstimnr, maxframes=10000,
 
     savepath = os.path.join(st.exp_dir, 'data_analysis', st.stimname)
     savefname = f'{st.stimnr}_texturesta'
-    if maxframes:
-        savefname += f'_{maxframes}fr'
+    if not maxframes:
+        maxframes = st.ntotal
+    savefname += f'_{maxframes}fr'
 
     plt.ylim([np.nanmin(stas_center_norm), np.nanmax(stas_center_norm)])
     fig_contrast.suptitle('Time course of center pixel of texture STAs')
