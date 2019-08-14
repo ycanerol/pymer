@@ -1,5 +1,6 @@
 
 import os
+import numpy as np
 
 import analysis_scripts as asc
 import iofuncs as iof
@@ -53,6 +54,16 @@ class Stimulus:
 
     def binnedspiketimes(self, i):
         return asc.binspikes(self.read_raster(i), self.frametimings)[:self.maxframes]
+
+    def allspikes(self):
+        if not self.maxframes:
+            ntotal = self.binnedspiketimes(0).shape[0]
+        else:
+            ntotal = self.maxframes
+        allspikes = np.zeros((self.nclusters, ntotal))
+        for i in range(self.nclusters):
+            allspikes[i] = self.binnedspiketimes(i)
+        return allspikes
 
     def read_datafile(self):
         return iof.load(self.exp, self.stimnr)
