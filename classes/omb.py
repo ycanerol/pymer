@@ -261,10 +261,6 @@ class OMB(Stimulus):
 
         """
         coord = np.array(coord)
-        # Movement in x direction corresponds to translation in left/right
-        # axis; and y to up/down axis. Since the first index is the row,
-        # we need swap x and y if we want to keep the order (x,y).
-        coord = np.flipud(coord)
 
         texture = self.texture_flipped
         # Use the clipped trajectory in case the
