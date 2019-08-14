@@ -79,7 +79,9 @@ def gqm_in(k, Q, mu):
     calculates the time series that go into exponential function
     """
     def f(x):
-#        if len(x.shape)==2:
+        global stimdim
+        if stimdim is None:
+            stimdim = x.ndim
         total = 0
         for j in range(stimdim):
             total += conv(k[j, :], x[j, :]) + conv2d(Q[j, :, :], x[j, :])
