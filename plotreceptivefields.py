@@ -17,9 +17,10 @@ import iofuncs as iof
 import analysis_scripts as asc
 import miscfuncs as msc
 
-exp = '20180802*421'
+exp = '20171122'
 sorted_stimuli = asc.stimulisorter(exp)
-checker = sorted_stimuli['frozennoise'][0]
+#checker = sorted_stimuli['frozennoise'][0]
+checker = sorted_stimuli['checkerflicker'][0]
 data = iof.load(exp, checker)
 parameters = asc.read_parameters(exp, checker)
 
@@ -59,17 +60,21 @@ def mahalonobis_convert(Z, pars):
 
 
 #%%
-def drawellipse(pars, ax=None):
+def drawellipse(pars, bound, ax=None):
     if ax is None:
         ax = plt.gca()
     center = pars[2:4][::-1]
-    width_x = pars[4]
-    width_y = pars[5]
-    angle = -pars[-1]
+    width_x = pars[5]*2 # HINT: this is a magic number, I don't know why it's 2
+    width_y = pars[4]*2
+
+    width_x *= bound
+    width_y *= bound
+
+    angle = pars[-1]
     rf = Ellipse(tuple(center), width_x, width_y, angle,
                  fill=False, edgecolor='green', lw=1)
     ax.add_artist(rf)
-
+    return rf
 
 #%%
 stixelw, stixelh = parameters['stixelwidth'],parameters['stixelheight']
@@ -77,9 +82,10 @@ if stixelw != stixelh:
     ValueError('Stimulus is not checkerflicker.')
 
 Y, X = np.meshgrid(np.arange(sta.shape[0]),
-                   np.arange(sta.shape[1]))
+                   np.arange(sta.shape[1]), indexing='xy')
 plt.figure()
 ax = plt.subplot(111)
+ax.axis('equal')
 all_pars = np.zeros((len(stas), 7))
 
 for i, _ in enumerate(data['clusters']):
@@ -95,13 +101,25 @@ for i, _ in enumerate(data['clusters']):
     Z = f(X, Y)
     Zm = mahalonobis_convert(Z, pars)
 
+    drawellipse(pars, bound, ax)
+
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', category=UserWarning)
-        ax.contour(X, Y, Zm, [bound])
-#image = mpimg.imread('/media/ycan/datadrive/data/Erol_20180207/microscope_images/afterexperiment_grid.tif')
+#        ax.contour(X, Y, Zm, [bound])
+plt.axis([0, sta.shape[1], 0, sta.shape[0]])
+	#image = mpimg.imread('/media/ycan/datadrive/data/Erol_20180207/microscope_images/afterexperiment_grid.tif')
 #ax.imshow(image)
 #plt.show()
-plt.savefig(f'/home/ycan/Downloads/TAC_outgoingfiles/RFs_{exp}.svg')
+#plt.savefig(f'/home/ycan/Downloads/TAC_outgoingfiles/RFs_{exp}.svg')
+
+#%%
+import plotfuncs as plf
+stas = np.array(stas)
+fig, sl = plf.multistabrowser(stas)
+for i in range(stas.shape[0]):
+    ax = fig.axes[i]
+    drawellipse(all_pars[i], 1.5, ax)
+
 
 #%%
 import pandas as pd
@@ -140,4 +158,3 @@ for i in range(len(stas)):
     ax = fig.axes[i]
 
     drawellipse(all_pars[i], ax)
-
