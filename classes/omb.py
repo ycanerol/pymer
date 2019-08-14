@@ -103,7 +103,7 @@ class OMB(Stimulus):
     def _generatetraj(self):
         self._generatesteps()
         self.bgtraj = np.cumsum(self.bgsteps, axis=1)
-        self.bgtraj_clipped = np.fmod(self.bgtraj, 1.5*self.texpars.noiselim[0])
+        self.bgtraj_clipped = np.fmod(self.bgtraj, self.texpars.noiselim[0])
 
     def _generatetexture(self):
         pars = self.pars
