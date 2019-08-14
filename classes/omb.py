@@ -353,6 +353,15 @@ class OMB(Stimulus):
 
         return np.load(os.path.join(self.stim_dir, texturefile))
 
+    def contrast_signal_cell(self, cell_i, *args):
+        """
+        Returns the contrast signal for a cell based on location of
+        the maximum pixel in its texture STA.
+        """
+        texture_maxi = self.read_texture_analysis()['texture_maxi']
+        contrast_signal = self.generatecontrast(texture_maxi[cell_i], *args)
+        return contrast_signal
+
 
 #%%
 if __name__ == '__main__':
