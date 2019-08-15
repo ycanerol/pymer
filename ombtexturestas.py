@@ -63,11 +63,7 @@ def ombtexturesta(exp, ombstimnr, maxframes=10000,
     for i in range(st.nclusters):
         all_spikes[i, :] = st.binnedspiketimes(i)
 
-#    texturestas = np.einsum('abcd,ec->eabd', RW, all_spikes)
-    # HINT: einsum can be replaced, to gain 2 to 5 fold performance
-    texturestas = np.tensordot(RW, all_spikes, axes=[[2], [1]])
-    # The axes need to be reordered to match (ncells, xpix, ypix, frames)
-    texturestas = np.moveaxis(texturestas, [2, 3], [3, 0])
+    texturestas = np.einsum('abcd,ec->eabd', RW, all_spikes)
 
     texturestas /= all_spikes.sum(axis=(-1))[:, np.newaxis,
                                              np.newaxis, np.newaxis]
