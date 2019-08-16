@@ -186,7 +186,7 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
     xr = asc.rolling_window(x, filter_length)[..., ::-1]
     # Add one extra dimension at the beginning in case the stimulus is
     # single dimensional
-    xr = xr[None, ...] if stimdim==1 else xr
+    xr = xr[None, ...] if x.ndim==1 else xr
     for j in range(stimdim):
         for i in range(spikes.shape[0]-filter_length):
             x_temp = xr[j, i, :]
