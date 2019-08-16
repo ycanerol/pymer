@@ -4,11 +4,8 @@
 Use movement in both x and y directions for OMB analysis
 """
 
-import sys
 import numpy as np
 import matplotlib.pyplot as plt
-
-sys.path.append('/home/ycan/repos/pymer/generalizedmodels/')
 
 import gen_quad_model_multidimensional as gqm
 import genlinmod as glm

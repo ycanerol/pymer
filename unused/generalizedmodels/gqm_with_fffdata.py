@@ -4,11 +4,8 @@
 
 """
 
-import sys
 import numpy as np
 import matplotlib.pyplot as plt
-
-sys.path.append('/home/ycan/repos/pymer/generalizedmodels/')
 
 import gen_quad_model as gqm
 import genlinmod as glm
