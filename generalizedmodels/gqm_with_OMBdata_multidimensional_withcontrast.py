@@ -17,18 +17,14 @@ from scipy import linalg
 from OMBanalyzer import q_nlt_recovery
 
 from omb import OMB
-import scratch_matchOMBandchecker as moc
 
 
-#exp_name, stim_nr = '20180710', 8
+exp_name, stim_nr = '20180710', 8
 #exp_name, stim_nr = 'Kuehn', 13
 
 st = OMB(exp_name, stim_nr, maxframes=None)
 
 data = st.read_datafile()
-texturedata = st.read_texture_analysis()
-
-texture_maxi = texturedata['texture_maxi']
 
 stimdim = 3
 
@@ -39,10 +35,6 @@ stimulus[:2, ...] = st.bgsteps
 
 gqmlabel = 'GQM_Md_contrast'
 
-clusters = st.clusters
-
-parameters = asc.read_parameters(st.exp, st.stimnr)
-
 fl = st.filter_length
 
 t = np.arange(0, st.filter_length*st.frame_duration, st.frame_duration)*1000
@@ -50,17 +42,16 @@ t = np.arange(0, st.filter_length*st.frame_duration, st.frame_duration)*1000
 savedir = os.path.join(st.exp_dir, 'data_analysis', st.stimname, gqmlabel)
 os.makedirs(savedir, exist_ok=True)
 
-kall = np.zeros((clusters.shape[0], stimdim, fl))
-Qall = np.zeros((clusters.shape[0], stimdim, fl, fl))
-muall = np.zeros((clusters.shape[0]))
+kall = np.zeros((st.nclusters, stimdim, fl))
+Qall = np.zeros((st.nclusters, stimdim, fl, fl))
+muall = np.zeros((st.nclusters))
 
-eigvals = np.zeros((clusters.shape[0], stimdim, fl))
-eigvecs = np.zeros((clusters.shape[0], stimdim, fl, fl))
+eigvals = np.zeros((st.nclusters, stimdim, fl))
+eigvecs = np.zeros((st.nclusters, stimdim, fl, fl))
 
-clids = plf.clusters_to_ids(clusters)
 cross_corrs = np.zeros(st.nclusters)
 
-for i, cl in enumerate(clusters):
+for i, cl in enumerate(st.clusters):
     sta = data['stas'][i]
 
     spikes = st.binnedspiketimes(i)
@@ -69,7 +60,7 @@ for i, cl in enumerate(clusters):
     start = time.time()
 
     # Calculate the contrast for each cell's receptive field
-    stimulus[-1, :] = st.generatecontrast(texture_maxi[i])
+    stimulus[-1, :] = st.contrast_signal_cell(i)
 
     res = gqm.minimize_loglikelihood(np.zeros((stimdim, fl)),
                                      np.zeros((stimdim, fl, fl)), 0,
@@ -137,21 +128,17 @@ for i, cl in enumerate(clusters):
             bins, spikecount = q_nlt_recovery(spikes, generator, nr_bins=40)
             axn.plot(bins, spikecount/st.frame_duration, color=colors[ind])
 
-        # In order to set the legend the same for all components, we supply a
-        # list to legend with a single element.
-
         axn.set_title('Nonlinearities')
         axn.set_ylabel('Firing rate [Hz]')
         axn.set_xlabel('Stimulus projection')
 
     plt.suptitle(f'{st.exp_foldername}\n'
                  f'{st.stimname}\n'
-                 f'{clids[i]} {gqmlabel} corr: {cross_corr:4.2f} nsp: {spikes.sum():5.0f}')
+                 f'{st.clids[i]} {gqmlabel} corr: {cross_corr:4.2f} nsp: {spikes.sum():5.0f}')
     plt.tight_layout()
     plt.subplots_adjust(top=.85)
     #%%
-#    break
-    plt.savefig(os.path.join(savedir, clids[i]+'.svg'),
+    plt.savefig(os.path.join(savedir, st.clids[i]+'.svg'),
                 bbox_inches='tight',
                 pad_inches=0.3)
     plt.show()
