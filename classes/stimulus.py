@@ -4,6 +4,7 @@ import numpy as np
 
 import analysis_scripts as asc
 import iofuncs as iof
+import plotfuncs as plf
 
 
 class Stimulus:
@@ -15,6 +16,7 @@ class Stimulus:
         self.exp_dir = iof.exp_dir_fixer(exp)
         self.exp_foldername = os.path.split(self.exp_dir)[-1]
         self.stimname = iof.getstimname(exp, stimnr)
+        self.clids = plf.clusters_to_ids(self.clusters)
 #        self.get_frametimings()
         self._getstimtype()
         self.refresh_rate = self.metadata['refresh_rate']
