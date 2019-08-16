@@ -33,7 +33,7 @@ stimdim = 3
 stimulus = np.zeros((stimdim, st.ntotal))
 stimulus[:2, ...] = st.bgsteps
 
-gqmlabel = 'GQM_Md_contrast'
+gqmlabel = 'GQM_motioncontrast'
 
 fl = st.filter_length
 

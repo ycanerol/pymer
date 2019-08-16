@@ -30,7 +30,7 @@ stimdim = 2
 
 stimulus = st.bgsteps.copy()
 
-gqmlabel = 'GQM_Md_motion'
+gqmlabel = 'GQM_motion'
 
 fl = st.filter_length
 
@@ -135,7 +135,6 @@ for i, cl in enumerate(st.clusters):
                 bbox_inches='tight',
                 pad_inches=0.3)
     plt.show()
-    break
     #%%
 
 keystosave = ['Qall', 'kall', 'muall', 'eigvecs', 'eigvals',
