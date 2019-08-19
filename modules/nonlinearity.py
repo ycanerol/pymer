@@ -8,7 +8,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 from scipy.stats.mstats import mquantiles
-from scipy.stats import binned_statistic_2d
+from scipy.stats import binned_statistic, binned_statistic_2d
 
 
 def bin_midpoints(bins):
@@ -18,6 +18,58 @@ def bin_midpoints(bins):
     This will reduce the size of the array by one.
     """
     return (bins[1:]+bins[:-1])/2
+
+
+def _calc_nonlin(spikes, generator, nr_bins=20):
+    """
+    This is the previous version of the function, without using
+    binned statistic. It is easier to see the logic, so this is
+    left for posterity.
+
+    NOTE:
+    There is a slight difference between the old and new versions;
+    old version has slightly fewer count in the last bin.
+
+    Calculate nonlinearities from the spikes and the generator signal.
+    Bins for the generator are defined such that they contain equal number
+    of samples. Since there are fewer samples for more extreme values of the
+    generator signal, bins get wider.
+    """
+
+    quantiles = np.linspace(0, 1, nr_bins+1)
+
+    quantile_bins = mquantiles(generator, prob=quantiles)
+    bindices = np.digitize(generator, quantile_bins)
+    # Returns which bin each should go
+    spikecount_in_bins = np.full(nr_bins, np.nan)
+    for i in range(nr_bins):  # Sorts values into bins
+        spikecount_in_bins[i] = spikes[bindices == i+1].mean()
+    # Use the middle point of adjacent bins instead of the edges
+    # Note that this decrasese the length of the array by one
+    quantile_bins = (quantile_bins[1:]+quantile_bins[:-1])/2
+    return quantile_bins, spikecount_in_bins
+
+
+def calc_nonlin(spikes, generator, nr_bins=20):
+    """
+    Calculate nonlinearities from the spikes and the generator signal.
+    Bins for the generator are defined such that they contain equal number
+    of samples. Since there are fewer samples for more extreme values of the
+    generator signal, bins get wider.
+    """
+
+    quantiles = np.linspace(0, 1, nr_bins+1)
+
+    # m stands for masked, to be able to apply the function
+    # to masked numpy arrays. In practice, masked arrays are rarely needed.
+    quantile_bins = mquantiles(generator, prob=quantiles)
+
+    res = binned_statistic(generator, spikes, bins=quantile_bins)
+
+    nonlinearity = res.statistic
+    bins = bin_midpoints(quantile_bins)
+
+    return nonlinearity, bins
 
 
 #%%
