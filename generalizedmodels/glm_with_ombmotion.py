@@ -51,8 +51,8 @@ for i, cluster in enumerate(clusters):
 
         res = glm.minimize_loglhd(stas[i, j, :], 0, stimulus[j, :],
                                   frame_dur, spikes,
-                                  usegrad=False,
-                                  method='CG')
+                                  usegrad=True,
+                                  method='BFGS')
         k_pred = res['x'][:-1]
         mu_pred = res['x'][-1]
 

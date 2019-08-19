@@ -8,8 +8,6 @@ Created on Wed Oct 17 14:24:09 2018
 import warnings
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-from matplotlib.patches import Ellipse
-
 import numpy as np
 
 import gaussfitter as gfit
@@ -17,10 +15,9 @@ import iofuncs as iof
 import analysis_scripts as asc
 import miscfuncs as msc
 
-exp = '20171122'
+exp = '20180710'
 sorted_stimuli = asc.stimulisorter(exp)
-#checker = sorted_stimuli['frozennoise'][0]
-checker = sorted_stimuli['checkerflicker'][0]
+checker = sorted_stimuli['frozennoise'][0]
 data = iof.load(exp, checker)
 parameters = asc.read_parameters(exp, checker)
 
@@ -49,7 +46,6 @@ def fitgaussian(sta, f_size=10):
     pars_out[2:4] = pars[2:4] - [f_size, f_size] + max_i[:2]
     return pars_out
 
-
 def mahalonobis_convert(Z, pars):
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', '.*divide by zero*.', RuntimeWarning)
@@ -57,36 +53,22 @@ def mahalonobis_convert(Z, pars):
         Zm[np.isinf(Zm)] = np.nan
         Zm = np.sqrt(Zm*-2)
     return Zm
-
-
-#%%
-def drawellipse(pars, bound, ax=None):
-    if ax is None:
-        ax = plt.gca()
-    center = pars[2:4][::-1]
-    width_x = pars[5]*2 # HINT: this is a magic number, I don't know why it's 2
-    width_y = pars[4]*2
-
-    width_x *= bound
-    width_y *= bound
-
-    angle = pars[-1]
-    rf = Ellipse(tuple(center), width_x, width_y, angle,
-                 fill=False, edgecolor='green', lw=1)
-    ax.add_artist(rf)
-    return rf
-
 #%%
 stixelw, stixelh = parameters['stixelwidth'],parameters['stixelheight']
 if stixelw != stixelh:
     ValueError('Stimulus is not checkerflicker.')
 
-Y, X = np.meshgrid(np.arange(sta.shape[0]),
-                   np.arange(sta.shape[1]), indexing='xy')
+upscale_factor = stixelw
+upscale_factor = 2
+Y, X = np.meshgrid(np.arange(sta.shape[0]*upscale_factor),
+                   np.arange(sta.shape[1]*upscale_factor))
+X = X.T
+Y = Y.T
 plt.figure()
 ax = plt.subplot(111)
-ax.axis('equal')
 all_pars = np.zeros((len(stas), 7))
+masks = np.zeros((len(stas), *X.shape))
+
 
 for i, _ in enumerate(data['clusters']):
     sta = stas[i]
@@ -96,38 +78,56 @@ for i, _ in enumerate(data['clusters']):
     except ValueError as e:
         if str(e).startswith('Fit failed'):
             continue
+
+    pars[2:6] *= upscale_factor
+
+
     all_pars[i, :] = pars
     f = gfit.twodgaussian(pars)
     Z = f(X, Y)
     Zm = mahalonobis_convert(Z, pars)
-
-    drawellipse(pars, bound, ax)
-
+    with warnings.catch_warnings():
+        warnings.filterwarnings('ignore', '.*invalid value encountered in less*.', RuntimeWarning)
+        masks[i] = np.where(Zm < bound, 1, 0)
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', category=UserWarning)
-#        ax.contour(X, Y, Zm, [bound])
-plt.axis([0, sta.shape[1], 0, sta.shape[0]])
-	#image = mpimg.imread('/media/ycan/datadrive/data/Erol_20180207/microscope_images/afterexperiment_grid.tif')
-#ax.imshow(image)
-#plt.show()
-#plt.savefig(f'/home/ycan/Downloads/TAC_outgoingfiles/RFs_{exp}.svg')
+        ax.contour(X, Y, Zm, [bound])
+#image = mpimg.imread('/media/ycan/datadrive/data/Erol_20180207/microscope_images/afterexperiment_grid.tif')
+#ax.imshow(image, zorder=-1, extent=(0, 800, 0, 600))
+plt.axis('equal')
+plt.show()
 
 #%%
-import plotfuncs as plf
-stas = np.array(stas)
-fig, sl = plf.multistabrowser(stas)
-for i in range(stas.shape[0]):
-    ax = fig.axes[i]
-    drawellipse(all_pars[i], 1.5, ax)
+# Pad to 800 by 800 size
+pad_height = int((masks.shape[2]-masks.shape[1])/2)
+clusternr = masks.shape[0]
+pad_array = np.zeros((clusternr, pad_height, masks.shape[2]))
+masks = np.concatenate((pad_array, masks, pad_array), axis=1)
 
+centers = all_pars[:, (2,3)]
+widths = all_pars[:, (4,5)]
+
+centers[:, 0] += pad_height
+
+#%%
+from matplotlib.patches import Ellipse
+
+i = 23
+ax = plt.subplot(111)
+im = ax.imshow(masks[i, ...])
+rf = Ellipse(tuple(centers[i, :]),
+             width=widths[i][0], height=widths[i][1],
+             angle=all_pars[i, -1])
+ax.add_artist(rf)
+plt.show()
 
 #%%
 import pandas as pd
 import seaborn as sns
 
 pars_filtered = all_pars[:, (4, 5)]
-#pars_filtered = pars_filtered[pars_filtered[:, 0]<5]
-#pars_filtered = pars_filtered[pars_filtered[:, 1]<5]
+#pars_filtered = pars_filtered[pars_filtered[:, 0]<6]
+#pars_filtered = pars_filtered[pars_filtered[:, 1]<6]
 
 sizes = pd.DataFrame(data=pars_filtered, columns=['x', 'y'])
 
@@ -137,24 +137,3 @@ g = sns.jointplot('x','y', sizes, 'scatter',
 #                  shade_lowest = False,
 #                  , xlim=[0, 6], ylim=[0, 6]
                   )
-
-
-#%%
-import plotfuncs as plf
-
-plf.absmax() # stop the script
-
-for i in range(len(stas)):
-    sta = stas[i]
-    plt.imshow(sta[..., max_inds[i][-1]], cmap='RdBu_r',
-              vmax=asc.absmax(sta), vmin=asc.absmin(sta))
-    drawellipse(all_pars[i])
-    plt.title(f'{i}')
-    plt.show()
-
-#%%
-fig, sl = plf.multistabrowser(stas)
-for i in range(len(stas)):
-    ax = fig.axes[i]
-
-    drawellipse(all_pars[i], ax)

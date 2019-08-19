@@ -668,6 +668,11 @@ def rolling_window(a, window, preserve_dim=True):
         Whether return an array with the same number of rows as a. This is
         done by adding zeros to the beginning of a. Default is True.
 
+        Warning: this duplicates the array in memory so defeats the purpose
+        of using the view approach, This should not be used; instead the
+        original array a should be generated with zeros from the beginning to
+        avoid duplication.
+
     Returns
     -------
     Array that is a view of the original array with a added dimension
