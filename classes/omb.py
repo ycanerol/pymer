@@ -265,6 +265,8 @@ class OMB(Stimulus):
             directions around coord. If zero, size will be a single pixel.
 
         """
+        if isinstance(coord, int) or len(coord) != 2:
+            raise ValueError('coord is expected to have two elements.')
         coord = np.array(coord)
 
         texture = self.texture_flipped
