@@ -92,21 +92,20 @@ def calc_nonlin_2d(spikes, generator_x, generator_y, nr_bins=20):
 
 
 if __name__ == '__main__':
-    import genlinmod as glm
 
-    import iofuncs as iof
+    from omb import OMB
+
     exp, stim = '20180710', 8
-    data = iof.load(exp, stim)
 
-    stim = glm.loadstim(exp, stim, maxframenr=None)
+    st = OMB(exp, stim)
 
-    spikes = data['all_spikes']
-    frame_duration = data['frame_duration']
+    data = st.read_datafile()
 
     generators_x = data['generators_x']
     generators_y = data['generators_y']
 
     i = 0
+    spikes = st.allspikes()
 
     nlt, bins_x, bins_y = calc_nonlin_2d(spikes[i, :],
                                          generators_x[i, :],
@@ -114,7 +113,7 @@ if __name__ == '__main__':
                                          nr_bins=9)
 
     # Normalize nonlinearity so units are spikes/s
-    nlt = nlt/frame_duration
+    nlt = nlt/st.frame_duration
 
     cmap = 'Greens'
     cmap_contours = 'coolwarm'
