@@ -39,20 +39,14 @@ cross_corrs = data_cm['cross_corrs']
 allspikes = st.allspikes()
 
 stim_mot = st.bgsteps.copy()
-r = np.sqrt(np.sum(stim_mot**2, axis=0))
 
-eigen_index = -1
 cmap = 'Greens'
 
 for i in range(st.nclusters):
     stim_con = st.contrast_signal_cell(i).squeeze()
 
-    generator_x = np.convolve(stim_mot[0, :],
-                              eigvecs[i, 0, :, eigen_index],
-                              'full')[:-st.filter_length+1]
-    generator_y = np.convolve(stim_mot[1, :],
-                              eigvecs[i, 1, :, eigen_index],
-                              'full')[:-st.filter_length+1]
+    generator_x = gqm.conv2d(qall[i, 0, :], stim_mot[0, :])
+    generator_y = gqm.conv2d(qall[i, 1, :], stim_mot[1, :])
 
     generators = np.vstack([generator_x, generator_y])
     r = np.sqrt(np.sum(generators**2, axis=0))
