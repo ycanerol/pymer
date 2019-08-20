@@ -40,6 +40,7 @@ allspikes = st.allspikes()
 
 stim_mot = st.bgsteps.copy()
 
+nbins_nlt = 9
 cmap = 'Greens'
 
 for i in range(st.nclusters):
@@ -55,14 +56,17 @@ for i in range(st.nclusters):
                               kall[i, 2, :],
                               'full')[:-st.filter_length+1]
 
-    nonlinearity, bins_c, bins_r = nlt.calc_nonlin_2d(allspikes[i, :], generator_c, r)
-
+    nonlinearity, bins_c, bins_r = nlt.calc_nonlin_2d(allspikes[i, :],
+                                                      generator_c,
+                                                      r, nr_bins=nbins_nlt)
+    nonlinearity /= st.frame_duration
 #    plt.imshow(nonlinearity, cmap=cmap)
 #    plt.show()
 
-    plt.scatter(generator_c, r, s=np.sqrt(allspikes[i, :]), color='k')
-    plt.title(i)
-    plt.show()
+    if False:
+        plt.scatter(generator_c, r, s=np.sqrt(allspikes[i, :]), color='k')
+        plt.title(i)
+        plt.show()
 
     X, Y = np.meshgrid(bins_c, bins_r)
 
@@ -73,4 +77,4 @@ for i in range(st.nclusters):
     plt.title(i)
 #    plt.axis('equal')
     plt.show()
-    break
+#    break
