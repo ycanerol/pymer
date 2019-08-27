@@ -13,9 +13,11 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from matplotlib import animation
 from matplotlib.widgets import Slider
+from matplotlib.ticker import MaxNLocator
 
 import iofuncs as iof
 import analysis_scripts as asc
+
 
 interactive_backends = ['Qt', 'Tk']
 
@@ -567,3 +569,26 @@ def check_interactive_backend():
     if not backend[:2] in interactive_backends:
         raise ValueError('Switch to an interactive backend (e.g. Qt) to see'
                          ' the animation.')
+
+
+def integerticks(axes, *args, which='xyz'):
+    """
+    Set the ticks to be integer values when possible.
+
+    Parameters:
+    ----
+        axes:
+            can be a single Axes object or multiple
+        *args:
+            are passed to MaxNLocator.
+        which:
+            which axis to apply this to.
+    """
+    if isinstance(axes, mpl.axes.Axes):
+        axes = [axes]
+    for ax in axes:
+        for axis in which:
+            try:
+                getattr(ax, axis+'axis').set_major_locator(MaxNLocator(*args, integer=True))
+            except AttributeError:
+                pass
