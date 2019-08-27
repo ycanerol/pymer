@@ -288,13 +288,13 @@ def stashow(sta, ax=None, cbar=True, **kwargs):
     vmin = asc.absmin(sta)
 
     # Make a dictionary for imshow and colorbar kwargs
-    imshowkw = {'cmap': iof.config('colormap'), 'vmin':vmin, 'vmax':vmax}
-    cbarkw = {'size':'2%', 'ticks':[vmin, vmax], 'format':'%.2f'}
-    for key in kwargs.keys():
+    imshowkw = {'cmap': iof.config('colormap'), 'vmin': vmin, 'vmax': vmax}
+    cbarkw = {'size': '2%', 'ticks': [vmin, vmax], 'format': '%.2f'}
+    for key, val in kwargs.items():
         if key in ['extent', 'aspect', 'cmap']:
-            imshowkw.update({key:kwargs[key]})
+            imshowkw.update({key: val})
         elif key in ['size', 'ticks', 'format']:
-            cbarkw.update({key:kwargs[key]})
+            cbarkw.update({key: val})
         else:
             raise ValueError(f'Unknown kwarg: {key}')
 
@@ -309,11 +309,11 @@ def stashow(sta, ax=None, cbar=True, **kwargs):
 
 
 def subplottext(text, axis, x=-.3, y=1.1, **kwargs):
-    textkwargs = {'transform':axis.transAxes,
-                  'fontsize':12,
-                  'fontweight':'bold',
-                  'va':'top',
-                  'ha':'right'}
+    textkwargs = {'transform': axis.transAxes,
+                  'fontsize': 12,
+                  'fontweight': 'bold',
+                  'va': 'top',
+                  'ha': 'right'}
     textkwargs.update(kwargs)
     axis.text(x, y, text, **textkwargs)
 
@@ -339,16 +339,16 @@ def addarrowaxis(ax, x=0.5, y=0.5, dx=.1, dy=.2, xtext='',
         Font size of the text
     """
     arrowprops = dict(arrowstyle='<-', facecolor='black')
-    ax.annotate('', xy=(x, y),  xycoords='axes fraction',
+    ax.annotate('', xy=(x, y), xycoords='axes fraction',
                 xytext=(x+dx, y), textcoords='axes fraction',
                 arrowprops=arrowprops)
-    ax.annotate('', xy=(x, y),  xycoords='axes fraction',
+    ax.annotate('', xy=(x, y), xycoords='axes fraction',
                 xytext=(x, y+dy), textcoords='axes fraction',
                 arrowprops=arrowprops)
     ax.text(x, y - xtextoffset, xtext, transform=ax.transAxes,
-        fontsize=fontsize, va='top')
+            fontsize=fontsize, va='top')
     ax.text(x - ytextoffset, y, ytext, rotation=90, transform=ax.transAxes,
-        fontsize=fontsize, ha='left', va='bottom')
+            fontsize=fontsize, ha='left', va='bottom')
 
 
 def playsta(sta, frame_duration=None, cmap=None, centerzero=True, **kwargs):
@@ -388,7 +388,7 @@ def playsta(sta, frame_duration=None, cmap=None, centerzero=True, **kwargs):
     ax = plt.gca()
     for i in range(sta.shape[-1]):
         im = ax.imshow(sta[:, :, i], animated=True,
-                        cmap=cmap, vmin=vmin, vmax=vmax)
+                       cmap=cmap, vmin=vmin, vmax=vmax)
 
         ims.append([im]) # Needs to be a list of lists
     ani = animation.ArtistAnimation(fig, ims, **kwargs)
@@ -529,7 +529,7 @@ def stabrowser(sta, frame_duration=None, cmap=None, centerzero=True, **kwargs):
     imshowkwargs = dict(cmap=cmap, vmax=vmax, vmin=vmin, **kwargs)
 
     fig = plt.figure()
-    ax =  fig.add_axes([0.1, 0.1, 0.8, 0.8])
+    ax = fig.add_axes([0.1, 0.1, 0.8, 0.8])
 
 
     initial_frame = 5
