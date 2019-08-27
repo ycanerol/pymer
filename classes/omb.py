@@ -6,6 +6,7 @@ import scipy.ndimage as snd
 
 import analysis_scripts as asc
 import iofuncs as iof
+import plotfuncs as plf
 
 from randpy import randpy
 
@@ -363,6 +364,20 @@ class OMB(Stimulus):
         texture_maxi = self.read_texture_analysis()['texture_maxi']
         contrast_signal = self.generatecontrast(texture_maxi[cell_i], *args)
         return contrast_signal
+
+    def show_texture_stas(self):
+        """
+        Returns an overview of all texture STAs with the detected receptive
+        field centers marked.
+        """
+        texturedata = self.read_texture_analysis()
+        fig, sl = plf.multistabrowser(texturedata['texturestas'], self.frame_duration,
+                                      cmap='Greys_r')
+        coords = texturedata['texture_maxi']
+        for i in range(self.nclusters):
+            ax = fig.axes[i]
+            ax.plot(*coords[i][::-1], 'r+', markersize=10, alpha=.2)
+        return fig, sl
 
 
 #%%
