@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Fit two separate GLMs to motion in X and Y directions
 
+superseded by new version that considers multiple inputs in a single model
 """
 import numpy as np
 import matplotlib.pyplot as plt
