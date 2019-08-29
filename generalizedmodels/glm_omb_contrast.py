@@ -11,11 +11,12 @@ import datetime as dt
 
 import iofuncs as iof
 import analysis_scripts as asc
+import nonlinearity as nlt
 import genlinmod as glm
 
 from omb import OMB
 from stimulus import Stimulus
-from OMBanalyzer import q_nlt_recovery
+
 
 #exp, stim_nr  = '20180710', 8
 #exp, stim_nr  = 'Kuehn', 13
@@ -89,8 +90,8 @@ for i, cluster in enumerate(st.clusters):
     axnlt.set_title('Nonlinearity')
 
     generator = np.convolve(kall[i, :], stimulus, mode='full')[:-st.filter_length+1]
-    bins, spikecount = q_nlt_recovery(all_spikes[i, :], generator, nr_bins=40)
-    axnlt.plot(bins, spikecount/st.frame_duration)
+    nonlinearity, bins = nlt.calc_nonlin(all_spikes[i, :], generator, nr_bins=40)
+    axnlt.plot(bins, nonlinearity/st.frame_duration)
     axnlt.set_xlabel('Stimulus projection')
     axnlt.set_ylabel('Firing rate [spikes/s]')
 

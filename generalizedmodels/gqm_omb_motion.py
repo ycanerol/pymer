@@ -14,8 +14,7 @@ import iofuncs as iof
 import plotfuncs as plf
 from scipy import linalg
 
-from OMBanalyzer import q_nlt_recovery
-
+import nonlinearity as nlt
 from omb import OMB
 
 
@@ -118,8 +117,8 @@ for i, cl in enumerate(st.clusters):
             generator = np.convolve(eigvecs[i, j, :, eigind], stimulus[j, :],
                                     mode='full')[:-st.filter_length+1]
 
-            bins, spikecount = q_nlt_recovery(spikes, generator, nr_bins=40)
-            axn.plot(bins, spikecount/st.frame_duration, color=colors[ind])
+            nonlinearity, bins = nlt.calc_nonlin(spikes, generator, nr_bins=40)
+            axn.plot(bins, nonlinearity/st.frame_duration, color=colors[ind])
 
         axn.set_title('Nonlinearities')
         axn.set_ylabel('Firing rate [Hz]')

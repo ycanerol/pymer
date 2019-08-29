@@ -14,7 +14,7 @@ from randpy import randpy
 import analysis_scripts as asc
 import plotfuncs as plf
 import iofuncs as iof
-
+import nonlinearity as nlt
 
 def calc_covar(stim_small):
     """
@@ -24,28 +24,6 @@ def calc_covar(stim_small):
     stim = stim_small[np.newaxis, :]
     covar = np.dot(stim.T, stim)
     return covar
-
-
-def q_nlt_recovery(spikes, generator, nr_bins=20):
-    """
-    Calculate nonlinearities from the spikes and the generator signal.
-    Bins for the generator are defined such that they contain equal number
-    of samples. Since there are fewer samples for more extreme values of the
-    generator signal, bins get wider.
-    """
-
-    quantiles = np.linspace(0, 1, nr_bins+1)
-
-    quantile_bins = mquantiles(generator, prob=quantiles)
-    bindices = np.digitize(generator, quantile_bins)
-    # Returns which bin each should go
-    spikecount_in_bins = np.full(nr_bins, np.nan)
-    for i in range(nr_bins):  # Sorts values into bins
-        spikecount_in_bins[i] = spikes[bindices == i+1].mean()
-    # Use the middle point of adjacent bins instead of the edges
-    # Note that this decrasese the length of the array by one
-    quantile_bins = (quantile_bins[1:]+quantile_bins[:-1])/2
-    return quantile_bins, spikecount_in_bins
 
 
 def OMBanalyzer(exp_name, stimnr, plotall=False, nr_bins=20):
@@ -152,10 +130,10 @@ def OMBanalyzer(exp_name, stimnr, plotall=False, nr_bins=20):
                                          mode='full')[:-filter_length+1]
         generators_y[i, :] = np.convolve(eigvecs_y[i, :, -1], ysteps,
                                          mode='full')[:-filter_length+1]
-        bins_x[i, :], spikecount_x[i, :] = q_nlt_recovery(all_spikes[i, :],
+        spikecount_x[i, :], bins_x[i, :] = nlt.calc_nonlin(all_spikes[i, :],
                                                           generators_x[i, :],
                                                           nr_bins)
-        bins_y[i, :], spikecount_y[i, :] = q_nlt_recovery(all_spikes[i, :],
+        spikecount_y[i, :], bins_y[i, :] = nlt.calc_nonlin(all_spikes[i, :],
                                                           generators_y[i, :],
                                                           nr_bins)
     savepath = os.path.join(exp_dir, 'data_analysis', stimname)

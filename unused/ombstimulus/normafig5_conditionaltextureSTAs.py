@@ -15,8 +15,7 @@ import analysis_scripts as asc
 import plotfuncs as plf
 
 from omb import OMB
-from OMBanalyzer import q_nlt_recovery
-
+import nonlinearity as nlt
 
 def subtract_avgcontrast(sta, contrast_avg):
     """
@@ -39,7 +38,7 @@ checkerstimnr = 1
 
 
 st = OMB(exp, ombstimnr,
-         maxframes=30000
+         maxframes=1000
          )
 
 choosecells = [54, 55, 108, 109]
@@ -71,7 +70,7 @@ bins = np.zeros((nrcells, nbins))
 nlts = np.zeros((bins.shape))
 
 for i in range(nrcells):
-    bins[i, :], nlts[i, :] = q_nlt_recovery(all_spikes[i, :], steps_proj[i, :], nr_bins=nbins)
+    nlts[i, :], bins[i, :]  = nlt.calc_nonlin(all_spikes[i, :], steps_proj[i, :], nr_bins=nbins)
 
 nlts *= st.refresh_rate
 

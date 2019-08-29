@@ -15,7 +15,7 @@ import iofuncs as iof
 import plotfuncs as plf
 from scipy import linalg
 
-from OMBanalyzer import q_nlt_recovery
+import nonlinearity as nlt
 
 exp_name = '20180710'
 stim_nr = 8
@@ -118,8 +118,8 @@ for i, cl in enumerate(clusters):
         generator = np.convolve(eigvecs[i, :, eigind], stimulus,
                                 mode='full')[:-filter_length+1]
 
-        bins, spikecount = q_nlt_recovery(spikes, generator, nr_bins=40)
-        axn.plot(bins, spikecount/bin_length, color=colors[ind])
+        nonlinearity, bins = nlt.calc_nonlin(spikes, generator, nr_bins=40)
+        axn.plot(bins, nonlinearity/bin_length, color=colors[ind])
 
     # In order to set the legend the same for all components, we supply a
     # list to legend with a single element.
