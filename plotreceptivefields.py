@@ -64,8 +64,8 @@ def drawellipse(pars, bound, ax=None):
     if ax is None:
         ax = plt.gca()
     center = pars[2:4][::-1]
-    width_x = pars[5]*2 # HINT: this is a magic number, I don't know why it's 2
-    width_y = pars[4]*2
+    width_x = pars[5]*2 # HINT: magic number, possibly due to diameter vs radius
+    width_y = pars[4]*2 # difference in the arguments accepted by Ellipse and gaussfit
 
     width_x *= bound
     width_y *= bound
