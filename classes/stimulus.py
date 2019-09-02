@@ -11,17 +11,17 @@ class Stimulus:
     def __init__(self, exp, stimnr, maxframes=None):
         self.exp = exp
         self.stimnr = stimnr
+        self.maxframes = maxframes
         self.clusters, self.metadata = asc.read_spikesheet(self.exp)
         self.nclusters = self.clusters.shape[0]
         self.exp_dir = iof.exp_dir_fixer(exp)
         self.exp_foldername = os.path.split(self.exp_dir)[-1]
         self.stimname = iof.getstimname(exp, stimnr)
         self.clids = plf.clusters_to_ids(self.clusters)
-#        self.get_frametimings()
+        self.get_frametimings()
         self._getstimtype()
         self.refresh_rate = self.metadata['refresh_rate']
         self.sampling_rate = self.metadata['sampling_freq']
-        self.maxframes = maxframes
 
         self.stim_dir = os.path.join(self.exp_dir, 'data_analysis',
                                      self.stimname)
@@ -39,6 +39,7 @@ class Stimulus:
     def get_frametimings(self):
         frametimings = asc.readframetimes(self.exp, self.stimnr)[:self.maxframes]
         self.frametimings = frametimings
+        self.frame_duration = np.ediff1d(frametimings).mean()
 
     def readpars(self):
         self.param_file = asc.read_parameters(self.exp, self.stimnr)
