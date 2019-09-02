@@ -62,6 +62,7 @@ class OMB(Stimulus):
             frametimings = frametimings[:-1]
         self.frametimings = frametimings
         self.filter_length = filter_length
+        self.frame_duration = np.ediff1d(frametimings).mean()
 
     def _checkimplemented(self):
         pars = self.pars
@@ -77,7 +78,6 @@ class OMB(Stimulus):
     def _generatesteps(self):
         pars = self.pars
         frametimings = self.frametimings
-        self.frame_duration = np.ediff1d(frametimings).mean()
         if self.maxframes is None:
             ntotal = int(pars.stimframes/pars.nblinks)
             if ntotal != frametimings.shape[0]:
