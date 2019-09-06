@@ -88,7 +88,7 @@ def omb_contrastmotion2dnonlin(exp, stim, nbins_nlt=9, cmap='Greys',
         all_bins_r[i, :] = bins_r
         nonlinearities[i, ...] = nonlinearity
 
-        X, Y = np.meshgrid(bins_c, bins_r)
+        X, Y = np.meshgrid(bins_c, bins_r, indexing='ij')
 
         plt.figure()
         im = plt.pcolormesh(X, Y, nonlinearity, cmap=cmap)
