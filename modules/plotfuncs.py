@@ -166,14 +166,23 @@ def clusters_to_ids(clusters):
     return clusterids
 
 
-def colorbar(mappable, size='5%', title=None, **kwargs):
+def colorbar(mappable, size='5%', title=None, side='right', **kwargs):
     """
     Make colorbars that scale properly.
 
-    Size determines the proportion of the colorbar width
-    with respect to image axis.
+    Parameters:
+    -------
+        size:
+            proportion of the colorbar width with respect to image axis.
+        title:
+            title of the colorbar
+        side:
+            which side to put the colorbar
 
-    kwargs will be passed to colorbar.
+    remaining kwargs will be passed to colorbar.
+
+        pad:
+            distance between the colorbar and the main axis
 
     Usage:
         im = ax.imshow(data)
@@ -192,7 +201,7 @@ def colorbar(mappable, size='5%', title=None, **kwargs):
     fig = ax.figure
     divider = make_axes_locatable(ax)
     pad = kwargs.get('pad', 0.05)
-    cax = divider.append_axes("right", size=size, pad=pad)
+    cax = divider.append_axes(side, size=size, pad=pad)
     cb = fig.colorbar(mappable, cax=cax, **kwargs)
     # Turn off the box around the colorbar.
     cb.outline.set_linewidth(0)
