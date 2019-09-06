@@ -52,8 +52,11 @@ def omb_contrastmotion2dnonlin(exp, stim, nbins_nlt=9, cmap='Greys',
 
     stim_mot = st.bgsteps.copy()
 
-    all_bins_c = np.zeros((st.nclusters, nbins_nlt))
-    all_bins_r = np.zeros((st.nclusters, nbins_nlt))
+    # Bin dimension should be one greater than nonlinearity for pcolormesh
+    # compatibility. Otherwise the last row and column of nonlinearity is not
+    # plotted.
+    all_bins_c = np.zeros((st.nclusters, nbins_nlt+1))
+    all_bins_r = np.zeros((st.nclusters, nbins_nlt+1))
     nonlinearities = np.zeros((st.nclusters, nbins_nlt, nbins_nlt))
 
     savedir = os.path.join(st.stim_dir, '2D-nonlin_magQ_motion_kcontrast')

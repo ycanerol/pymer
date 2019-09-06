@@ -73,7 +73,19 @@ def calc_nonlin(spikes, generator, nr_bins=20):
 
 
 #%%
-def calc_nonlin_2d(spikes, generator_x, generator_y, nr_bins=20):
+def calc_nonlin_2d(spikes, generator_x, generator_y, nr_bins=9):
+    """
+    The returned 2d nonlinearity and the bins have different dimensions
+    for compatibility with plt.pcolormesh , when bins are provided
+    for this function, the bin dimension should be one greater than nonlinearity.
+    Otherwise the last row and column are not plotted.
+
+    Returns
+    ------
+    nonlinearity: (nr_bins, nr_bins)
+    bins_x, bins_y: (nr_bins+1)
+
+    """
 
     quantiles = np.linspace(0, 1, nr_bins+1)
     qbins_x = mquantiles(generator_x, prob=quantiles)
@@ -85,10 +97,8 @@ def calc_nonlin_2d(spikes, generator_x, generator_y, nr_bins=20):
                               bins=[qbins_x, qbins_y])
 
     nlt_2d = res[0]
-    bins_x = bin_midpoints(qbins_x)
-    bins_y = bin_midpoints(qbins_y)
 
-    return nlt_2d, bins_x, bins_y
+    return nlt_2d, qbins_x, qbins_y
 
 
 if __name__ == '__main__':
