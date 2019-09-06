@@ -191,7 +191,8 @@ def colorbar(mappable, size='5%', title=None, **kwargs):
     ax = mappable.axes
     fig = ax.figure
     divider = make_axes_locatable(ax)
-    cax = divider.append_axes("right", size=size, pad=0.05)
+    pad = kwargs.get('pad', 0.05)
+    cax = divider.append_axes("right", size=size, pad=pad)
     cb = fig.colorbar(mappable, cax=cax, **kwargs)
     # Turn off the box around the colorbar.
     cb.outline.set_linewidth(0)
