@@ -572,7 +572,7 @@ def check_interactive_backend():
                          ' the animation.')
 
 
-def integerticks(axes, *args, which='xyz'):
+def integerticks(axes, *args, which='xyz', **kwargs):
     """
     Set the ticks to be integer values when possible.
 
@@ -590,6 +590,6 @@ def integerticks(axes, *args, which='xyz'):
     for ax in axes:
         for axis in which:
             try:
-                getattr(ax, axis+'axis').set_major_locator(MaxNLocator(*args, integer=True))
+                getattr(ax, axis+'axis').set_major_locator(MaxNLocator(*args, integer=True, **kwargs))
             except AttributeError:
                 pass
