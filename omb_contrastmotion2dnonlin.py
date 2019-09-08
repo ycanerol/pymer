@@ -59,7 +59,9 @@ def omb_contrastmotion2dnonlin(exp, stim, nbins_nlt=9, cmap='Greys',
     all_bins_r = np.zeros((st.nclusters, nbins_nlt+1))
     nonlinearities = np.zeros((st.nclusters, nbins_nlt, nbins_nlt))
 
-    savedir = os.path.join(st.stim_dir, '2D-nonlin_magQ_motion_kcontrast')
+    label = '2D-nonlin_magQ_motion_kcontrast'
+
+    savedir = os.path.join(st.stim_dir, label)
     os.makedirs(savedir, exist_ok=True)
 
     for i in range(st.nclusters):
@@ -120,3 +122,11 @@ def omb_contrastmotion2dnonlin(exp, stim, nbins_nlt=9, cmap='Greys',
             ax.xaxis.set_major_locator(MaxNLocator(integer=True))
             ax.yaxis.set_major_locator(MaxNLocator(integer=True))
             ax.zaxis.set_major_locator(MaxNLocator(integer=True))
+
+    keystosave = ['nonlinearities', 'all_bins_c', 'all_bins_r', 'nbins_nlt']
+    datadict = {}
+
+    for key in keystosave:
+        datadict.update({key: locals()[key]})
+    npzfpath = os.path.join(savedir, f'{st.stimnr}_{label}.npz')
+    np.savez(npzfpath, **datadict)
