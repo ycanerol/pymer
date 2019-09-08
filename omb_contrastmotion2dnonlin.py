@@ -12,6 +12,7 @@ import os
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gsp
 
 import plotfuncs as plf
 import nonlinearity as nlt
@@ -92,17 +93,44 @@ def omb_contrastmotion2dnonlin(exp, stim, nbins_nlt=9, cmap='Greys',
 
         X, Y = np.meshgrid(bins_c, bins_r, indexing='ij')
 
-        plt.figure()
-        im = plt.pcolormesh(X, Y, nonlinearity, cmap=cmap)
-        ax = im.axes
-        plf.integerticks(ax)
-        cb = plf.colorbar(im, title='spikes/s')
-        plf.integerticks(cb.ax, which='y')
-        ax.set_xlabel('Projection onto linear contrast filter')
-        ax.set_ylabel('Magnitude of projection onto quadratic motion filters')
-        ax.set_title(f'{st.exp_foldername}\n{st.stimname}\n2D nonlinearity\n'
-                     f'{st.clids[i]} nsp: {st.allspikes()[i, :].sum():<5.0f}')
-        plt.savefig(os.path.join(savedir, st.clids[i]), bbox_inches='tight')
+        fig = plt.figure()
+
+        gs = gsp.GridSpec(5, 5)
+        axmain = plt.subplot(gs[1:, :-1])
+        axx = plt.subplot(gs[0, :-1], sharex=axmain)
+        axy = plt.subplot(gs[1:, -1], sharey=axmain)
+
+        # Normally subplots turns off shared axis tick labels but
+        # Gridspec does not do this
+        plt.setp(axx.get_xticklabels(), visible=False)
+        plt.setp(axy.get_yticklabels(), visible=False)
+
+        im = axmain.pcolormesh(X, Y, nonlinearity, cmap=cmap)
+        plf.integerticks(axmain)
+
+        cb = plt.colorbar(im)
+        cb.outline.set_linewidth(0)
+        cb.ax.set_xlabel('spikes/s')
+        cb.ax.xaxis.set_label_position('top')
+
+        plf.integerticks(cb.ax, 4, which='y')
+        plf.integerticks(axx, 1, which='y')
+        plf.integerticks(axy, 1, which='x')
+
+        axx.bar(nlt.bin_midpoints(bins_c), nonlinearity.mean(axis=1),
+                width=np.ediff1d(bins_c)*.99, alpha=.3, facecolor='k')
+        axy.barh(nlt.bin_midpoints(bins_r), nonlinearity.mean(axis=0),
+                 height=np.ediff1d(bins_r)*.99, alpha=.3, facecolor='k')
+        plf.spineless(axx, 'b')
+        plf.spineless(axy, 'l')
+
+        axmain.set_xlabel('Projection onto linear contrast filter')
+        axmain.set_ylabel('Magnitude of projection onto quadratic motion filters')
+        fig.suptitle(f'{st.exp_foldername}\n{st.stimname}\n{st.clids[i]} '
+                     f'2D nonlinearity nsp: {st.allspikes()[i, :].sum():<5.0f}')
+
+        plt.subplots_adjust(top=.85)
+        fig.savefig(os.path.join(savedir, st.clids[i]), bbox_inches='tight')
         plt.show()
 
         if plot3d:
