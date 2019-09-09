@@ -42,7 +42,7 @@ def omb_contrastmotion2dnonlin(exp, stim, nbins_nlt=9, cmap='Greys',
     # Motion and contrast
     data_cm = np.load(os.path.join(st.exp_dir, 'data_analysis',
                                    st.stimname, 'GQM_motioncontrast',
-                                   f'{stim}_GQM_motioncontrast_data.npz'))
+                                   f'{stim}_GQM_motioncontrast.npz'))
 
     qall = data_cm['Qall']
     kall = data_cm['kall']
@@ -117,10 +117,13 @@ def omb_contrastmotion2dnonlin(exp, stim, nbins_nlt=9, cmap='Greys',
         plf.integerticks(axx, 1, which='y')
         plf.integerticks(axy, 1, which='x')
 
+        barkwargs = dict(alpha=.3, facecolor='k',
+                         linewidth=.5, edgecolor='w')
+
         axx.bar(nlt.bin_midpoints(bins_c), nonlinearity.mean(axis=1),
-                width=np.ediff1d(bins_c)*.99, alpha=.3, facecolor='k')
+                width=np.ediff1d(bins_c), **barkwargs)
         axy.barh(nlt.bin_midpoints(bins_r), nonlinearity.mean(axis=0),
-                 height=np.ediff1d(bins_r)*.99, alpha=.3, facecolor='k')
+                 height=np.ediff1d(bins_r), **barkwargs)
         plf.spineless(axx, 'b')
         plf.spineless(axy, 'l')
 
