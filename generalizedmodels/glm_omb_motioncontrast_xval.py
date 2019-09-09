@@ -123,6 +123,7 @@ for i, cluster in enumerate(st.clusters):
     fig.suptitle(f'{st.exp_foldername} \n {st.stimname} \n'
                  f'{st.clids[i]} {glmlabel} avgmu: {avg_mu:4.2f} '
                  f'corr: {avg_cross_corr:4.2f} nsp: {all_spikes[i, :].sum():5.0f}')
+    fig.align_labels()
     plt.show()
     fig.savefig(os.path.join(savepath, f'{st.clids[i]}.svg'))
     plt.close()
