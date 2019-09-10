@@ -153,5 +153,5 @@ datadict = {}
 for key in keystosave:
     datadict[key] = locals()[key]
 
-npzfpath = os.path.join(savedir, str(st.stimnr)+'_'+gqmlabel+'_data')
+npzfpath = os.path.join(savedir, str(st.stimnr)+'_'+gqmlabel)
 np.savez(npzfpath, **datadict)
