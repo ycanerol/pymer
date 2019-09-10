@@ -11,6 +11,9 @@ def train_test_split(spikes, stimulus, test_size=0.2, split_pos=None):
     """
     split_pos:
         Where the split should start as a ratio.
+
+    Returns:
+        spikes_training, spikes_test, stimulus_training, stimulus_test
     """
     total_len = spikes.shape[0]
     if split_pos is None:
