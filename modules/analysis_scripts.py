@@ -584,6 +584,7 @@ def stimulisorter(exp_name):
     """
     possible_stim_names = ['spontaneous', 'onoffsteps', 'fff', 'stripeflicker',
                            'checkerflicker', 'directiongratingsequence',
+                           'driftinggratings', 'directiongratings',
                            'rotatingstripes', 'frozennoise',
                            'checkerflickerplusmovie', 'OMSpatches', 'OMB',
                            'saccadegrating']
