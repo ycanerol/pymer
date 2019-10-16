@@ -15,13 +15,18 @@ from stimulus import Stimulus, Parameters
 
 class DriftingGratings(Stimulus):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, fromsequence=None, **kwargs):
         super().__init__(*args, **kwargs)
         if self.stimtype not in ('directiongratings', 'driftinggratings'):
             raise ValueError('The stimulus is not drifting gratings.')
 
         self.readpars()
-        self._setdefaults()
+        if fromsequence:
+            self.param_file = fromsequence
+            self.set_sequence_parameters()
+        else:
+            self._setdefaults()
+        self.calculate_basic_pars()
         self.reshape_frametimings()
         self.calculate_tuning_curves()
         self.vectorize_tuning_curves()
@@ -38,7 +43,23 @@ class DriftingGratings(Stimulus):
         pars.nangles = param_file.get('Nangles', 8)
         pars.gratingwidth = param_file.get('gratingwidth', None)
         pars.duration = param_file.get('duration', 5*pars.period)
+        self.pars = pars
 
+    def set_sequence_parameters(self):
+        pars = Parameters()
+        param_file = self.param_file
+        pars.period = param_file['period']
+        pars.ncycles = param_file['ncycles']
+        pars.sequence = 0
+        pars.regeneration = None
+        pars.brightness = None
+        pars.nangles = param_file['nangles']
+        pars.gratingwidth = (param_file['gratingwidthwhite'], param_file['gratingwidthblack'])
+        pars.duration = param_file['duration']
+        self.pars = pars
+
+    def calculate_basic_pars(self):
+        pars = self.pars
         pars.nperiod = int(pars.duration / pars.period)
         pars.pulse_per_cycle = pars.nperiod * pars.nangles
         ncycles = int(np.floor(self.frametimings.shape[0] / pars.pulse_per_cycle))
@@ -92,5 +113,4 @@ class DriftingGratings(Stimulus):
 
 if __name__ == '__main__':
     exp, stimnr = 'Kuehn', 5
-    dgs = Stimulus(exp, stimnr)
     dg = DriftingGratings(exp, stimnr)

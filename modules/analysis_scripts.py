@@ -514,6 +514,12 @@ def read_parameters(exp_name, stimulusnr, defaultpath=True):
                     value = True
                 elif value == ' false' or value == 'false':
                     value = False
+                else:
+                    # If the line contains multiple numbers, return a list
+                    array = np.fromstring(value, sep=' ')
+                    # Avoid catching the name of the stimulus
+#                    if array.size > 1:
+                    value = list(array)
 
             parameters[key] = value
         except ValueError:

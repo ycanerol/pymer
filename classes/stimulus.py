@@ -84,3 +84,9 @@ class Parameters:
 
     def __repr__(self):
         return self.__str__()
+
+    def items(self):
+        return self.__dict__.items()
+
+#    def __iter__(self):
+#        return iter(self.__dict__)
