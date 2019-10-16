@@ -61,7 +61,7 @@ def glm_neuron(k, mu, time_res):
 
 
 def minimize_loglhd(k_initial, mu_initial, x, time_res, spikes, usegrad=True,
-                    method='Newton-CG', **kwargs):
+                    method='Newton-CG', regularizer=None, tuning_parameter=0.5, **kwargs):
     """
     Calculate the filters that minimize the log likelihood function for a
     given set of spikes and stimulus.
@@ -86,6 +86,10 @@ def minimize_loglhd(k_initial, mu_initial, x, time_res, spikes, usegrad=True,
     method:
         Optimization method to use, see the Notes section in the  documentation of
         scipy.minimize for a full list.
+    regularizer:
+        Choice of regularizer. 'l1' or 'l2'
+    tuning_parameter:
+        Strength of the penalty term.
     """
     minimizekwargs = {'method': method,
                       'tol': 1e-3,
@@ -101,11 +105,17 @@ def minimize_loglhd(k_initial, mu_initial, x, time_res, spikes, usegrad=True,
             stimdim = x.shape[0]
         else:
             stimdim = 1
-
     def loglhd(kmu):
         k, mu = splitpars(kmu)
         nlt_in = glm_in(k, mu)(x)
-        return -np.sum(spikes * nlt_in) + time_res*np.sum(np.exp(nlt_in))
+        if regularizer == 'l1':
+            penalty_term = np.linalg.norm(k, 1)
+        elif regularizer == 'l2':
+            penalty_term = np.linalg.norm(k, 2)
+        else:
+            penalty_term = 0
+        penalty_term = penalty_term * tuning_parameter
+        return -np.sum(spikes * nlt_in) + time_res*np.sum(np.exp(nlt_in)) + penalty_term
 
     def grad(kmu):
         k, mu = splitpars(kmu)
@@ -148,7 +158,7 @@ if __name__ == '__main__':
     filter_length = 20
     frame_rate = 60
     time_res = 1/frame_rate
-    tstop = 100
+    tstop = 1000
     t = np.arange(0, tstop, time_res)
 
     np.random.seed(31)
@@ -164,8 +174,9 @@ if __name__ == '__main__':
     spikes = np.random.poisson(myglmneuron(stim))
 
     res = minimize_loglhd(np.zeros((stimdim, filter_length)), 0, stim, time_res,
-                          spikes, method='BFGS', usegrad=True)
-#%%
+                          spikes, method='BFGS', usegrad=True,
+                          regularizer='l2', tuning_parameter=100)
+
     k_res, mu_res = splitpars(res.x)
     fig, axes = plt.subplots(stimdim, 1, sharex=True, sharey=True)
     for i, ax in enumerate(axes):
