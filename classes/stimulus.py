@@ -18,10 +18,11 @@ class Stimulus:
         self.exp_foldername = os.path.split(self.exp_dir)[-1]
         self.stimname = iof.getstimname(exp, stimnr)
         self.clids = plf.clusters_to_ids(self.clusters)
-        self.get_frametimings()
-        self._getstimtype()
         self.refresh_rate = self.metadata['refresh_rate']
         self.sampling_rate = self.metadata['sampling_freq']
+        self.readpars()
+        self.get_frametimings()
+        self._getstimtype()
 
         self.stim_dir = os.path.join(self.exp_dir, 'data_analysis',
                                      self.stimname)
@@ -37,7 +38,17 @@ class Stimulus:
         self.stimtype = stimtype
 
     def get_frametimings(self):
-        frametimings = asc.readframetimes(self.exp, self.stimnr)[:self.maxframes]
+        try:
+            filter_length, frametimings = asc.ft_nblinks(self.exp,
+                                                         self.stimnr,
+                                                         self.param_file.get('Nblinks', None),
+                                                         self.refresh_rate)
+        except ValueError as e:
+            if str(e).startswith('Unexpected value for nblinks'):
+                frametimings = asc.readframetimes(self.exp, self.stimnr)
+                filter_length = None
+        frametimings = frametimings[:self.maxframes]
+        self.filter_length = filter_length
         self.frametimings = frametimings
         self.frame_duration = np.ediff1d(frametimings).mean()
 
