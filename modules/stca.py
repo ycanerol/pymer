@@ -16,6 +16,10 @@ from omb import OMB
 
 
 def calc_stca(spikes, stimulus, filter_length):
+    """
+    Calculate spike triggered average and spike triggered covariance
+    from a 1D stimulus vector and the corresponding spikes.
+    """
     rw = asc.rolling_window(stimulus, filter_length, preserve_dim=True)
     sta, stc = calc_stca_from_stimulus_matrix(spikes, rw)
     return sta, stc
@@ -31,7 +35,7 @@ def calc_stca_from_stimulus_matrix(spikes, stimulus_matrix):
 
     stimulus_matrix is equivalent to the output of the rolling window function.
     It is a (N, f) matrix where each row contains the preceding stimulus
-    segment. Total number of time bins is N and the lenght of the filter in
+    segment. Total number of time bins is N and the length of the filter in
     number of bins is f.
     """
     sta = (spikes @ stimulus_matrix) / spikes.sum()
