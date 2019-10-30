@@ -164,7 +164,7 @@ def sigtest(spikes, stimulus, filter_length, ntest=500,
                 for line in [low_min, high_min, low_max, high_max]:
                     plt.axhline(line, color='red', alpha=.3)
 
-            if outlier_index == len(eigvals_notzero) - 1:
+            if outlier_index == len(eigvals_notzero) - 1 + ncomps_below:
                 # Outlier larger than mean eigenvalue
                 ncomps_above += 1
             elif outlier_index == 0 + ncomps_below:
