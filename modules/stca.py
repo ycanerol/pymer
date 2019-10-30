@@ -78,7 +78,7 @@ def confidence_interval_bootstrap(data, confidence_level=.95):
 
 
 def sigtest(spikes, stimulus, filter_length, ntest=500,
-            confidence_level=.95, debug_plot=False):
+            confidence_level=.95, debug=False):
     """
     Calculate the significant components of the spike-triggered covariance
     matrix.
@@ -164,6 +164,13 @@ def sigtest(spikes, stimulus, filter_length, ntest=500,
             outlier_index = outlier_index + ncomps_below
             significant_components = np.hstack((significant_components, outlier_index))
 
+            if debug:
+                print(f'Eigval {outlier_index} is a significant component')
+                plt.figure()
+                plt.plot(eigvals_notzero, 'ko')
+                for line in [low_min, high_min, low_max, high_max]:
+                    plt.axhline(line, color='red', alpha=.3)
+
             if outlier_index == len(eigvals_notzero) - 1:
                 # Outlier larger than mean eigenvalue
                 ncomps_above += 1
@@ -173,11 +180,6 @@ def sigtest(spikes, stimulus, filter_length, ntest=500,
             else:
                 raise ValueError('Largest outlier found in unexpected place!')
 
-            if debug_plot:
-                plt.figure()
-                plt.plot(eigvals_notzero, 'ko')
-                for line in [low_min, high_min, low_max, high_max]:
-                    plt.axhline(line, color='red', alpha=.3)
 
         if len(significant_components) > 8:
             raise ValueError('Number of significant components is too damn high!')
