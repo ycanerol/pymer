@@ -13,7 +13,8 @@ from scipy.stats.mstats import mquantiles
 import analysis_scripts as asc
 
 from omb import OMB
-
+from stimulus import Stimulus
+from randpy import randpy
 
 def calc_stca(spikes, stimulus, filter_length):
     """
@@ -185,21 +186,23 @@ def sigtest(spikes, stimulus, filter_length, ntest=500,
 #%%
 if __name__ == '__main__':
 
-    exp, stimnr = '20180710', 8
+    # Choice between OMB and FFF data
+    # FFF has STA so it comes out as a significant component
+    # OMB data has no structure in STA,
+    use_omb = False
+    exp = '20180710'
 
-    st = OMB(exp, stimnr)
-    stimulus = st.bgsteps[0, :]
+    if use_omb:
+        stimnr = 8
+        st = OMB(exp, stimnr)
+        stimulus = st.bgsteps[0, :]
+    else:
+        stimnr = 1
+        st = Stimulus('20180710', stimnr)
+        stimulus = np.array(randpy.gasdev(-1000, st.frametimings.shape[0])[0])
+
     allspikes = st.allspikes()
     filter_length = st.filter_length
-
-
-    from stimulus import Stimulus
-    from randpy import randpy
-    ff = Stimulus('20180710', 1)
-    stimulus = np.array(randpy.gasdev(-1000, ff.frametimings.shape[0])[0])
-    filter_length = ff.filter_length
-    allspikes = ff.allspikes()
-    st = ff
 
     rw = asc.rolling_window(stimulus, filter_length, preserve_dim=True)
 
