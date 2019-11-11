@@ -6,13 +6,10 @@ Helper functions for implementing Generalized Linear Model
 import numpy as np
 from scipy.optimize import minimize
 
-from randpy import randpy
 import analysis_scripts as asc
-import iofuncs as iof
 
-import genlinmod as glm
+from genlinmod import conv
 
-conv = glm.conv
 stimdim = None
 filter_length = None
 

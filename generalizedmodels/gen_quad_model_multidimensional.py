@@ -9,11 +9,10 @@ from scipy.linalg import eigh
 from scipy.optimize import minimize
 import analysis_scripts as asc
 
+from genlinmod import conv
+
 filter_length = None
 stimdim = None
-
-def conv(k, x):
-    return np.convolve(k, x, 'full')[:-k.shape[0]+1]
 
 
 def conv2d_old(Q, x):
