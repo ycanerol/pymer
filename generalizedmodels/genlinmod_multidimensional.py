@@ -19,6 +19,11 @@ def set_stimdim(stimdim_toset):
     stimdim = stimdim_toset
 
 
+def set_filter_length(filter_length_toset):
+    global filter_length
+    filter_length = filter_length_toset
+
+
 def flattenpars(k, mu):
     """
     Flatten a set of parameters to be used with optimization
