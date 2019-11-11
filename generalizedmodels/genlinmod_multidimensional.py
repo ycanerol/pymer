@@ -34,9 +34,10 @@ def flattenpars(k, mu):
 
 
 def splitpars(kmu):
+    global stimdim
     k = kmu[:-1]
     mu = kmu[-1]
-    k = k.reshape((stimdim, filter_length))
+    k = k.reshape((stimdim, -1))
     return k, mu
 
 
@@ -63,6 +64,36 @@ def glm_neuron(k, mu, time_res):
     def firing_rate(x):
         return np.exp(glm_in(k, mu)(x))*time_res
     return firing_rate
+
+
+def loglhd(kmu, x, spikes, time_res):
+    global stimdim
+    if stimdim is None:
+        if x.ndim > 1:
+            stimdim = x.shape[0]
+        else:
+            stimdim = 1
+    k, mu = splitpars(kmu)
+    nlt_in = glm_in(k, mu)(x)
+    return -np.sum(spikes * nlt_in) + time_res*np.sum(np.exp(nlt_in))
+
+
+def grad(kmu, x, spikes, time_res):
+    k, mu = splitpars(kmu)
+    nlt_in = glm_in(k, mu)(x)
+    xr = asc.rolling_window(x, filter_length)[..., ::-1]
+    dldk = spikes@xr - time_res*np.exp(nlt_in)@xr
+#        dldk = (np.einsum('j,mjk->mk', spikes, xr) -
+#                time_res * np.einsum('j,mjk->mk', nlt_in, xr))
+#        dldk2 = np.zeros(l)
+#        for i in range(len(spikes)):
+#            dldk2 += spikes[i] * xr[i, :]
+#            dldk2 -= time_res*np.exp(nlt_in[i])*xr[i, :]
+#        assert np.isclose(dldk, dldk2).all()
+#        import pdb; pdb.set_trace()
+    dldm = spikes.sum() - time_res*np.exp(nlt_in).sum()
+    dl = flattenpars(dldk, dldm)
+    return -dl
 
 
 def minimize_loglhd(k_initial, mu_initial, x, time_res, spikes, usegrad=True,
@@ -107,32 +138,10 @@ def minimize_loglhd(k_initial, mu_initial, x, time_res, spikes, usegrad=True,
         else:
             stimdim = 1
 
-    def loglhd(kmu):
-        k, mu = splitpars(kmu)
-        nlt_in = glm_in(k, mu)(x)
-        return -np.sum(spikes * nlt_in) + time_res*np.sum(np.exp(nlt_in))
-
-    def grad(kmu):
-        k, mu = splitpars(kmu)
-        nlt_in = glm_in(k, mu)(x)
-        xr = asc.rolling_window(x, filter_length)[..., ::-1]
-        dldk = spikes@xr - time_res*np.exp(nlt_in)@xr
-#        dldk = (np.einsum('j,mjk->mk', spikes, xr) -
-#                time_res * np.einsum('j,mjk->mk', nlt_in, xr))
-#        dldk2 = np.zeros(l)
-#        for i in range(len(spikes)):
-#            dldk2 += spikes[i] * xr[i, :]
-#            dldk2 -= time_res*np.exp(nlt_in[i])*xr[i, :]
-#        assert np.isclose(dldk, dldk2).all()
-#        import pdb; pdb.set_trace()
-        dldm = spikes.sum() - time_res*np.exp(nlt_in).sum()
-        dl = flattenpars(dldk, dldm)
-        return -dl
-
     if usegrad:
         minimizekwargs.update({'jac': grad})
 
-    res = minimize(loglhd, flattenpars(k_initial, mu_initial), **minimizekwargs)
+    res = minimize(loglhd, flattenpars(k_initial, mu_initial), args=(x, spikes, time_res), **minimizekwargs)
 
     return res
 
