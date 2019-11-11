@@ -66,7 +66,7 @@ def splitpars(kQmu):
     """
     k, Q, mu = np.split(kQmu,
                         [filter_length*stimdim,
-                        stimdim*(filter_length+filter_length**2)])
+                         stimdim*(filter_length+filter_length**2)])
     k = k.reshape((stimdim, filter_length))
     Q = Q.reshape((stimdim, filter_length, filter_length))
     return k, Q, mu.squeeze()
@@ -163,7 +163,7 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
     if filter_length is None:
         filter_length = k_initial.shape[-1]
     if stimdim is None:
-        if x.ndim>1:
+        if x.ndim > 1:
             stimdim = x.shape[0]
         else:
             stimdim = 1
@@ -185,7 +185,7 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
     xr = asc.rolling_window(x, filter_length)[..., ::-1]
     # Add one extra dimension at the beginning in case the stimulus is
     # single dimensional
-    xr = xr[None, ...] if x.ndim==1 else xr
+    xr = xr[None, ...] if x.ndim == 1 else xr
     for j in range(stimdim):
         for i in range(spikes.shape[0]-filter_length):
             x_temp = xr[j, i, :]
@@ -199,7 +199,7 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
         # Fast way of calculating gradients using rolling window and einsum
 #        dLdk = spikes @ xr - time_res*(P @ xr)
         dLdk = (np.einsum('j,mjk->mk', spikes, xr)
-             - time_res*np.einsum('j,mjk->mk', P, xr))
+                - time_res*np.einsum('j,mjk->mk', P, xr))
         # Using einsum to multiply and sum along the desired axis.
         # more detailed explanation here:
         # https://stackoverflow.com/questions/26089893/understanding-numpys-einsum
@@ -210,14 +210,15 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
         dL = flattenpars(dLdk, dLdq, dLdmu)
         return -dL
 
-    minimizekwargs = {'options':{'disp':minimize_disp}}
+    minimizekwargs = {'options': {'disp': minimize_disp}}
     if usegrad:
-        minimizekwargs.update({'jac':gradients})
+        minimizekwargs.update({'jac': gradients})
     minimizekwargs.update(kwargs)
 
     res = minimize(loglikelihood, kQmu_initial, tol=1e-5,
                    method=method, **minimizekwargs)
     return res
+
 
 #%%
 # If the script is being imported from elsewhere to use the functions, do not run the simulation
@@ -226,7 +227,7 @@ if __name__ == '__main__':
     stimdim = 3
     frame_rate = 60
     time_res = (1/frame_rate)
-    tstop = 100 # simulation length in seconds
+    tstop = 100  # simulation length in seconds
     t = np.arange(0, tstop, time_res)
     # Set the seed for PRNG for reproducibility
     np.random.seed(1221)
@@ -238,7 +239,6 @@ if __name__ == '__main__':
     mu_in = .3
     k_in = np.exp(-(tmini-0.12)**2/.002)*.5
     k_in = np.stack((k_in, -k_in, -k_in/2))
-
 
     Q_in, Qks, Qws = makeQ2(tmini)
     Q_in *= .14
