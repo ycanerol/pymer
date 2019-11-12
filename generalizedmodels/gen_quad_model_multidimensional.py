@@ -137,6 +137,39 @@ def makeQ2(t):
     return Q, ks, ws
 
 
+def loglikelihood(kQmu, x, spikes, time_res):
+    """
+    Define the likelihood function for GQM
+
+    :math: \\mathcal{L}(k, Q, mu) =
+    """
+    # Star before an argument expands (or unpacks) the values
+    P = gqm_in(*splitpars(kQmu))
+    return -np.sum(spikes*P(x)) + time_res*np.sum(np.exp(P(x)))
+
+
+def gradients(kQmu, x, spikes, time_res):
+    """
+    Calculate gradients for the log-likelihood function
+    """
+    k, Q, mu = splitpars(kQmu)
+    P = np.exp(gqm_in(k, Q, mu)(x))
+    global sTs, xr
+    # Fast way of calculating gradients using rolling window and einsum
+#        dLdk = spikes @ xr - time_res*(P @ xr)
+    dLdk = (np.einsum('j,mjk->mk', spikes, xr)
+            - time_res*np.einsum('j,mjk->mk', P, xr))
+    # Using einsum to multiply and sum along the desired axis.
+    # more detailed explanation here:
+    # https://stackoverflow.com/questions/26089893/understanding-numpys-einsum
+    dLdq = (np.einsum('mijk,i->mjk', sTs, spikes)
+            - time_res*np.einsum('mijk,i->mjk', sTs, P))
+    dLdmu = spikes.sum() - time_res*np.sum(P)
+
+    dL = flattenpars(dLdk, dLdq, dLdmu)
+    return -dL
+
+
 def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
                            x, time_res, spikes, usegrad=True,
                            method='CG', minimize_disp=False,
@@ -179,16 +212,7 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
         else:
             stimdim = 1
 
-    def loglikelihood(kQmu):
-        """
-        Define the likelihood function for GQM
-
-        :math: \\mathcal{L}(k, Q, mu) =
-        """
-        # Star before an argument expands (or unpacks) the values
-        P = gqm_in(*splitpars(kQmu))
-        return -np.sum(spikes*P(x)) + time_res*np.sum(np.exp(P(x)))
-
+    global sTs, xr  # So that they are reachable from gradients function
     # Initialize a N-D numpy array to keep outer products
     sTs = np.zeros((stimdim, spikes.shape[0], filter_length, filter_length))
     # Instead of iterating over each time bin, use the rolling window function
@@ -201,25 +225,6 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
         for i in range(spikes.shape[0]-filter_length):
             x_temp = xr[j, i, :]
             sTs[j, i, :, :] = np.outer(x_temp, x_temp)
-    def gradients(kQmu):
-        """
-        Calculate gradients for the log-likelihood function
-        """
-        k, Q, mu = splitpars(kQmu)
-        P = np.exp(gqm_in(k, Q, mu)(x))
-        # Fast way of calculating gradients using rolling window and einsum
-#        dLdk = spikes @ xr - time_res*(P @ xr)
-        dLdk = (np.einsum('j,mjk->mk', spikes, xr)
-                - time_res*np.einsum('j,mjk->mk', P, xr))
-        # Using einsum to multiply and sum along the desired axis.
-        # more detailed explanation here:
-        # https://stackoverflow.com/questions/26089893/understanding-numpys-einsum
-        dLdq = (np.einsum('mijk,i->mjk', sTs, spikes)
-                - time_res*np.einsum('mijk,i->mjk', sTs, P))
-        dLdmu = spikes.sum() - time_res*np.sum(P)
-
-        dL = flattenpars(dLdk, dLdq, dLdmu)
-        return -dL
 
     minimizekwargs = {'options': {'disp': minimize_disp}}
     if usegrad:
@@ -227,7 +232,7 @@ def minimize_loglikelihood(k_initial, Q_initial, mu_initial,
     minimizekwargs.update(kwargs)
 
     res = minimize(loglikelihood, kQmu_initial, tol=1e-5,
-                   method=method, **minimizekwargs)
+                   method=method, args=(x, spikes, time_res), **minimizekwargs)
     return res
 
 
