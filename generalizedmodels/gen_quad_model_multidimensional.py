@@ -15,6 +15,16 @@ filter_length = None
 stimdim = None
 
 
+def set_stimdim(stimdim_toset):
+    global stimdim
+    stimdim = stimdim_toset
+
+
+def set_filter_length(filter_length_toset):
+    global filter_length
+    filter_length = filter_length_toset
+
+
 def conv2d_old(Q, x):
     """
     Calculate the quadratic form. Equivalent to conv2d(), but slower.
@@ -64,6 +74,7 @@ def splitpars(kQmu):
 
     Inverse operation of flattenpars.
     """
+    global stimdim, filter_length
     k, Q, mu = np.split(kQmu,
                         [filter_length*stimdim,
                          stimdim*(filter_length+filter_length**2)])
@@ -292,6 +303,7 @@ if __name__ == '__main__':
         #plt.savefig(savepath+'simulatedsuccess.png')
     plt.show()
 #%%
+
     w_in, v_in = eigh(Q_in)
     w_out, v_out = eigh(Q_out)
 
