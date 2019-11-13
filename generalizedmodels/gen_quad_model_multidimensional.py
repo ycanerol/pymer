@@ -10,10 +10,11 @@ from scipy.optimize import minimize
 import analysis_scripts as asc
 
 from genlinmod import conv
+from gqm2dbases import weightstofilter
 
 filter_length = None
 stimdim = None
-
+nbases = None
 
 def set_stimdim(stimdim_toset):
     global stimdim
@@ -23,6 +24,11 @@ def set_stimdim(stimdim_toset):
 def set_filter_length(filter_length_toset):
     global filter_length
     filter_length = filter_length_toset
+
+
+def set_nbases(nbases_toset):
+    global nbases
+    nbases = nbases_toset
 
 
 def conv2d_old(Q, x):
@@ -38,7 +44,7 @@ def conv2d_old(Q, x):
     return out
 
 
-def conv2d(Q, x, optimize='greedy'):
+def conv2d(W, x, optimize='greedy'):
     """
     Calculate the quadratic form for each time bin for generalized quadratic
     model.
@@ -48,6 +54,7 @@ def conv2d(Q, x, optimize='greedy'):
     * np.broadcast_to for shaping the quadratic filter matrix in the required
       form without allocating memory
     """
+    Q = weightstofilter(W)
     l = Q.shape[0]
     # Generate a rolling view of the stimulus wihtout allocating space in memory
     # Equivalent to "xr = hankel(x)[:, :l]" but much more memory efficient
@@ -57,33 +64,33 @@ def conv2d(Q, x, optimize='greedy'):
     return np.einsum('ij,ijk,ki->i', xr, Qb, xr.T, optimize=optimize)
 
 
-def flattenpars(k, Q, mu):
+def flattenpars(k, W, mu):
     """
     Flatten a set of parameters to be used with optimization
     functions.
 
     Inverse operation of splitpars.
     """
-    kQmu = np.concatenate((k.ravel(), Q.ravel(), [mu]))
-    return kQmu
+    kWmu = np.concatenate((k.ravel(), W.ravel(), [mu]))
+    return kWmu
 
 
-def splitpars(kQmu):
+def splitpars(kWmu):
     """
     Split the flattened array into original shape
 
     Inverse operation of flattenpars.
     """
-    global stimdim, filter_length
-    k, Q, mu = np.split(kQmu,
+    global stimdim, filter_length, nbases
+    k, W, mu = np.split(kWmu,
                         [filter_length*stimdim,
-                         stimdim*(filter_length+filter_length**2)])
+                         stimdim*(filter_length+nbases**2)])
     k = k.reshape((stimdim, filter_length))
-    Q = Q.reshape((stimdim, filter_length, filter_length))
-    return k, Q, mu.squeeze()
+    W = W.reshape((stimdim, nbases, nbases))
+    return k, W, mu.squeeze()
 
 
-def gqm_in(k, Q, mu):
+def gqm_in(k, W, mu):
     """
     Given a set of parameters,
     calculates the time series that go into exponential function
@@ -94,13 +101,13 @@ def gqm_in(k, Q, mu):
             stimdim = x.ndim
         total = 0
         for j in range(stimdim):
-            total += conv(k[j, :], x[j, :]) + conv2d(Q[j, :, :], x[j, :])
+            total += conv(k[j, :], x[j, :]) + conv2d(W[j, :, :], x[j, :])
         return total + mu
 #        return conv(k, x) + conv2d(Q, x) + mu
     return f
 
 
-def gqm_neuron(k, Q, mu, time_res):
+def gqm_neuron(k, W, mu, time_res):
     """
     Given a set of filters, return the firing rate of a neuron that would respond
     to a stimulus
@@ -108,7 +115,7 @@ def gqm_neuron(k, Q, mu, time_res):
     The output is scaled by the length of time bins
     """
     def fr(x):
-        return np.exp(gqm_in(k, Q, mu)(x))*time_res
+        return np.exp(gqm_in(k, W, mu)(x))*time_res
     return fr
 
 
@@ -137,23 +144,32 @@ def makeQ2(t):
     return Q, ks, ws
 
 
-def loglikelihood(kQmu, x, spikes, time_res):
+def loglikelihood(kWmu, x, spikes, time_res):
     """
     Define the likelihood function for GQM
 
-    :math: \\mathcal{L}(k, Q, mu) =
+    .. math::
+        \\mathcal{L}(k, Q, mu) = \\sum_{t}{y_{t}log{\\lambda_{t}}}
+                                 - \\Delta \\sum_{t}{\\lambda_{t}} + c
+
+    where
+
+    .. math::
+        \\lambda_{t} = exp(k \\cdot s_{t} + s^{T}_{t}Qs_{t} + mu)
+
+    for a given time bin :math:`t`.
     """
     # Star before an argument expands (or unpacks) the values
-    P = gqm_in(*splitpars(kQmu))
+    P = gqm_in(*splitpars(kWmu))
     return -np.sum(spikes*P(x)) + time_res*np.sum(np.exp(P(x)))
 
 
-def gradients(kQmu, x, spikes, time_res):
+def gradients(kWmu, x, spikes, time_res):
     """
     Calculate gradients for the log-likelihood function
     """
-    k, Q, mu = splitpars(kQmu)
-    P = np.exp(gqm_in(k, Q, mu)(x))
+    k, W, mu = splitpars(kWmu)
+    P = np.exp(gqm_in(k, W, mu)(x))
     global sTs, xr
     # Fast way of calculating gradients using rolling window and einsum
 #        dLdk = spikes @ xr - time_res*(P @ xr)
