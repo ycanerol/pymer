@@ -18,3 +18,4 @@ dependencies:
 - pip:
   - pyglmnet
   - pycorrelate
+  - git+https://github.com/G-Node/python-neuroshare@master
