@@ -33,6 +33,14 @@ import sys
 sys.path.append('<path_to_main_dir>/modules')
 sys.path.append('<path_to_main_dir>/external_libs')
 ```
+## Set up Neuroshare libraries
+Copy the neuroshare library files to your computer
+
+```bash
+sudo mkdir /usr/lib/neuroshare
+sudo cp external_libs/neurosharelibs /usr/lib/neuroshare/
+```
+
 
 ## Random Number Generator
 The random number generator should be setup by running the setup.py file in
