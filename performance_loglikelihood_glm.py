@@ -56,6 +56,7 @@ if __name__ == '__main__':
                    ('Motion', 2)]
 
     logls = np.zeros((st.nclusters, 3))
+    ll0s = np.zeros((st.nclusters, 3))
 
     # Exclude those with very few spikes
     cutoff = 0.2  # In units of spikes/s
@@ -81,7 +82,10 @@ if __name__ == '__main__':
             spikes = allspikes[i, :]
             logl = glmm.loglhd(glmm.flattenpars(kall[i], muall[i]), stimulus,
                                spikes, st.frame_duration)
+            ll0 =  glmm.loglhd(glmm.flattenpars(kall[i], muall[i]), stimulus,
+                               np.broadcast_to(spikes.mean(), spikes.shape), st.frame_duration)
             logls[i, j] = -logl  # negative loglikelihood is returned by the function
+            ll0s[i, j] = -ll0
 
     logls_norm = logls / allspikes.sum(axis=1)[:, None]  # Normalize with the number of spikes
     logls_norm = np.ma.array(logls_norm, mask=lowq_mask)
@@ -138,4 +142,5 @@ if __name__ == '__main__':
     ax4.set_xlabel('Motion')
 
     fig.suptitle(f'GLM Log likelihood per spike \n{species} {st.exp_foldername}')
-    fig.savefig(f'/home/ycan/Documents/meeting_notes/2019-11-13/loglikelihood_glm_{species}.pdf')
+    if False:
+        fig.savefig(f'/home/ycan/Documents/meeting_notes/2019-11-13/loglikelihood_glm_{species}.pdf')
