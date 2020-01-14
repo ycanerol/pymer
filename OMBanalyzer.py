@@ -14,7 +14,7 @@ from randpy import randpy
 import analysis_scripts as asc
 import plotfuncs as plf
 import iofuncs as iof
-
+import nonlinearity as nlt
 
 def calc_covar(stim_small):
     """
@@ -24,25 +24,6 @@ def calc_covar(stim_small):
     stim = stim_small[np.newaxis, :]
     covar = np.dot(stim.T, stim)
     return covar
-
-
-def q_nlt_recovery(spikes, generator, nr_bins=20):
-    """
-    Calculate nonlinearities from
-    """
-    # Define the quantiles we want to use for binning.
-    # endpoint and [1:] are used to exclude outermost bins because
-    # sometimes they cause bugs (e.g. nonlinearity is zero for some cells)
-    quantiles = np.linspace(0, 1, nr_bins+1, endpoint=False)[1:]
-    quantile_bins = mquantiles(generator, prob=quantiles)
-    bindices = np.digitize(generator, quantile_bins)
-    # Returns which bin each should go
-    spikecount_in_bins = np.array([])
-    for i in range(nr_bins):  # Sorts values into bins
-        spikecount_in_bins = np.append(spikecount_in_bins,
-                                       (np.average(spikes[np.where
-                                                          (bindices == i)])))
-    return quantile_bins, spikecount_in_bins
 
 
 def OMBanalyzer(exp_name, stimnr, plotall=False, nr_bins=20):
@@ -57,15 +38,15 @@ def OMBanalyzer(exp_name, stimnr, plotall=False, nr_bins=20):
     stimname = iof.getstimname(exp_dir, stimnr)
 
     parameters = asc.read_parameters(exp_name, stimnr)
-    assert(parameters['stimulus_type']=='objectsmovingbackground')
-    stimframes = asc.parameter_dict_get(parameters, 'stimFrames', 108000)
-    preframes = asc.parameter_dict_get(parameters, 'preFrames', 200)
-    nblinks = asc.parameter_dict_get(parameters, 'Nblinks', 2)
+    assert parameters['stimulus_type'] == 'objectsmovingbackground'
+    stimframes = parameters.get('stimFrames', 108000)
+    preframes = parameters.get('preFrames', 200)
+    nblinks = parameters.get('Nblinks', 2)
 
-    seed = asc.parameter_dict_get(parameters, 'seed', -10000)
-    seed2 = asc.parameter_dict_get(parameters, 'objseed', -1000)
+    seed = parameters.get('seed', -10000)
+    seed2 = parameters.get('objseed', -1000)
 
-    stepsize = asc.parameter_dict_get(parameters, 'stepsize', 2)
+    stepsize = parameters.get('stepsize', 2)
 
     ntotal = int(stimframes / nblinks)
 
@@ -73,16 +54,18 @@ def OMBanalyzer(exp_name, stimnr, plotall=False, nr_bins=20):
 
     refresh_rate = metadata['refresh_rate']
     filter_length, frametimings = asc.ft_nblinks(exp_name, stimnr, nblinks,
-                                                refresh_rate)
+                                                 refresh_rate)
+    frame_duration = np.ediff1d(frametimings).mean()
+    frametimings = frametimings[:-1]
 
-    if ntotal+1 != frametimings.shape[0]:
+    if ntotal != frametimings.shape[0]:
         print(f'For {exp_name}\nstimulus {stimname} :\n'
               f'Number of frames specified in the parameters file ({ntotal}'
               f' frames) and frametimings ({frametimings.shape[0]}) do not'
               ' agree!'
               ' The stimulus was possibly interrupted during recording.'
               ' ntotal is changed to match actual frametimings.')
-        ntotal = frametimings.shape[0]-1
+        ntotal = frametimings.shape[0]
 
     # Generate the numbers to be used for reconstructing the motion
     # ObjectsMovingBackground.cpp line 174, steps are generated in an
@@ -101,7 +84,7 @@ def OMBanalyzer(exp_name, stimnr, plotall=False, nr_bins=20):
     all_spikes = np.empty((clusters.shape[0], ntotal))
     for i, (cluster, channel, _) in enumerate(clusters):
         spiketimes = asc.read_raster(exp_name, stimnr, cluster, channel)
-        spikes = asc.binspikes(spiketimes, frametimings)[:-1]
+        spikes = asc.binspikes(spiketimes, frametimings)
         all_spikes[i, :] = spikes
 
     # Collect STA for x and y movement in one array
@@ -137,20 +120,22 @@ def OMBanalyzer(exp_name, stimnr, plotall=False, nr_bins=20):
         stas[i, :, :] = stas[i, :, :] / totalspikes
         stc_x[i, :, :] = stc_x[i, :, :] / totalspikes
         stc_y[i, :, :] = stc_y[i, :, :] / totalspikes
-        eigvals_x[i, :], eigvecs_x[i, :, :] = np.linalg.eigh(stc_x[i, :, :])
-        eigvals_y[i, :], eigvecs_y[i, :, :] = np.linalg.eigh(stc_y[i, :, :])
-
+        try:
+            eigvals_x[i, :], eigvecs_x[i, :, :] = np.linalg.eigh(stc_x[i, :, :])
+            eigvals_y[i, :], eigvecs_y[i, :, :] = np.linalg.eigh(stc_y[i, :, :])
+        except np.linalg.LinAlgError:
+            continue
         # Calculate the generator signals and nonlinearities
         generators_x[i, :] = np.convolve(eigvecs_x[i, :, -1], xsteps,
-                                  mode='full')[:-filter_length+1]
+                                         mode='full')[:-filter_length+1]
         generators_y[i, :] = np.convolve(eigvecs_y[i, :, -1], ysteps,
-                                  mode='full')[:-filter_length+1]
-        bins_x[i, :], spikecount_x[i, :] = q_nlt_recovery(all_spikes[i, :],
-                                                         generators_x[i, :],
-                                                         nr_bins)
-        bins_y[i, :], spikecount_y[i, :] = q_nlt_recovery(all_spikes[i, :],
-                                                         generators_y[i, :],
-                                                         nr_bins)
+                                         mode='full')[:-filter_length+1]
+        spikecount_x[i, :], bins_x[i, :] = nlt.calc_nonlin(all_spikes[i, :],
+                                                          generators_x[i, :],
+                                                          nr_bins)
+        spikecount_y[i, :], bins_y[i, :] = nlt.calc_nonlin(all_spikes[i, :],
+                                                          generators_y[i, :],
+                                                          nr_bins)
     savepath = os.path.join(exp_dir, 'data_analysis', stimname)
     if not os.path.isdir(savepath):
         os.makedirs(savepath, exist_ok=True)
@@ -194,8 +179,9 @@ def OMBanalyzer(exp_name, stimnr, plotall=False, nr_bins=20):
         ax3.plot(eigvals_y[i, :], 'o', markerfacecolor='C1', markersize=4,
                  markeredgewidth=0)
         ax4 = plt.subplot(2, 3, 5)
-        ax4.plot(bins_x[i, :], spikecount_x[i, :])
-        ax4.plot(bins_y[i, :], spikecount_y[i, :])
+        ax4.plot(bins_x[i, :], spikecount_x[i, :]/frame_duration)
+        ax4.plot(bins_y[i, :], spikecount_y[i, :]/frame_duration)
+        ax4.set_ylabel('Firing rate [Hz]')
         ax4.set_title('Nonlinearities', size='small')
         plf.spineless([ax1, ax2, ax3, ax4], 'tr')
         ax5 = plt.subplot(2, 3, 6, projection='polar')
@@ -211,14 +197,14 @@ def OMBanalyzer(exp_name, stimnr, plotall=False, nr_bins=20):
             plt.show()
         plt.close()
 
-    keystosave = ['nblinks', 'all_spikes', 'clusters',
+    keystosave = ['nblinks', 'all_spikes', 'clusters', 'frame_duration',
                   'eigvals_x', 'eigvals_y',
                   'eigvecs_x', 'eigvecs_y',
                   'filter_length', 'magx', 'magy',
                   'ntotal', 'r', 'theta', 'stas',
                   'stc_x', 'stc_y', 'bins_x', 'bins_y', 'nr_bins',
-                  'spikecount_x','spikecount_y',
-                  'generators_x', 'generators_y']
+                  'spikecount_x', 'spikecount_y',
+                  'generators_x', 'generators_y', 't']
     datadict = {}
 
     for key in keystosave:

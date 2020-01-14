@@ -6,9 +6,20 @@ Created on Tue Nov 14 13:37:25 2017
 @author: ycan
 """
 import os
+
+import numpy as np
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import numpy as np
+from matplotlib import animation
+from matplotlib.widgets import Slider
+from matplotlib.ticker import MaxNLocator
+
+import iofuncs as iof
+import analysis_scripts as asc
+
+
+interactive_backends = ['Qt', 'Tk']
 
 
 def spineless(axes, which='trlb'):
@@ -16,14 +27,18 @@ def spineless(axes, which='trlb'):
     Set the spine visibility quickly in matplotlib.
 
     Parameters:
-        ax: List of axis objects returned by e.g. plt.subplot()
-        which: List of spines to turn off.
+    --------
+    ax:
+        List of axis objects returned by e.g. plt.subplot()
+    which:
+        List of spines to turn off.
 
     Example usage:
-    ax=plt.subplot(111)
-    ax.plot(np.random.randint(5, 10, size=10))
-    spineless(ax, which='trlb')
-    plt.show()
+
+    >>> ax=plt.subplot(111)
+    >>> ax.plot(np.random.randint(5, 10, size=10))
+    >>> spineless(ax, which='trlb')
+    >>> plt.show()
     """
     # Check whether a single axes object is given
     if isinstance(axes, mpl.axes.Axes):
@@ -151,14 +166,23 @@ def clusters_to_ids(clusters):
     return clusterids
 
 
-def colorbar(mappable, size='5%', **kwargs):
+def colorbar(mappable, size='5%', title=None, side='right', **kwargs):
     """
     Make colorbars that scale properly.
 
-    Size determines the proportion of the colorbar width
-    with respect to image axis.
+    Parameters:
+    -------
+        size:
+            proportion of the colorbar width with respect to image axis.
+        title:
+            title of the colorbar
+        side:
+            which side to put the colorbar
 
-    kwargs will be passed to colorbar.
+    remaining kwargs will be passed to colorbar.
+
+        pad:
+            distance between the colorbar and the main axis
 
     Usage:
         im = ax.imshow(data)
@@ -176,13 +200,20 @@ def colorbar(mappable, size='5%', **kwargs):
     ax = mappable.axes
     fig = ax.figure
     divider = make_axes_locatable(ax)
-    cax = divider.append_axes("right", size=size, pad=0.05)
+    pad = kwargs.get('pad', 0.05)
+    cax = divider.append_axes(side, size=size, pad=pad)
     cb = fig.colorbar(mappable, cax=cax, **kwargs)
     # Turn off the box around the colorbar.
     cb.outline.set_linewidth(0)
+    cbax = cb.ax
     # Turn off tick marks
-    cb.ax.tick_params(length=0)
+    cbax.tick_params(length=0)
+
+    if title:
+        cbax.set_xlabel(title)
+        cbax.xaxis.set_label_position('top')
     return cb
+
 
 def drawonoff(ax, preframedur, stimdur, h=1, contrast=1):
     """
@@ -253,7 +284,7 @@ def stashow(sta, ax=None, cbar=True, **kwargs):
         imshow
             extent: Change the labels of the axes. [xmin, xmax, ymin, ymax]
             aspect: Aspect ratio of the image. 'auto', 'equal'
-            cmap:  Colormap to be used. Default is 'RdBu'
+            cmap:  Colormap to be used. Default is set in config
         colorbar
             size: Width of the colorbar as percentage of image dimension
                   Default is 2%
@@ -263,17 +294,17 @@ def stashow(sta, ax=None, cbar=True, **kwargs):
         ax = plt.subplot(111)
         stashow(sta, ax)
     """
-    vmax = np.abs(sta).max()
-    vmin = -vmax
+    vmax = asc.absmax(sta)
+    vmin = asc.absmin(sta)
 
     # Make a dictionary for imshow and colorbar kwargs
-    imshowkw = {'cmap':'RdBu', 'vmin':vmin, 'vmax':vmax}
-    cbarkw = {'size':'2%', 'ticks':[vmin, vmax], 'format':'%.2f'}
-    for key in kwargs.keys():
+    imshowkw = {'cmap': iof.config('colormap'), 'vmin': vmin, 'vmax': vmax}
+    cbarkw = {'size': '2%', 'ticks': [vmin, vmax], 'format': '%.2f'}
+    for key, val in kwargs.items():
         if key in ['extent', 'aspect', 'cmap']:
-            imshowkw.update({key:kwargs[key]})
+            imshowkw.update({key: val})
         elif key in ['size', 'ticks', 'format']:
-            cbarkw.update({key:kwargs[key]})
+            cbarkw.update({key: val})
         else:
             raise ValueError(f'Unknown kwarg: {key}')
 
@@ -286,14 +317,16 @@ def stashow(sta, ax=None, cbar=True, **kwargs):
         colorbar(im, **cbarkw)
     return im
 
+
 def subplottext(text, axis, x=-.3, y=1.1, **kwargs):
-    textkwargs = {'transform':axis.transAxes,
-                  'fontsize':12,
-                  'fontweight':'bold',
-                  'va':'top',
-                  'ha':'right'}
+    textkwargs = {'transform': axis.transAxes,
+                  'fontsize': 12,
+                  'fontweight': 'bold',
+                  'va': 'top',
+                  'ha': 'right'}
     textkwargs.update(kwargs)
     axis.text(x, y, text, **textkwargs)
+
 
 def addarrowaxis(ax, x=0.5, y=0.5, dx=.1, dy=.2, xtext='',
                  ytext='', xtextoffset=0.02, ytextoffset=.032,
@@ -316,13 +349,256 @@ def addarrowaxis(ax, x=0.5, y=0.5, dx=.1, dy=.2, xtext='',
         Font size of the text
     """
     arrowprops = dict(arrowstyle='<-', facecolor='black')
-    ax.annotate('', xy=(x, y),  xycoords='axes fraction',
+    ax.annotate('', xy=(x, y), xycoords='axes fraction',
                 xytext=(x+dx, y), textcoords='axes fraction',
                 arrowprops=arrowprops)
-    ax.annotate('', xy=(x, y),  xycoords='axes fraction',
+    ax.annotate('', xy=(x, y), xycoords='axes fraction',
                 xytext=(x, y+dy), textcoords='axes fraction',
                 arrowprops=arrowprops)
     ax.text(x, y - xtextoffset, xtext, transform=ax.transAxes,
-        fontsize=fontsize, va='top')
+            fontsize=fontsize, va='top')
     ax.text(x - ytextoffset, y, ytext, rotation=90, transform=ax.transAxes,
-        fontsize=fontsize, ha='left', va='bottom')
+            fontsize=fontsize, ha='left', va='bottom')
+
+
+def playsta(sta, frame_duration=None, cmap=None, centerzero=True, **kwargs):
+    """
+    Create a looped animation for a single STA with 3 dimensions.
+
+    Parameters
+    ---------
+    cmap:
+        Colormap to be used. Defaults to the specified colormap in the
+        config file.
+    centerzero:
+        Center the colormap around zero if True.
+    interval:
+        Frame rate for the animation in ms.
+    repeat_delay:
+        Time to wait before the animation is repeated in ms.
+
+    Note
+    ----
+    The returned animation can be saved like so:
+
+    >>> ani = playsta(sta)
+    >>> ani.save('wheretosave/sta.gif', writer='imagemagick', fps=10)
+    """
+    check_interactive_backend()
+
+    if cmap is None:
+        cmap = iof.config('colormap')
+    if centerzero:
+        vmax = asc.absmax(sta)
+        vmin = asc.absmin(sta)
+    else:
+        vmax, vmin = sta.max(), sta.min()
+    ims = []
+    fig = plt.figure()
+    ax = plt.gca()
+    for i in range(sta.shape[-1]):
+        im = ax.imshow(sta[:, :, i], animated=True,
+                       cmap=cmap, vmin=vmin, vmax=vmax)
+
+        ims.append([im]) # Needs to be a list of lists
+    ani = animation.ArtistAnimation(fig, ims, **kwargs)
+
+    return ani
+
+
+def multistabrowser(stas, frame_duration=None, normalize=True, cmap=None,
+                    centerzero=True, **kwargs):
+    """
+    Returns an interactive plot to browse multiple spatiotemporal
+    STAs at the same time. Requires an interactive matplotlib backend.
+
+    Parameters
+    --------
+    stas:
+        Numpy array containing STAs. First dimension should index individual cells,
+        last dimension should index time.
+        Alternatively, this could be a list of numpy arrays.
+    frame_duration:
+      Time between each frame. (optional)
+    normalize:
+      Whether to normalize each STA
+    cmap:
+      Colormap to use.
+    centerzero:
+      Whether to center the colormap around zero for diverging colormaps.
+
+    Example
+    ------
+    >>> print(stas.shape) # (nrcells, xpixels, ypixels, time)
+    (36, 75, 100, 40)
+    >>> fig, slider = stabrowser(stas, frame_duration=1/60)
+
+    Notes
+    -----
+    When calling the function, the slider is returned to prevent the reference
+    to it getting destroyed and to keep it interactive.
+    The dummy variable `_` can also be used.
+    """
+    check_interactive_backend()
+
+    if isinstance(stas, list):
+        stas = np.array(stas)
+
+    if normalize:
+        stas = asc.normalize(stas)
+
+    if cmap is None:
+        cmap = iof.config('colormap')
+    if centerzero:
+        vmax = asc.absmax(stas)
+        vmin = asc.absmin(stas)
+    else:
+        vmax, vmin = stas.max(), stas.min()
+
+    imshowkwargs = dict(cmap=cmap, vmax=vmax, vmin=vmin, **kwargs)
+
+    rows, cols = numsubplots(stas.shape[0])
+    fig, axes = plt.subplots(rows, cols, sharex=True, sharey=True)
+
+    initial_frame = 5
+
+    axsl = fig.add_axes([0.25, 0.05, 0.65, 0.03])
+    # For the slider to remain interactive, a reference to it should
+    # be kept, so it set to a variable and is returned by the function
+    slider_t = Slider(axsl, 'Frame before spike',
+                      0, stas.shape[-1]-1,
+                      valinit=initial_frame,
+                      valstep=1,
+                      valfmt='%2.0f')
+
+    def update(frame):
+        frame = int(frame)
+        for i in range(rows):
+            for j in range(cols):
+                # Calculate the flattened index, equivalent to i*cols+j
+                flat_idx = np.ravel_multi_index([i, j], (rows, cols))
+                if flat_idx < stas.shape[0]:
+                    im = axes[i, j].get_images()[0]
+                    im.set_data(stas[flat_idx, ..., frame])
+        if frame_duration is not None:
+            fig.suptitle(f'{frame*frame_duration*1000:4.0f} ms')
+        fig.canvas.draw_idle()
+
+    slider_t.on_changed(update)
+
+    for i in range(rows):
+        for j in range(cols):
+            flat_idx = np.ravel_multi_index([i, j], (rows, cols))
+            ax = axes[i, j]
+            if flat_idx < stas.shape[0]:
+                ax.imshow(stas[i*cols+j, ..., initial_frame], **imshowkwargs)
+            ax.set_axis_off()
+    plt.tight_layout()
+    plt.subplots_adjust(wspace=.01, hspace=.01)
+    return fig, slider_t
+
+
+def stabrowser(sta, frame_duration=None, cmap=None, centerzero=True, **kwargs):
+    """
+    Returns an interactive plot to browse an spatiotemporal
+    STA. Requires an interactive matplotlib backend.
+
+    Parameters
+    --------
+    sta:
+        Numpy array containing the STA. Last dimension should index time.
+    frame_duration:
+      Time between each frame. (optional)
+    cmap:
+      Colormap to use.
+    centerzero:
+      Whether to center the colormap around zero for diverging colormaps.
+
+    Example
+    ------
+    >>> print(sta.shape) # (xpixels, ypixels, time)
+    (75, 100, 40)
+    >>> fig, slider = stabrowser(sta, frame_duration=1/60)
+
+    Notes
+    -----
+    When calling the function, the slider is returned to prevent the reference
+    to it getting destroyed and to keep it interactive.
+    The dummy variable `_` can also be used.
+    """
+    check_interactive_backend()
+
+    if cmap is None:
+        cmap = iof.config('colormap')
+    if centerzero:
+        vmax = asc.absmax(sta)
+        vmin = asc.absmin(sta)
+    else:
+        vmax, vmin = sta.max(), sta.min()
+
+    imshowkwargs = dict(cmap=cmap, vmax=vmax, vmin=vmin, **kwargs)
+
+    fig = plt.figure()
+    ax = fig.add_axes([0.1, 0.1, 0.8, 0.8])
+
+
+    initial_frame = 5
+
+    axsl = fig.add_axes([0.25, 0.05, 0.65, 0.03])
+    # For the slider to remain interactive, a reference to it should
+    # be kept, so it set to a variable and is returned by the function
+    slider_t = Slider(axsl, 'Frame before spike',
+                      0, sta.shape[-1]-1,
+                      valinit=initial_frame,
+                      valstep=1,
+                      valfmt='%2.0f')
+
+    def update(frame):
+        frame = int(frame)
+        im = ax.get_images()[0]
+        im.set_data(sta[..., frame])
+        if frame_duration is not None:
+            fig.suptitle(f'{frame*frame_duration*1000:4.0f} ms')
+        fig.canvas.draw_idle()
+
+    slider_t.on_changed(update)
+
+    ax.imshow(sta[..., initial_frame], **imshowkwargs)
+    ax.set_axis_off()
+    plt.tight_layout()
+    plt.subplots_adjust(wspace=.01, hspace=.01)
+    return fig, slider_t
+
+
+def check_interactive_backend():
+    """
+    Check whether the current backend is an interactive one for certain
+    plots.
+    """
+    backend = mpl.get_backend()
+    if not backend[:2] in interactive_backends:
+        raise ValueError('Switch to an interactive backend (e.g. Qt) to see'
+                         ' the animation.')
+
+
+def integerticks(axes, *args, which='xyz', **kwargs):
+    """
+    Set the ticks to be integer values when possible.
+
+    Parameters:
+    ----
+        axes:
+            can be a single Axes object or multiple
+        *args:
+            are passed to MaxNLocator.
+        which:
+            which axis to apply this to.
+    """
+    if isinstance(axes, mpl.axes.Axes):
+        axes = [axes]
+    for ax in axes:
+        for axis in which:
+            try:
+                getattr(ax, axis+'axis').set_major_locator(MaxNLocator(*args, integer=True, **kwargs))
+            except AttributeError:
+                pass

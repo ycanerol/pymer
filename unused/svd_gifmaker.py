@@ -22,7 +22,7 @@ try:
     import plotfuncs as plf
 except ImportError:
     import sys
-    sys.path.append('/home/ycan/Documents/scripts/modules/')
+    sys.path.append('/home/ycan/repos/pymer/modules/')
     import miscfuncs as mf
     import plotfuncs as plf
 

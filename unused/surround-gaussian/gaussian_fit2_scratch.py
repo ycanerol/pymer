@@ -17,7 +17,7 @@ import sys
 try:
     from mpfit import mpfit
 except ImportError:
-    sys.path.append('/home/ycan/Documents/scripts/external_libs')
+    sys.path.append('/home/ycan/repos/pymer/external_libs')
     from mpfit import mpfit
 
 def moments(data, circle, rotate, vheight, estimator=np.ma.median, angle_guess=45.0,

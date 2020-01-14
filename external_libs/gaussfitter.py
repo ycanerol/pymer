@@ -10,7 +10,7 @@ Copied from https://github.com/keflavich/gaussfitter/blob/master/gaussfitter/gau
 
 """
 
-
+import warnings
 import numpy as np
 from mpfit import mpfit
 
@@ -125,8 +125,11 @@ def twodgaussian(inpars, circle=False, rotate=True, vheight=True, shape=None):
         else:
             xp = x
             yp = y
-        g = height+amplitude*np.exp(-(((rcen_x-xp)/width_x)**2 +
-                                      ((rcen_y-yp)/width_y)**2)/2.)
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore',
+                                    '.*divide by zero*.', RuntimeWarning)
+            g = height+amplitude*np.exp(-(((rcen_x-xp)/width_x)**2 +
+                                          ((rcen_y-yp)/width_y)**2)/2.)
         return g
     if shape is not None:
         return rotgauss(*np.indices(shape))

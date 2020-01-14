@@ -81,7 +81,7 @@ def plotcheckersvd(expname, stimnr, filename=None):
         for j in range(len(plotthese)):
             ax = plt.subplot(rows, cols, j+1)
             im = plt.imshow(plotthese[j], vmin=vmin, vmax=vmax,
-                            cmap='RdBu')
+                            cmap=iof.config('colormap'))
             ax.set_aspect('equal')
             plt.xticks([])
             plt.yticks([])

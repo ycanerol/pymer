@@ -43,12 +43,11 @@ def fffanalyzer(exp_name, stimnrs):
 
         nblinks = parameters['Nblinks']
 
-        bw = asc.parameter_dict_get(parameters, 'blackwhite', False)
+        bw = parameters.get('blackwhite', False)
 
-        seed = asc.parameter_dict_get(parameters, 'seed', -10000)
+        seed = parameters.get('seed', -10000)
 
-        filter_length, frametimings = asc.ft_nblinks(exp_dir, stimnr,
-                                                     nblinks, refresh_rate)
+        filter_length, frametimings = asc.ft_nblinks(exp_dir, stimnr)
 
         frame_duration = np.average(np.ediff1d(frametimings))
         total_frames = frametimings.shape[0]
@@ -105,7 +104,11 @@ def fffanalyzer(exp_name, stimnrs):
         for i in range(clusters.shape[0]):
             stas[i] = stas[i]/spikenrs[i]
             covars[i] = covars[i]/spikenrs[i]
-            eigvals[i], eigvecs[i] = np.linalg.eigh(covars[i])
+            try:
+                eigvals[i], eigvecs[i] = np.linalg.eigh(covars[i])
+            except np.linalg.LinAlgError:
+                eigvals[i] = np.full((filter_length), np.nan)
+                eigvecs[i] = np.full((filter_length, filter_length), np.nan)
             fig = plt.figure(figsize=(9, 6))
             ax = plt.subplot(111)
             ax.plot(t, stas[i], label='STA')

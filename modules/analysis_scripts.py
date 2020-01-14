@@ -7,6 +7,7 @@ Created on Tue Nov 21 15:54:03 2017
 
 Collection of analysis functions
 """
+import re
 import os
 import glob
 import struct
@@ -60,28 +61,24 @@ def read_spikesheet(exp_name, cutoff=4, defaultpath=True):
     """
     if defaultpath:
         exp_dir = iof.exp_dir_fixer(exp_name)
-        cfg = iof.readconfig()
-        filenames = parameter_dict_get(cfg, 'spike_sorting_filenames',
-                                       'spike_sorting')
-        if type(filenames) is not list:
-            filenames = [filenames]
+        filenames = iof.config('spike_sorting_filenames')
         for filename in filenames:
             filepath = os.path.join(exp_dir, filename)
             if os.path.isfile(filepath + '.ods'):
                 filepath += '.ods'
                 meta_keys = [0, 0, 1, 25]
                 meta_vals = [1, 0, 2, 25]
-                cluster_chnl = [4, 0, 400, 1]
-                cluster_cltr = [4, 4, 400, 5]
-                cluster_rtng = [4, 5, 400, 6]
+                cluster_chnl = [4, 0, 2000, 1]
+                cluster_cltr = [4, 4, 2000, 5]
+                cluster_rtng = [4, 5, 2000, 6]
                 break
             elif os.path.isfile(filepath + '.xlsx'):
                 filepath += '.xlsx'
-                meta_keys = [4, 1, 18, 2]
-                meta_vals = [4, 5, 18, 6]
-                cluster_chnl = [44, 1, 400, 2]
-                cluster_cltr = [44, 5, 400, 6]
-                cluster_rtng = [44, 6, 400, 7]
+                meta_keys = [4, 1, 25, 2]
+                meta_vals = [4, 5, 25, 6]
+                cluster_chnl = [51, 1, 2000, 2]
+                cluster_cltr = [51, 5, 2000, 6]
+                cluster_rtng = [51, 6, 2000, 7]
                 break
         else:
             raise FileNotFoundError('Spike sorting file (ods/xlsx) not found.')
@@ -194,9 +191,9 @@ def saveframetimes(exp_name, forceextraction=False, start=None, end=None,
     """
     exp_dir = iof.exp_dir_fixer(exp_name)
     if start is None:
-        start =1
+        start = 1
     if end is None:
-        end=100
+        end = 100
 
     for i in range(start, end):
         alreadyextracted = True
@@ -477,7 +474,9 @@ def read_parameters(exp_name, stimulusnr, defaultpath=True):
     else:
         stimdir = exp_dir
 
-    paramfile = glob.glob(os.path.join(stimdir, '{}_*'.format(stimulusnr)))
+    # Filter stimulus directory contents with RE to allow leading zero
+    pattern = f'0?{stimulusnr}_.*'
+    paramfile = list(filter(re.compile(pattern).match, os.listdir(stimdir)))
     if len(paramfile) == 1:
         paramfile = paramfile[0]
     elif len(paramfile) == 0:
@@ -489,13 +488,13 @@ def read_parameters(exp_name, stimulusnr, defaultpath=True):
         raise ValueError('Multiple files were found starting'
                          ' with {}'.format(stimulusnr))
 
-    f = open(paramfile)
+    f = open(os.path.join(stimdir, paramfile))
     lines = [line.strip('\n') for line in f]
     f.close()
 
     parameters = {}
 
-    parameters['filename'] = os.path.split(paramfile)[-1]
+    parameters['filename'] = paramfile
     if len(lines) == 0:
         parameters['stimulus_type'] = 'spontaneous_activity'
 
@@ -586,7 +585,8 @@ def stimulisorter(exp_name):
     possible_stim_names = ['spontaneous', 'onoffsteps', 'fff', 'stripeflicker',
                            'checkerflicker', 'directiongratingsequence',
                            'rotatingstripes', 'frozennoise',
-                           'checkerflickerplusmovie', 'OMSpatches', 'OMB']
+                           'checkerflickerplusmovie', 'OMSpatches', 'OMB',
+                           'saccadegrating']
     sorted_stimuli = {key:[] for key in possible_stim_names}
     exp_dir = iof.exp_dir_fixer(exp_name)
 
@@ -601,16 +601,11 @@ def stimulisorter(exp_name):
     return sorted_stimuli
 
 
-def ft_nblinks(exp_dir, stimulusnr, nblinks, refresh_rate):
+def ft_nblinks(exp_name, stimulusnr, nblinks=None, refresh_rate=None):
     """
     Return the appropriate frametimings array depending on the stimulus
     update frequency.
-    Parameters
-        nblinks :
-            Number of screen frames for each stimulus frame, as defined
-            in stimulator program.
-        refresh_rate :
-            Update frequency of the screen that is used. Typically 60Hz.
+
     Returns
         filter_length:
             Appropriate length of the temporal filter length for STA
@@ -619,6 +614,12 @@ def ft_nblinks(exp_dir, stimulusnr, nblinks, refresh_rate):
             frame was updated.
 
     """
+    exp_dir = iof.exp_dir_fixer(exp_name)
+    if nblinks is None:
+        parameters = read_parameters(exp_dir, stimulusnr)
+        nblinks = parameters.get('Nblinks', None)
+    if refresh_rate is None:
+        refresh_rate = read_spikesheet(exp_name)[1]['refresh_rate']
 
     # Both onsets and offsets are required in the case of odd numbered
     # nblinks values.
@@ -648,14 +649,134 @@ def ft_nblinks(exp_dir, stimulusnr, nblinks, refresh_rate):
     return filter_length, frametimings
 
 
-def parameter_dict_get(dictionary, key, defaultvalue=None):
+def rolling_window(a, window, preserve_dim=True):
     """
-    This function is used for parsing information from stimulus
-    parameter files.
+
+    Make an ndarray with a rolling window of the last dimension,
+    this is useful for replacing for loops with numpy operations.
+
+    By default adds zeros to the beginning of the array to preserve
+    the dimension (otherwise the array returned has a-window+1 rows).
+
+    Parameters
+    ----------
+    a : array_like
+        Array to add rolling window to
+    window : int
+        Size of rolling window
+    preserve_dim : bool
+        Whether return an array with the same number of rows as a. This is
+        done by adding zeros to the beginning of a. Default is True.
+
+        Warning: this duplicates the array in memory so defeats the purpose
+        of using the view approach, This should not be used; instead the
+        original array a should be generated with zeros from the beginning to
+        avoid duplication.
+
+    Returns
+    -------
+    Array that is a view of the original array with a added dimension
+    of size w.
+
+    Notes
+    -------
+    A similar (but memory inefficient) way of achieving the same thing
+    would be using a hankel matrix. The difference is that hankel matrix
+    will be zero padded at the end.
+
+    >>> import numpy as np
+    >>> from scipy.linalg import hankel
+    >>> a = np.random.random(size=10000)
+    >>> window = 50
+    >>> h = hankel(a)[:, :window]
+    >>> r = rolling_window(a, window, preserve_dim=True)
+    >>> np.isclose(r[window-1:, :], h[:-window+1, :]).all()
+    True
+
+    where ``a`` is a 1D numpy array containing values for the stimulus.
+
+    Examples
+    --------
+    >>> x=np.arange(10).reshape((2,5))
+    >>> rolling_window(x, 3)
+    array([[[0, 1, 2], [1, 2, 3], [2, 3, 4]],
+           [[5, 6, 7], [6, 7, 8], [7, 8, 9]]])
+
+    Calculate rolling mean of last dimension:
+
+    >>> np.mean(rolling_window(x, 3), -1)
+    array([[ 1.,  2.,  3.],
+          [ 6.,  7.,  8.]])
+
+    Reference
+    ----------
+    Taken from https://stackoverflow.com/a/4924433/9205838
+
     """
-    try:
-        return dictionary[key]
-    except KeyError as e:
-        if defaultvalue is None:
-            raise e
-        return defaultvalue
+    if preserve_dim:
+#        a = np.concatenate((np.zeros(window-1), a))
+        # Same thing for arbitrary number of dimensions
+        a = np.concatenate((np.zeros((*a.shape[:-1], window-1)), a), axis=-1)
+    if window < 1:
+        raise ValueError("`window` must be at least 1.")
+    if window > a.shape[-1]:
+        raise ValueError("`window` is too long.")
+    shape = a.shape[:-1] + (a.shape[-1] - window + 1, window)
+    strides = a.strides + (a.strides[-1],)
+    return np.lib.stride_tricks.as_strided(a, shape=shape, strides=strides)
+
+
+def absmax(arr, **kwargs):
+    """
+    Return the furthest value from zero in a given array. Useful for
+    defining the colormap for STAs and normalizing.
+    """
+    return np.nanmax(np.abs(arr), **kwargs)
+
+
+def absmin(arr, **kwargs):
+    """
+    Return the multiplicative inverse of the furthest value
+    from zero in a given array. Useful for defining the colormap for STAs
+    and normalizing.
+    """
+    return -absmax(arr, **kwargs)
+
+
+def normalize(arr, axis_inv=0):
+    """
+    Normalize a given ndarray by dividing to the absolute maximum value
+    along all axes except axis_inv. Useful for normalizing multiple STAs
+    that are in a single numpy array.
+
+    Parameters:
+    --------
+    axis_inv:
+        maxima will be calculated except this axis. For STAs, this would
+        be the axis corespoding to cells. This is the opposite of the
+        axis argument in np.max().
+
+    Example:
+    -------
+    >>> print(stas.shape) # (nrcells, xpixels, ypixels, time)
+    (36, 75, 100, 40)
+    >>> stas.min(), stas.max()
+    (-0.138, 0.171)
+    >>> stas_normalized = normalize(stas, axis_inv=0)
+    >>> stas_normalized.min(), stas_normalized.max()
+    (-1.0, 1.0)
+
+    Notes:
+    -----
+    Note that this is based on absmax; so for an element along axis_inv
+    (i.e. STA of a single cell), one of minimum or maximum will be used.
+    In other words, the range for one STA can be [-1, 0.123] or [-0.123, 1]
+    and not necessarily [-1, 1].
+
+
+    """
+    inverted_axes = tuple(i for i in range(arr.ndim) if i != axis_inv)
+    maxima = absmax(arr, axis=inverted_axes)
+    maxima = maxima.reshape((-1,) + (1,)*(arr.ndim-1))
+    arr_norm = arr/maxima
+    return arr_norm

@@ -29,7 +29,7 @@ def frametimesfrommat(exp_name):
             name = iof.getstimname(exp_dir, i)
         except IndexError as e:
             if str(e).startswith('Stimulus'):
-                break
+                continue
             else:
                 raise
 
