@@ -45,10 +45,10 @@ def spineless(axes, which='trlb'):
         axes = [axes]
 
     for ax in axes:
-        if which.find('t') is not -1: ax.spines['top'].set_visible(False)
-        if which.find('r') is not -1: ax.spines['right'].set_visible(False)
-        if which.find('l') is not -1: ax.spines['left'].set_visible(False)
-        if which.find('b') is not -1: ax.spines['bottom'].set_visible(False)
+        if which.find('t') != -1: ax.spines['top'].set_visible(False)
+        if which.find('r') != -1: ax.spines['right'].set_visible(False)
+        if which.find('l') != -1: ax.spines['left'].set_visible(False)
+        if which.find('b') != -1: ax.spines['bottom'].set_visible(False)
 
 
 def savefigmkdir(path, **kwargs):
