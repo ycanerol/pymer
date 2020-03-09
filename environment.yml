@@ -1,0 +1,20 @@
+name: pymer
+# forge is needed for some of the packages
+channels:
+- default
+- conda-forge
+
+dependencies:
+- python>=3.8
+- pip
+- numpy
+- matplotlib
+- h5py
+- scipy
+- pandas
+- pyexcel
+- pyexcel-ods3
+- pyexcel-xlsx
+- pip:
+  - pyglmnet
+  - pycorrelate

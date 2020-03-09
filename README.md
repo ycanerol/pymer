@@ -3,6 +3,19 @@ Collection of **Py**thon scripts for analyzing extracellular **m**ulti**e**lectr
 array recordings from the **r**etina in the Gollisch lab, Göttingen.
 
 # Installing
+
+## Creating conda environment
+
+Open the terminal and navigate to the directory where you downloaded the repository.
+```bash
+conda env create --file environment.yml
+```
+
+This will create a new conda environment named pymer with the required packages. You
+need to activate it.
+
+The environment name can be overriden by `-n <your_fav_name>` flag.
+
 ## Adding path variables
 Folder paths to `modules/` and `external_libs/` should be added
 to your python path variable, so that the imports can work.
