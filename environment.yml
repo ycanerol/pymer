@@ -15,6 +15,7 @@ dependencies:
 - pyexcel
 - pyexcel-ods3
 - pyexcel-xlsx
+- libiconv # Required for pyexcel to work properly under python3.8
 - pip:
   - pyglmnet
   - pycorrelate
