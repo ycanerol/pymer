@@ -10,6 +10,8 @@ import numpy as np
 import pandas as pd
 import h5py
 
+import analysis_scripts as asc
+
 #%%
 def read_spiketimes(folder):
     spiketimes_insamples = np.load(os.path.join(folder,
@@ -189,6 +191,70 @@ def preprocess_ks(folder):
 
     save_spikes_perstimuli(folder, spikes, goodcells)
     goodcells.to_csv(os.path.join(folder, 'spikes', 'clusters.csv'))
+
+
+def read_clusters(folder):
+    """
+    Returns the cleaned up clusters file after excluding noise cells
+    and dropping some columns
+    """
+    # pd.read_csv(os.path.join(folder, 'cluster_info.tsv'),
+    #                    sep='\t', header=0)
+
+    infofile = pd.read_csv(os.path.join(folder, 'spikes', 'clusters.csv'))
+    infofile.loc[:, 'ch'] +=1
+    return infofile
+
+def clusters_spikesheet(folder):
+    """
+    Generate the clusters array to emulate asc.read_spikesheet behavior
+    """
+    clusters_pd = read_clusters(asc.kilosorted_path(folder))
+    return np.array(clusters_pd.loc[:, ['ch', 'cluster', 'quality']], dtype=int)
+
+
+def clusters_metadata(folder):
+    """
+    Generate metadata dictionary to emulate asc.read_spikesheet behavior
+    """
+
+    def convert(val):
+        """
+        Cast from string to appropriate type
+        """
+        constructors = [int, float, str, bool]
+        for c in constructors:
+            try:
+                return c(val)
+            except ValueError:
+                pass
+
+    try:
+        metadata = asc.read_spikesheet(asc.kilosorted_path(folder), onlymetadata=True)
+        return metadata
+    except FileNotFoundError:
+        pass
+
+    params = read_params(asc.kilosorted_path(folder))
+
+    params_dict = {}
+
+    for el in params:
+        keyval = el.split('=')
+        key, val = keyval[0].strip(), convert(keyval[1].strip())
+        if key == 'sample_rate':
+            # Naming is expected to be specifically sample_freq
+            key = 'sample_freq'
+            val = int(val)
+        elif key == 'hp_filtered':
+            val = val == 'True'
+        params_dict.update({key: val})
+
+    return params_dict
+
+
+def read_spikesheet_ks(folder):
+    return clusters_spikesheet(folder), clusters_metadata(folder)
 
 
 def load_spikes(folder, stimnr):

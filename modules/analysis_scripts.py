@@ -81,6 +81,10 @@ def read_spikesheet(exp_name, cutoff=4, defaultpath=True, onlymetadata=False):
                 cluster_cltr = [51, 5, 2000, 6]
                 cluster_rtng = [51, 6, 2000, 7]
                 break
+            elif iskilosorted(exp_name) and not onlymetadata:
+                import readks
+                return readks.read_spikesheet_ks(exp_name)
+
         else:
             raise FileNotFoundError('Spike sorting file (ods/xlsx) not found.')
     else:
@@ -432,6 +436,17 @@ def read_raster(exp_name, stimnr, channel, cluster, defaultpath=True):
     path to the raster with exp_dir.
     """
     exp_dir = iof.exp_dir_fixer(exp_name)
+
+    # Check if kilosort output is present
+    if iskilosorted(exp_name):
+       import readks
+       exp_name = kilosorted_path(exp_name)
+       ksclusters = readks.clusters_spikesheet(exp_name)
+       # Find the index of the requested cell
+       ind = np.intersect1d(np.where(ksclusters[:, 0] == channel)[0],
+                            np.where(ksclusters[:, 1] == cluster)[0])[0]
+       return readks.load_spikes(exp_name, stimnr)[ind]
+
     if defaultpath:
         r = os.path.join(exp_dir, 'results/rasters/')
     else:
