@@ -76,6 +76,9 @@ def exp_dir_fixer(exp_name):
 
     """
     if os.path.isdir(exp_name):
+        if os.path.basename(exp_name) == 'ks_sorted':
+            # If the folder is a kilosort folder return the parent
+            exp_name = os.path.dirname(exp_name)
         # If the experiment name is already a path nothing needs to be done.
         return exp_name
 
