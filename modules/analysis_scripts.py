@@ -17,7 +17,7 @@ import pyexcel
 import iofuncs as iof
 
 
-def read_spikesheet(exp_name, cutoff=4, defaultpath=True):
+def read_spikesheet(exp_name, cutoff=4, defaultpath=True, onlymetadata=False):
     """
     Read metadata and cluster information from spike sorting file
     (manually created during spike sorting), return good clusters.
@@ -37,7 +37,8 @@ def read_spikesheet(exp_name, cutoff=4, defaultpath=True):
         Whether to iterate over all possible file names in exp_dir.
         If False, the full path to the file should be supplied
         in exp_name.
-
+    onlymetadata:
+        To read ods and return only the metadata information
     Returns:
     --------
     clusters:
@@ -90,6 +91,9 @@ def read_spikesheet(exp_name, cutoff=4, defaultpath=True):
     meta_keys = sheet[meta_keys[0]:meta_keys[2], meta_keys[1]:meta_keys[3]]
     meta_vals = sheet[meta_vals[0]:meta_vals[2], meta_vals[1]:meta_vals[3]]
     metadata = dict(zip(meta_keys.ravel(), meta_vals.ravel()))
+
+    if onlymetadata:
+        return metadata
 
     # Concatenate cluster information
     clusters = sheet[cluster_chnl[0]:cluster_chnl[2],
