@@ -164,7 +164,11 @@ def readframetimes(exp_name, stimnr, returnoffsets=False):
     try:
         filename = glob.glob(filepath)[0]
     except IndexError:
-        raise ValueError(f'No frametimes file for {stimnr} in {exp_name}.')
+        try:
+            filepath = os.path.join(exp_dir, 'frametimes', f'0{stimnr}'+'_*.npz')
+            filename = glob.glob(filepath)[0]
+        except IndexError:
+            raise ValueError(f'No frametimes file for {stimnr} in {exp_name}.')
     f = np.load(filename)
 
     frametimings_on = f['f_on']

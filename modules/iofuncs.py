@@ -233,11 +233,10 @@ def getstimname(exp_name, stim_nr):
     lines = lines[1:]
     name = None
     for line in lines:
-        if line.startswith('%s_' % stim_nr):
+        if (line.startswith('%s_' % stim_nr) or
+           line.startswith('0%s' % stim_nr)):
             name = line[:-4].strip()
-        # In case the stimulus name is in the format 01_spontaneous
-        elif line.startswith('0%s' % stim_nr):
-            name = line[1:-4].strip()
+
     if name:
         return name
     else:
