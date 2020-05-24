@@ -17,7 +17,7 @@ import pyexcel
 import iofuncs as iof
 
 
-def read_spikesheet(exp_name, cutoff=4, defaultpath=True):
+def read_spikesheet(exp_name, cutoff=4, defaultpath=True, onlymetadata=False):
     """
     Read metadata and cluster information from spike sorting file
     (manually created during spike sorting), return good clusters.
@@ -37,7 +37,8 @@ def read_spikesheet(exp_name, cutoff=4, defaultpath=True):
         Whether to iterate over all possible file names in exp_dir.
         If False, the full path to the file should be supplied
         in exp_name.
-
+    onlymetadata:
+        To read ods and return only the metadata information
     Returns:
     --------
     clusters:
@@ -80,6 +81,10 @@ def read_spikesheet(exp_name, cutoff=4, defaultpath=True):
                 cluster_cltr = [51, 5, 2000, 6]
                 cluster_rtng = [51, 6, 2000, 7]
                 break
+            elif iskilosorted(exp_name) and not onlymetadata:
+                import readks
+                return readks.read_spikesheet_ks(exp_name)
+
         else:
             raise FileNotFoundError('Spike sorting file (ods/xlsx) not found.')
     else:
@@ -90,6 +95,9 @@ def read_spikesheet(exp_name, cutoff=4, defaultpath=True):
     meta_keys = sheet[meta_keys[0]:meta_keys[2], meta_keys[1]:meta_keys[3]]
     meta_vals = sheet[meta_vals[0]:meta_vals[2], meta_vals[1]:meta_vals[3]]
     metadata = dict(zip(meta_keys.ravel(), meta_vals.ravel()))
+
+    if onlymetadata:
+        return metadata
 
     # Concatenate cluster information
     clusters = sheet[cluster_chnl[0]:cluster_chnl[2],
@@ -164,7 +172,11 @@ def readframetimes(exp_name, stimnr, returnoffsets=False):
     try:
         filename = glob.glob(filepath)[0]
     except IndexError:
-        raise ValueError(f'No frametimes file for {stimnr} in {exp_name}.')
+        try:
+            filepath = os.path.join(exp_dir, 'frametimes', f'0{stimnr}'+'_*.npz')
+            filename = glob.glob(filepath)[0]
+        except IndexError:
+            raise ValueError(f'No frametimes file for {stimnr} in {exp_name}.')
     f = np.load(filename)
 
     frametimings_on = f['f_on']
@@ -424,6 +436,17 @@ def read_raster(exp_name, stimnr, channel, cluster, defaultpath=True):
     path to the raster with exp_dir.
     """
     exp_dir = iof.exp_dir_fixer(exp_name)
+
+    # Check if kilosort output is present
+    if iskilosorted(exp_name):
+       import readks
+       exp_name = kilosorted_path(exp_name)
+       ksclusters = readks.clusters_spikesheet(exp_name)
+       # Find the index of the requested cell
+       ind = np.intersect1d(np.where(ksclusters[:, 0] == channel)[0],
+                            np.where(ksclusters[:, 1] == cluster)[0])[0]
+       return readks.load_spikes(exp_name, stimnr)[ind]
+
     if defaultpath:
         r = os.path.join(exp_dir, 'results/rasters/')
     else:
@@ -780,3 +803,15 @@ def normalize(arr, axis_inv=0):
     maxima = maxima.reshape((-1,) + (1,)*(arr.ndim-1))
     arr_norm = arr/maxima
     return arr_norm
+
+
+def iskilosorted(folder):
+    exp_dir = iof.exp_dir_fixer(folder)
+    return 'ks_sorted' in os.listdir(exp_dir)
+
+
+def kilosorted_path(folder):
+    folder = iof.exp_dir_fixer(folder)
+    if not os.path.basename(folder) == 'ks_sorted':
+        folder += '/ks_sorted'
+    return folder

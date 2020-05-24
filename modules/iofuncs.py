@@ -76,6 +76,9 @@ def exp_dir_fixer(exp_name):
 
     """
     if os.path.isdir(exp_name):
+        if os.path.basename(exp_name) == 'ks_sorted':
+            # If the folder is a kilosort folder return the parent
+            exp_name = os.path.dirname(exp_name)
         # If the experiment name is already a path nothing needs to be done.
         return exp_name
 
@@ -230,11 +233,10 @@ def getstimname(exp_name, stim_nr):
     lines = lines[1:]
     name = None
     for line in lines:
-        if line.startswith('%s_' % stim_nr):
+        if (line.startswith('%s_' % stim_nr) or
+           line.startswith('0%s' % stim_nr)):
             name = line[:-4].strip()
-        # In case the stimulus name is in the format 01_spontaneous
-        elif line.startswith('0%s' % stim_nr):
-            name = line[1:-4].strip()
+
     if name:
         return name
     else:
