@@ -168,8 +168,14 @@ def add_clusternumbers(dataframe):
 
 
 def read_infofile(folder):
-    return pd.read_csv(os.path.join(folder, 'cluster_info.tsv'),
+    """
+    Returns the info file as written by phy
+    """
+    infofile = pd.read_csv(os.path.join(folder, 'cluster_info.tsv'),
                        sep='\t', header=0)
+    # Change from index zero to index one
+    infofile.loc[:, 'ch'] +=1
+    return infofile
 
 
 def preprocess_ks(folder):
