@@ -39,10 +39,13 @@ def cluster_spikes_perstim(folder, stimnr, spiketimes, spikeclusters):
                                spiketimes < bounds[stimnr])
     return spiketimes[stimrange], spikeclusters[stimrange]
 
-
-def read_samplingrate(folder):
+def read_params(folder):
     with open(os.path.join(folder, 'params.py'), 'r') as f:
         lines = f.readlines()
+    return lines
+
+def read_samplingrate(folder):
+    lines = read_params(folder)
     for line in lines:
         if line.startswith('sample_rate'):
             return int(line.split('= ')[1].split('.')[0])
