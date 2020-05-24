@@ -780,3 +780,15 @@ def normalize(arr, axis_inv=0):
     maxima = maxima.reshape((-1,) + (1,)*(arr.ndim-1))
     arr_norm = arr/maxima
     return arr_norm
+
+
+def iskilosorted(folder):
+    exp_dir = iof.exp_dir_fixer(folder)
+    return 'ks_sorted' in os.listdir(exp_dir)
+
+
+def kilosorted_path(folder):
+    folder = iof.exp_dir_fixer(folder)
+    if not os.path.basename(folder) == 'ks_sorted':
+        folder += '/ks_sorted'
+    return folder
