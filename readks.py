@@ -148,11 +148,7 @@ def pick_goodcells(dataframe):
 
 
 def pick_usefulcols(dataframe):
-    return dataframe.loc[:, ['id', 'ch', 'quality', 'comment', 'KSLabel', 'group', 'n_spikes']]
-
-
-def drop_columns(dataframe):
-    return dataframe.drop(['amp', 'depth', 'sh', 'fr', 'ContamPct', 'Amplitude'], axis=1)
+    return dataframe.loc[:, ['id', 'ch', 'quality', 'comment', 'group', 'n_spikes']]
 
 
 def sortbychannel(dataframe):
