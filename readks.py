@@ -202,7 +202,6 @@ def read_clusters(folder):
     #                    sep='\t', header=0)
 
     infofile = pd.read_csv(os.path.join(folder, 'spikes', 'clusters.csv'))
-    infofile.loc[:, 'ch'] +=1
     return infofile
 
 def clusters_spikesheet(folder):
