@@ -21,7 +21,7 @@ def packdims(array, window):
     return rw
 
 
-exp, stim_nr = '20180710', 8
+exp, stim_nr = '20180710_kilosorted', 8
 n_components = 6
 
 

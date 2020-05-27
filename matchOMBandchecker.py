@@ -122,7 +122,7 @@ def chkmax2ombcoord(cell_i, exp, omb_stimnr, chk_stimnr):
 
 #%%
 if __name__ == '__main__':
-    exp, omb_stimnr = '20180710', 8
+    exp, omb_stimnr = '20180710_YE', 8
     chk_stimnr = 6
 
     omstx, ckstx, _ = read_and_match_pars(exp, omb_stimnr, chk_stimnr)

@@ -18,7 +18,7 @@ from train_test_split import train_test_split
 from omb import OMB
 from stimulus import Stimulus
 
-exp, stim_nr = '20180710', 8
+exp, stim_nr = '20180710_kilosorted', 8
 #exp, stim_nr  = 'Kuehn', 13
 xval_splits = 10
 xval_fraction = 1/xval_splits

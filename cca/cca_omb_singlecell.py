@@ -42,7 +42,7 @@ def cart2pol(x, y):
     return(rho, phi)
 
 
-exp, stim_nr = '20180710', 8
+exp, stim_nr = '20180710_kilosorted', 8
 n_components = 6
 
 
@@ -131,7 +131,7 @@ for shift in [0]:
                 plf.colorbar(im)
     # fig.tight_layout()
     fig.subplots_adjust(wspace=0.3)
-    fig.savefig(f'/Users/ycan/Downloads/2020-04-29_meeting/singlecell{cells.shape[-1]}.pdf')
+    fig.savefig(f'/home/ycan/Downloads/2020-05-25_labmeeting/singlecell{cells.shape[-1]}.pdf')
     plt.show()
 
 #%%

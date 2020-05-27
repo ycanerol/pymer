@@ -16,8 +16,8 @@ from train_test_split import train_test_split
 
 from stimulus import Stimulus
 
-#exp, stim_nr = '20180710', 8
-exp = 'Kuehn'
+exp, stim_nr = '20180710_kilosorted', 8
+# exp = 'Kuehn'
 
 xval_splits = 10
 xval_fraction = 1/xval_splits
