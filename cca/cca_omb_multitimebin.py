@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from omb import OMB
 import analysis_scripts as asc
 import plotfuncs as plf
-
+import spikeshuffler
 
 def packdims(array, window):
     sh = array.shape
@@ -44,14 +44,16 @@ def cart2pol(x, y):
 
 exp, stim_nr = '20180710_kilosorted', 8
 n_components = 6
-
+shufflespikes = True
 
 st = OMB(exp, stim_nr)
-filter_length = st.filter_length
+filter_length = st.filter_length*2
 
 spikes = st.allspikes()
 bgsteps = st.bgsteps
 
+if shufflespikes:
+    spikes = spikeshuffler.shufflebyrow(spikes)
 
 stimulus = packdims(st.bgsteps, filter_length)
 spikes = packdims(spikes, filter_length)
@@ -106,7 +108,7 @@ for row, ax_row in enumerate(axes):
             im = ax.imshow(cells[mode_i, :], cmap='RdBu_r',
                            vmin=asc.absmin(cells), vmax=asc.absmax(cells),
                            aspect='auto',
-                         interpolation='none')
+                         interpolation='nearest')
             ax.set_xticks(np.array([0, .25, .5, .75, 1]) * cells.shape[-1])
             ax.xaxis.set_ticklabels(np.round((ax.get_xticks()*st.frame_duration), 1))
             ax.set_xlabel('Time [s]')
@@ -114,8 +116,8 @@ for row, ax_row in enumerate(axes):
         if mode_i == n_components-1:
             plf.colorbar(im)
 # fig.tight_layout()
-fig.subplots_adjust(wspace=0.3)
-fig.savefig(f'/Users/ycan/Downloads/2020-04-29_meeting/{cells.shape[-1]}.pdf')
+fig.subplots_adjust(wspace=0.1)
+fig.savefig(f'/Users/ycan/Downloads/2020-05-27_meeting/shuffled{shufflespikes}.pdf')
 plt.show()
 
 #%%
@@ -134,3 +136,4 @@ plt.show()
 offsets = np.arange(n_components)*.6
 plt.plot(cca.y_weights_ + np.tile(offsets, (stimulus.shape[1], 1)), lw=0.5)
 plt.hlines(offsets, 0, stimulus.shape[1], lw=.2)
+plt.savefig(f'/Users/ycan/Downloads/2020-05-27_meeting/rawcomponents_shuffled{shufflespikes}.pdf')

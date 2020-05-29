@@ -64,6 +64,9 @@ st.nclusters = len(selected_cells)
 if n_components > st.nclusters:
     n_components = st.nclusters
 
+import spikeshuffler
+spikes = spikeshuffler.shufflebyrow(spikes)
+
 for shift in [0]:
     print(shift)
 
@@ -135,7 +138,7 @@ for shift in [0]:
                 plf.colorbar(im)
     # fig.tight_layout()
     fig.subplots_adjust(wspace=0.3)
-    fig.savefig(f'/home/ycan/Downloads/2020-05-25_labmeeting/cca_DScells.pdf')
+    fig.savefig(f'/Users/ycan/Downloads/2020-05-27_meeting/cca_DScells_shuffled.pdf')
     plt.show()
 
 #%%
