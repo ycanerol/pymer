@@ -7,18 +7,7 @@ from sklearn.cross_decomposition import CCA
 from omb import OMB
 import analysis_scripts as asc
 import plotfuncs as plf
-
-
-def packdims(array, window):
-    sh = array.shape
-    if array.ndim == 1:
-        array = array[None, :]
-    if array.ndim > 2:
-        array = array.reshape(np.prod(sh[:-1]), -1)
-    rw = np.empty((sh[-1], array.shape[0]*window))
-    for i in range(array.shape[0]):
-        rw[:, i*window:(i+1)*window] = asc.rolling_window(array[i, :], window)
-    return rw
+from model_fitting_tools import packdims 
 
 
 exp, stim_nr = '20180710_kilosorted', 8

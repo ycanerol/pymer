@@ -10,39 +10,10 @@ from omb import OMB
 import analysis_scripts as asc
 import plotfuncs as plf
 
-
-def packdims(array, window):
-    sh = array.shape
-    if array.ndim == 1:
-        array = array[None, :]
-    if array.ndim > 2:
-        array = array.reshape(np.prod(sh[:-1]), -1)
-    rw = np.empty((sh[-1], array.shape[0]*window))
-    for i in range(array.shape[0]):
-        rw[:, i*window:(i+1)*window] = asc.rolling_window(array[i, :], window)
-    return rw
+from model_fitting_tools import packdims, shiftspikes, cart2pol
 
 
-def shiftspikes(spikes: np.array, shift:int) -> np.array:
-    """
-    Shift the spikes array by a given amount by padding with zeros
-    at the beginning and trimming off the end.
-
-    """
-    shift = int(shift)
-    if shift == 0:
-        return spikes
-    return np.hstack((np.zeros((spikes.shape[0],
-                                shift)), spikes))[:, :-shift]
-
-
-def cart2pol(x, y):
-    rho = np.sqrt(x**2 + y**2)
-    phi = np.arctan2(y, x)
-    return(rho, phi)
-
-
-exp, stim_nr = '20180710', 8
+exp, stim_nr = '20180710*kilosorted', 8
 n_components = 6
 
 
@@ -52,7 +23,7 @@ filter_length = st.filter_length
 spikes = st.allspikes()
 bgsteps = st.bgsteps
 
-or shift in [0]:
+for shift in [0]:
     print(shift)
 
     spikes = shiftspikes(st.allspikes(), shift)
