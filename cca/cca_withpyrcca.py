@@ -35,7 +35,7 @@ spikes = mft.packdims(spikes, filter_length)
 
 cca.train([spikes, stimulus])
 
-cells = cca.ws[0]
+cells = np.swapaxes(cca.ws[0], 1, 0)
 cells = cells.reshape((n_components, st.nclusters, filter_length))
 
 motionfilt_x = cca.ws[1][:filter_length]
