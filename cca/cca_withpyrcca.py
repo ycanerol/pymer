@@ -25,6 +25,8 @@ filter_length = st.filter_length
 spikes = st.allspikes()
 bgsteps = st.bgsteps
 
+nspikes_percell = spikes.sum(axis=1)
+
 if shufflespikes:
     spikes = spikeshuffler.shufflebyrow(spikes)
 
@@ -38,25 +40,40 @@ cca.train([spikes, stimulus])
 cells = np.swapaxes(cca.ws[0], 1, 0)
 cells = cells.reshape((n_components, st.nclusters, filter_length))
 
+cells_sorted_nsp = cells[:, np.argsort(nspikes_percell), :]
+
 motionfilt_x = cca.ws[1][:filter_length]
 motionfilt_y = cca.ws[1][filter_length:]
 
 motionfilt_r, motionfilt_theta = mft.cart2pol(motionfilt_x, motionfilt_y)
 #%%
 nrows, ncols = plf.numsubplots(n_components)
-fig, axes = plt.subplots(nrows, ncols, figsize=(10, 10))
+fig_cells, axes_cells = plt.subplots(nrows, ncols, figsize=(10, 10))
 
 for i in range(n_components):
-    ax = axes.flat[i]
+    ax = axes_cells.flat[i]
     im = ax.imshow(cells[i, :], cmap='RdBu_r',
                     vmin=asc.absmin(cells),
                     vmax=asc.absmax(cells),
                     aspect='auto', interpolation='nearest')
     ax.set_title(f'{i}')
-fig.suptitle(f'{shufflespikes=}')
+fig_cells.suptitle(f'Cells default order {shufflespikes=}')
 if savefig:
-    fig.savefig(savedir + f'cells_{n_components=}_{shufflespikes=}.pdf')
+    fig_cells.savefig(savedir + f'cells_{n_components=}_{shufflespikes=}_default_order.pdf')
 plt.show()
+#%%
+fig_cells_sorted, axes_cells_sorted = plt.subplots(nrows, ncols, figsize=(10, 10))
+for i in range(n_components):
+    ax = axes_cells_sorted.flat[i]
+    im = ax.imshow(cells_sorted_nsp[i, :], cmap='RdBu_r',
+                    vmin=asc.absmin(cells_sorted_nsp),
+                    vmax=asc.absmax(cells_sorted_nsp),
+                    aspect='auto', interpolation='nearest')
+    ax.set_title(f'{i}')
+fig_cells_sorted.suptitle(f'Cells sorted by number of sp {shufflespikes=}')
+plt.show()
+
+
 #%%
 fig_stimfilters, axes_stimfilters = plt.subplots(2, 2, figsize=(9, 7))
 (ax_x, ax_y, ax_r, ax_th) = axes_stimfilters.flat
