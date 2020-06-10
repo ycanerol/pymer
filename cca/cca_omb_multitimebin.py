@@ -58,7 +58,7 @@ fig, axes = plt.subplots(nrows=nsubplots[0]*nsubrows, ncols=nsubplots[1],
 
 for row, ax_row in enumerate(axes):
     for col, ax in enumerate(ax_row):
-        mode_i = (row // (axes.shape[0] // 2)*axes.shape[1] + col)
+        mode_i = int( row / nsubrows ) * nsubplots[1]  + col
         if row % nsubrows == 0:
             ax.plot(motionfilt_x[mode_i, :])
             ax.plot(motionfilt_y[mode_i, :])

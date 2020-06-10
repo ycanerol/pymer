@@ -76,7 +76,7 @@ for shift in [0]:
         axes = axes[:, None]
     for row, ax_row in enumerate(axes):
         for col, ax in enumerate(ax_row):
-            mode_i = (row // (axes.shape[0] // 2)*axes.shape[1] + col)
+            mode_i = int( row / nsubrows ) * nsubplots[1]  + col
             if singlecell: mode_i -= 1
             if row % nsubrows == 0:
                 ax.plot(motionfilt_x[mode_i, :])
