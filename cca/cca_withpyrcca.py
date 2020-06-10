@@ -55,7 +55,7 @@ for i in range(n_components):
     ax.set_title(f'{i}')
 fig.suptitle(f'{shufflespikes=}')
 if savefig:
-    fig.savefig(savedir + f'cells_{n_components=}_{shufflespikes=}.png')
+    fig.savefig(savedir + f'cells_{n_components=}_{shufflespikes=}.pdf')
 plt.show()
 #%%
 fig_stimfilters, axes_stimfilters = plt.subplots(2, 2, figsize=(9, 7))
@@ -65,7 +65,7 @@ ax_y.plot(motionfilt_y.T)
 ax_r.plot(motionfilt_r.T)
 ax_th.plot(motionfilt_theta.T)
 if savefig:
-    fig_stimfilters.savefig(savedir + f'stimcomponents_{n_components=}_{shufflespikes=}.png')
+    fig_stimfilters.savefig(savedir + f'stimcomponents_{n_components=}_{shufflespikes=}.pdf')
 plt.show()
 #%%
 fig_corrs = plt.figure()
@@ -74,5 +74,5 @@ plt.xlabel('Component index')
 plt.ylabel('Correlation')
 plt.title(f'Cannonical correlations {shufflespikes=}')
 if savefig:
-    fig_corrs.savefig(savedir + f'Correlations_{n_components=}_{shufflespikes=}.png')
+    fig_corrs.savefig(savedir + f'Correlations_{n_components=}_{shufflespikes=}.pdf')
 plt.show()
