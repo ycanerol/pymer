@@ -60,16 +60,17 @@ plt.show()
 #%%
 fig_stimfilters, axes_stimfilters = plt.subplots(2, 2, figsize=(9, 7))
 (ax_x, ax_y, ax_r, ax_th) = axes_stimfilters.flat
-ax_x.plot(motionfilt_x.T)
-ax_y.plot(motionfilt_y.T)
-ax_r.plot(motionfilt_r.T)
-ax_th.plot(motionfilt_theta.T)
+ax_x.plot(motionfilt_x)
+ax_y.plot(motionfilt_y)
+ax_r.plot(motionfilt_r)
+ax_th.plot(motionfilt_theta)
 if savefig:
     fig_stimfilters.savefig(savedir + f'stimcomponents_{n_components=}_{shufflespikes=}.pdf')
 plt.show()
 #%%
 fig_corrs = plt.figure()
 plt.plot(cca.cancorrs, 'ko')
+plt.ylim([0.17, 0.24])
 plt.xlabel('Component index')
 plt.ylabel('Correlation')
 plt.title(f'Cannonical correlations {shufflespikes=}')
