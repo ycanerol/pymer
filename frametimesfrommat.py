@@ -49,7 +49,7 @@ def frametimesfrommat(exp_name):
                 if len(ftimes.shape) != 1:
                     ftimes = ftimes.flatten()
 
-        ftimes = (ftimes/1000)+monitor_delay
+        ftimes += monitor_delay
 
         np.savez(os.path.join(exp_dir, 'frametimes', name + '_frametimes'),
                  f_on=ftimes)
