@@ -11,6 +11,7 @@ import scipy.io
 import iofuncs as iof
 import analysis_scripts as asc
 
+
 def frametimesfrommat(exp_name):
     """
     Extract frame times from .mat files. Needed for analyzing data
@@ -34,6 +35,9 @@ def frametimesfrommat(exp_name):
                 raise
 
         matfile = os.path.join(exp_dir, 'frametimes', name + '_frametimings.mat')
+        # Check for zero padded name
+        if not os.path.isfile(matfile):
+            matfile = os.path.join(exp_dir, 'frametimes', '0' + name + '_frametimings.mat')
 
         try:
             f = scipy.io.matlab.loadmat(matfile)
