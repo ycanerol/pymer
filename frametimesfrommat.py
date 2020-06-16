@@ -42,15 +42,29 @@ def frametimesfrommat(exp_name):
         try:
             f = scipy.io.matlab.loadmat(matfile)
             ftimes = f['ftimes'][0, :]
+            try:
+                ftimes_off = f['ftimesoff'][0, :]
+            except KeyError:
+                print(f'Frame times offset not found for stimulus {i}')
+                ftimes_off = None
         except NotImplementedError:
             import h5py
             with h5py.File(matfile, mode='r') as f:
                 ftimes = f['ftimes'][:]
+                try:
+                    ftimes_off = f['ftimesoff'][:]
+                except KeyError:
+                    print(f'Frame times offset not found for stimulus {i}')
+                    ftimes_off = None
                 if len(ftimes.shape) != 1:
                     ftimes = ftimes.flatten()
+                    if ftimes_off is not None:
+                        ftimes_off = ftimes_off.flatten()
 
         ftimes += monitor_delay
+        if ftimes_off is not None:
+            ftimes_off += monitor_delay
 
         np.savez(os.path.join(exp_dir, 'frametimes', name + '_frametimes'),
-                 f_on=ftimes)
+                 f_on=ftimes, f_off=ftimes_off)
         print(f'Converted and saved frametimes for {name}')
