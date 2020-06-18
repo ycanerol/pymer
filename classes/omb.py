@@ -346,15 +346,15 @@ class OMB(Stimulus):
     def read_texture_analysis(self):
         # In case of multiple texture data files, find the one with most
         # number of frames.
-        files = glob.glob(os.path.join(self.stim_dir,
-                                       f'{self.stimnr}_texturesta_*'))
+        files = list(self.stim_dir.glob(f'{self.stimnr}_texturesta_*'))
+
         newlist = []
         for file in files:
-            newlist.append(file.split('/')[-1].split('_')[-1].split('fr')[0])
+            newlist.append(file.stem.split('_')[-1].split('fr')[0])
         newlist = np.array(newlist, dtype=np.int)
         texturefile = files[np.argsort(newlist)[-1]]
 
-        return np.load(os.path.join(self.stim_dir, texturefile))
+        return np.load(self.stim_dir / texturefile)
 
     def contrast_signal_cell(self, cell_i, *args):
         """
