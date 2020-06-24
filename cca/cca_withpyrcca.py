@@ -56,6 +56,8 @@ def cca_omb_components(exp: str, stim_nr: int,
     bgsteps = st.bgsteps
 
     if select_cells is not None:
+        if type(select_cells) is not np.array:
+            select_cells = np.array(select_cells)
         spikes = spikes[select_cells]
         st.nclusters = len(select_cells)
 
