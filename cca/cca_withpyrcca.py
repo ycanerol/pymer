@@ -38,6 +38,8 @@ def cca_omb_components(exp: str, stim_nr: int,
         Wheter to sort the cell weights array by the number of spikes during the stimulus.
     select_cells: list
        A list of indexes for the subset of cells to perform the analysis for.
+    plot_first_ncells: int
+        Number of cells to plot in the cell plots.
     """
 
 
@@ -79,6 +81,9 @@ def cca_omb_components(exp: str, stim_nr: int,
         cells_toplot = cells_sorted_nsp
     else:
         cells_toplot = cells
+
+    if plot_first_ncells is not None:
+        cells_toplot = cells_toplot[:, :plot_first_ncells, ...]
 
     motionfilt_x = cca.ws[1][:filter_length].T
     motionfilt_y = cca.ws[1][filter_length:].T
@@ -141,7 +146,7 @@ def cca_omb_components(exp: str, stim_nr: int,
                 ax.set_xticks([])
                 if row == axes.shape[0]-1:
                     ax.set_xlabel('Time [s]')
-                    ax.set_xticks(np.array([0, .25, .5, .75, 1]) * cells.shape[-1])
+                    ax.set_xticks(np.array([0, .25, .5, .75, 1]) * cells_toplot.shape[-1])
                     ax.xaxis.set_ticklabels(np.round((ax.get_xticks()*st.frame_duration), 1))
                 if col==0: ax.set_ylabel(f'Cells\n{"(sorted nsp)"*sort_by_nspikes}', rotation=0, ha='right', va='center')
 
