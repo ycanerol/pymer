@@ -114,7 +114,7 @@ def cca_omb_components(exp: str, stim_nr: int,
     fig, axes = plt.subplots(nrows=nsubplots[0]*nsubrows, ncols=nsubplots[1],
                              gridspec_kw={'height_ratios':height_ratios},
                              # sharey=True,
-                             figsize=(9,10))
+                             figsize=(11,10))
 
     for row, ax_row in enumerate(axes):
         for col, ax in enumerate(ax_row):
@@ -150,12 +150,16 @@ def cca_omb_components(exp: str, stim_nr: int,
                     ax.set_xlabel('Time [s]')
                     ax.set_xticks(np.array([0, .25, .5, .75, 1]) * cells_toplot.shape[-1])
                     ax.xaxis.set_ticklabels(np.round((ax.get_xticks()*st.frame_duration), 1))
-                if col==0: ax.set_ylabel(f'Cells\n{"(sorted nsp)"*sort_by_nspikes}', rotation=0, ha='right', va='center')
+                if col==0:
+                    ax.set_ylabel(f'Cells\n{"(sorted nsp)"*sort_by_nspikes}\n{("(first " + str(plot_first_ncells)+ " cells)")*(type(plot_first_ncells) is int) }',
+                                  rotation=0, ha='right', va='center')
+                    plf.integerticks(ax, 5, which='y')
 
                 if mode_i == n_components-1:
                     plf.colorbar(im)
     # fig.tight_layout()
-    fig.suptitle(f'CCA components of {st.exp_foldername}\n{shufflespikes=} {n_components=}\n{sort_by_nspikes=}')
+    fig.suptitle(f'CCA components of {st.exp_foldername}\n{shufflespikes=} {n_components=}\n{sort_by_nspikes=}\n'
+            + f'{select_cells=}')
     fig.subplots_adjust(wspace=0.1)
     if savefig:
         fig.savefig(savedir / f'{n_components=}_{shufflespikes=}_cellsandcomponents.pdf')
@@ -165,7 +169,7 @@ def cca_omb_components(exp: str, stim_nr: int,
     #%%
     fig_corrs = plt.figure()
     plt.plot(cca.cancorrs, 'ko')
-    plt.ylim([0.17, 0.24])
+    # plt.ylim([0.17, 0.24])
     plt.xlabel('Component index')
     plt.ylabel('Correlation')
     plt.title(f'Cannonical correlations {shufflespikes=}')
