@@ -66,6 +66,8 @@ def cca_omb_components(exp: str, stim_nr: int,
     if shufflespikes:
         spikes = spikeshuffler.shufflebyrow(spikes)
 
+    figsavename = f'{n_components=}_{shufflespikes=}_{select_cells=}'
+
     #sp_train, sp_test, stim_train, stim_test = train_test_split(spikes, bgsteps)
 
     stimulus = mft.packdims(st.bgsteps, filter_length)
@@ -104,7 +106,7 @@ def cca_omb_components(exp: str, stim_nr: int,
         ax.set_title(f'{i}')
     fig_cells.suptitle(f'Cells default order {shufflespikes=}')
     if savefig:
-        fig_cells.savefig(savedir / f'{n_components=}_{shufflespikes=}_cells_default_order.pdf')
+        fig_cells.savefig(savedir / f'{figsavename}_cells_default_order.pdf')
     plt.close(fig_cells)
 
     nsubplots = plf.numsubplots(n_components)
@@ -162,7 +164,7 @@ def cca_omb_components(exp: str, stim_nr: int,
             + f'{select_cells=}')
     fig.subplots_adjust(wspace=0.1)
     if savefig:
-        fig.savefig(savedir / f'{n_components=}_{shufflespikes=}_cellsandcomponents.pdf')
+        fig.savefig(savedir / f'{figsavename}_cellsandcomponents.pdf')
     # plt.show()
     plt.close(fig)
 
@@ -174,7 +176,7 @@ def cca_omb_components(exp: str, stim_nr: int,
     plt.ylabel('Correlation')
     plt.title(f'Cannonical correlations {shufflespikes=}')
     if savefig:
-        fig_corrs.savefig(savedir / f'{n_components=}_{shufflespikes=}_correlation_coeffs.pdf')
+        fig_corrs.savefig(savedir / f'{figsavename}_correlation_coeffs.pdf')
     # plt.show()
     plt.close(fig_corrs)
 
