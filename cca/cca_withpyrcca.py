@@ -10,7 +10,12 @@ import plotfuncs as plf
 from omb import OMB
 
 
-def cca_omb_components(exp, stim_nr, n_components=10, shufflespikes=False, savedir=None, savefig=True, sort_by_nspikes=True, select_cells=None):
+def cca_omb_components(exp: str, stim_nr: int,
+                       n_components: int = 10,
+                       shufflespikes: bool = False, savedir: str = None,
+                       savefig: bool = True, sort_by_nspikes: bool = True,
+                       select_cells: list = None,
+                       plot_first_ncells: int = None):
 
     """
     Analyze OMB responses using cannonical correlation analysis and plot the results.
@@ -22,17 +27,17 @@ def cca_omb_components(exp, stim_nr, n_components=10, shufflespikes=False, saved
         the algortihm will stop at a later point. That means components of analyses with fewer
         n_components are going to be identical to the first n components of the higher-number
         component analyses.
-    shufflespikes:
+    shufflespikes: bool
         Whether to randomize the spikes, to validate the results
-    savedir:
+    savedir: str
         Custom directory to save the figures and data files. If None, will be saved in the experiment
         directory under appropritate path.
-    savefig:
+    savefig: bool
         Whether to save the figures.
-    sort_by_nspikes:
+    sort_by_nspikes: bool
         Wheter to sort the cell weights array by the number of spikes during the stimulus.
-    select_cells:
-        Which subset of cells to perform the analysis for.
+    select_cells: list
+       A list of indexes for the subset of cells to perform the analysis for.
     """
 
 
