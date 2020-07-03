@@ -12,6 +12,7 @@ from omb import OMB
 
 def cca_omb_components(exp: str, stim_nr: int,
                        n_components: int = 10,
+                       regularization=None,
                        shufflespikes: bool = False, savedir: str = None,
                        savefig: bool = True, sort_by_nspikes: bool = True,
                        select_cells: list = None,
@@ -27,6 +28,8 @@ def cca_omb_components(exp: str, stim_nr: int,
         the algortihm will stop at a later point. That means components of analyses with fewer
         n_components are going to be identical to the first n components of the higher-number
         component analyses.
+    regularization:
+        The regularization parameter to be passed onto rcca.CCA.
     shufflespikes: bool
         Whether to randomize the spikes, to validate the results
     savedir: str
@@ -41,9 +44,10 @@ def cca_omb_components(exp: str, stim_nr: int,
     plot_first_ncells: int
         Number of cells to plot in the cell plots.
     """
+    if regularization is None:
+        regularization = 0
 
-
-    cca = rcca.CCA(kernelcca=False, reg=0.01, numCC=n_components)
+    cca = rcca.CCA(kernelcca=False, reg=regularization, numCC=n_components)
 
     st = OMB(exp, stim_nr)
     filter_length = st.filter_length
@@ -66,7 +70,7 @@ def cca_omb_components(exp: str, stim_nr: int,
     if shufflespikes:
         spikes = spikeshuffler.shufflebyrow(spikes)
 
-    figsavename = f'{n_components=}_{shufflespikes=}_{select_cells=}'
+    figsavename = f'{n_components=}_{shufflespikes=}_{select_cells=}_{regularization=}'
 
     #sp_train, sp_test, stim_train, stim_test = train_test_split(spikes, bgsteps)
 
@@ -161,7 +165,7 @@ def cca_omb_components(exp: str, stim_nr: int,
                     plf.colorbar(im)
     # fig.tight_layout()
     fig.suptitle(f'CCA components of {st.exp_foldername}\n{shufflespikes=} {n_components=}\n{sort_by_nspikes=}\n'
-            + f'{select_cells=}')
+            + f'{select_cells=} {regularization=}')
     fig.subplots_adjust(wspace=0.1)
     if savefig:
         fig.savefig(savedir / f'{figsavename}_cellsandcomponents.pdf')
