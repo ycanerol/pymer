@@ -13,6 +13,7 @@ from omb import OMB
 def cca_omb_components(exp: str, stim_nr: int,
                        n_components: int = 10,
                        regularization=None,
+                       filter_length=None,
                        shufflespikes: bool = False, savedir: str = None,
                        savefig: bool = True, sort_by_nspikes: bool = True,
                        select_cells: list = None,
@@ -30,6 +31,8 @@ def cca_omb_components(exp: str, stim_nr: int,
         component analyses.
     regularization:
         The regularization parameter to be passed onto rcca.CCA.
+    filter_length:
+        The length of the time window to be considered in the past for the stimulus and the responses.
     shufflespikes: bool
         Whether to randomize the spikes, to validate the results
     savedir: str
@@ -50,7 +53,8 @@ def cca_omb_components(exp: str, stim_nr: int,
     cca = rcca.CCA(kernelcca=False, reg=regularization, numCC=n_components)
 
     st = OMB(exp, stim_nr)
-    filter_length = st.filter_length
+    if filter_length is None:
+        filter_length = st.filter_length
 
     if savedir is None:
         savedir = st.stim_dir / 'CCA'
@@ -70,7 +74,7 @@ def cca_omb_components(exp: str, stim_nr: int,
     if shufflespikes:
         spikes = spikeshuffler.shufflebyrow(spikes)
 
-    figsavename = f'{n_components=}_{shufflespikes=}_{select_cells=}_{regularization=}'
+    figsavename = f'{n_components=}_{shufflespikes=}_{select_cells=}_{regularization=}_{filter_length=}'
 
     #sp_train, sp_test, stim_train, stim_test = train_test_split(spikes, bgsteps)
 
@@ -165,7 +169,7 @@ def cca_omb_components(exp: str, stim_nr: int,
                     plf.colorbar(im)
     # fig.tight_layout()
     fig.suptitle(f'CCA components of {st.exp_foldername}\n{shufflespikes=} {n_components=}\n{sort_by_nspikes=}\n'
-            + f'{select_cells=} {regularization=}')
+            + f'{select_cells=} {regularization=} {filter_length=}')
     fig.subplots_adjust(wspace=0.1)
     if savefig:
         fig.savefig(savedir / f'{figsavename}_cellsandcomponents.pdf')
