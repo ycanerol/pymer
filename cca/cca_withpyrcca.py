@@ -123,7 +123,6 @@ def cca_omb_components(exp: str, stim_nr: int,
     height_ratios = nsubplots[0] * height_list
     fig, axes = plt.subplots(nrows=nsubplots[0]*nsubrows, ncols=nsubplots[1],
                              gridspec_kw={'height_ratios':height_ratios},
-                             # sharey=True,
                              figsize=(11,10))
 
     for row, ax_row in enumerate(axes):
@@ -164,10 +163,13 @@ def cca_omb_components(exp: str, stim_nr: int,
                     ax.set_ylabel(f'Cells\n{"(sorted nsp)"*sort_by_nspikes}\n{("(first " + str(plot_first_ncells)+ " cells)")*(type(plot_first_ncells) is int) }',
                                   rotation=0, ha='right', va='center')
                     plf.integerticks(ax, 5, which='y')
-
                 if mode_i == n_components-1:
                     plf.colorbar(im)
-    # fig.tight_layout()
+            # Add ticks on the right side of the plots
+            if col == nsubplots[1]-1 and row % nsubrows != nsubrows - 1:
+                plf.integerticks(ax, 3, which='y')
+                ax.yaxis.tick_right()
+
     fig.suptitle(f'CCA components of {st.exp_foldername}\n{shufflespikes=} {n_components=}\n{sort_by_nspikes=}\n'
             + f'{select_cells=} {regularization=} {filter_length=}')
     fig.subplots_adjust(wspace=0.1)
