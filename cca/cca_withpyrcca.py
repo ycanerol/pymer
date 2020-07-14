@@ -1,3 +1,4 @@
+from pathlib import Path
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -55,6 +56,9 @@ def cca_omb_components(exp: str, stim_nr: int,
     st = OMB(exp, stim_nr)
     if filter_length is None:
         filter_length = st.filter_length
+
+    if type(savedir) is str:
+        savedir = Path(savedir)
 
     if savedir is None:
         savedir = st.stim_dir / 'CCA'
