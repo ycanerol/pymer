@@ -138,26 +138,30 @@ def cca_omb_components(exp: str, stim_nr: int,
             mode_i = int( row / nsubrows ) * nsubplots[1]  + col
             # ax.text(0.5, 0.5, f'{mode_i}')
             ax.set_yticks([])
+            # Plot motion filters
             if row % nsubrows == 0:
                 ax.plot(motionfilt_x[mode_i, :], marker='o', markersize=1)
                 ax.plot(motionfilt_y[mode_i, :], marker='o', markersize=1)
                 if col==0: ax.set_ylabel('Motion', rotation=0, ha='right', va='center')
                 ax.set_ylim(cca.ws[1].min(), cca.ws[1].max())
+                ax.hlines(0, *ax.get_xlim(), colors='k', linestyles='dashed', alpha=0.3)
                 # ax.set_title(f'Component {mode_i}', fontweight='bold')
                 ax.xaxis.set_ticklabels([])
+            # Plot magnitude of motion
             elif row % nsubrows == 1:
                 ax.plot(motionfilt_r[mode_i, :], color='k', marker='o', markersize=1)
                 if col==0: ax.set_ylabel('Magnitude', rotation=0, ha='right', va='center')
                 ax.set_ylim(motionfilt_r.min(), motionfilt_r.max())
                 ax.xaxis.set_ticklabels([])
+            # Plot direction of motion
             elif row % nsubrows == 2:
                 ax.plot(motionfilt_theta[mode_i, :], color='r', marker='o', markersize=1)
                 if mode_i == 0:
                     ax.yaxis.set_ticks([-np.pi, 0, np.pi])
                     ax.yaxis.set_ticklabels(['-π', 0, 'π'])
                 ax.xaxis.set_ticklabels([])
+            # Plot cell weights
             elif row % nsubrows == nsubrows-1:
-                # im = ax.imshow(cells[mode_i, :], cmap='RdBu_r',
                 im = ax.imshow(cells_toplot[mode_i, :], cmap='RdBu_r',
                                vmin=asc.absmin(cells), vmax=asc.absmax(cells),
                                aspect='auto',
