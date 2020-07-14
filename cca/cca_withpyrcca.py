@@ -11,7 +11,7 @@ from omb import OMB
 
 
 def cca_omb_components(exp: str, stim_nr: int,
-                       n_components: int = 10,
+                       n_components: int = 6,
                        regularization=None,
                        filter_length=None,
                        shufflespikes: bool = False, savedir: str = None,
