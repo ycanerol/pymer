@@ -68,6 +68,10 @@ def cca_omb_components(exp: str, stim_nr: int,
             select_cells = np.array(select_cells)
         spikes = spikes[select_cells]
         st.nclusters = len(select_cells)
+        # Convert to list for better string representation
+        # np.array is printed as "array([....])"
+        # with newline characters which is problematic in filenames
+        select_cells = list(select_cells)
 
     nspikes_percell = spikes.sum(axis=1)
 
