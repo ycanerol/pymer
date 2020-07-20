@@ -4,6 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import rcca
 
+from matplotlib.ticker import MaxNLocator
+
 import analysis_scripts as asc
 import model_fitting_tools as mft
 import spikeshuffler
@@ -34,6 +36,7 @@ def cca_omb_components(exp: str, stim_nr: int,
         The regularization parameter to be passed onto rcca.CCA.
     filter_length:
         The length of the time window to be considered in the past for the stimulus and the responses.
+        Can be different for stimulus and response, if a tuple is given.
     shufflespikes: bool
         Whether to randomize the spikes, to validate the results
     savedir: str
@@ -56,6 +59,9 @@ def cca_omb_components(exp: str, stim_nr: int,
     st = OMB(exp, stim_nr)
     if filter_length is None:
         filter_length = st.filter_length
+
+    if type(filter_length) is int:
+        filter_length = (filter_length, filter_length)
 
     if type(savedir) is str:
         savedir = Path(savedir)
@@ -86,13 +92,13 @@ def cca_omb_components(exp: str, stim_nr: int,
 
     #sp_train, sp_test, stim_train, stim_test = train_test_split(spikes, bgsteps)
 
-    stimulus = mft.packdims(st.bgsteps, filter_length)
-    spikes = mft.packdims(spikes, filter_length)
+    stimulus = mft.packdims(st.bgsteps, filter_length[0])
+    spikes = mft.packdims(spikes, filter_length[1])
 
     cca.train([spikes, stimulus])
 
     cells = np.swapaxes(cca.ws[0], 1, 0)
-    cells = cells.reshape((n_components, st.nclusters, filter_length))
+    cells = cells.reshape((n_components, st.nclusters, filter_length[1]))
 
     nsp_argsorted = np.argsort(nspikes_percell)
     cells_sorted_nsp = cells[:, nsp_argsorted, :]
@@ -105,8 +111,8 @@ def cca_omb_components(exp: str, stim_nr: int,
     if plot_first_ncells is not None:
         cells_toplot = cells_toplot[:, :plot_first_ncells, ...]
 
-    motionfilt_x = cca.ws[1][:filter_length].T
-    motionfilt_y = cca.ws[1][filter_length:].T
+    motionfilt_x = cca.ws[1][:filter_length[0]].T
+    motionfilt_y = cca.ws[1][filter_length[0]:].T
 
     motionfilt_r, motionfilt_theta = mft.cart2pol(motionfilt_x, motionfilt_y)
     #%%
@@ -127,6 +133,12 @@ def cca_omb_components(exp: str, stim_nr: int,
 
     nsubplots = plf.numsubplots(n_components)
     height_list = [1, 1, 1, 3] # ratios of the plots in each component
+
+    # Create a time vector for the stimulus plots
+    t_stim = -np.arange(0, filter_length[0]*st.frame_duration, st.frame_duration)[::-1] * 1000
+    t_response = -np.arange(0, filter_length[1]*st.frame_duration, st.frame_duration)[::-1] * 1000
+    xtick_loc_params = dict(nbins=4, steps=[2, 5, 10], integer=True)
+
     nsubrows = len(height_list)
     height_ratios = nsubplots[0] * height_list
     fig, axes = plt.subplots(nrows=nsubplots[0]*nsubrows, ncols=nsubplots[1],
@@ -140,41 +152,62 @@ def cca_omb_components(exp: str, stim_nr: int,
             ax.set_yticks([])
             # Plot motion filters
             if row % nsubrows == 0:
-                ax.plot(motionfilt_x[mode_i, :], marker='o', markersize=1)
-                ax.plot(motionfilt_y[mode_i, :], marker='o', markersize=1)
+
+                ax.plot(t_stim, motionfilt_x[mode_i, :], marker='o', markersize=1)
+                ax.plot(t_stim, motionfilt_y[mode_i, :], marker='o', markersize=1)
                 if col==0: ax.set_ylabel('Motion', rotation=0, ha='right', va='center')
                 ax.set_ylim(cca.ws[1].min(), cca.ws[1].max())
+
+                # Draw a horizontal line for zero and prevent rescaling of x-axis
+                xlims = ax.get_xlim()
                 ax.hlines(0, *ax.get_xlim(), colors='k', linestyles='dashed', alpha=0.3)
+                ax.set_xlim(*xlims)
+
                 # ax.set_title(f'Component {mode_i}', fontweight='bold')
-                ax.xaxis.set_ticklabels([])
+
+                ax.xaxis.set_major_locator(MaxNLocator(**xtick_loc_params))
+
+                if not mode_i == 0 or filter_length[0] == filter_length[1]:
+                    ax.xaxis.set_ticklabels([])
+                else:
+                    ax.tick_params(axis='x', labelsize=8)
+
             # Plot magnitude of motion
             elif row % nsubrows == 1:
-                ax.plot(motionfilt_r[mode_i, :], color='k', marker='o', markersize=1)
+                ax.plot(t_stim, motionfilt_r[mode_i, :], color='k', marker='o', markersize=1)
                 if col==0: ax.set_ylabel('Magnitude', rotation=0, ha='right', va='center')
                 ax.set_ylim(motionfilt_r.min(), motionfilt_r.max())
                 ax.xaxis.set_ticklabels([])
+                ax.xaxis.set_major_locator(MaxNLocator(**xtick_loc_params))
             # Plot direction of motion
             elif row % nsubrows == 2:
-                ax.plot(motionfilt_theta[mode_i, :], color='r', marker='o', markersize=1)
+                ax.plot(t_stim, motionfilt_theta[mode_i, :], color='r', marker='o', markersize=1)
                 if mode_i == 0:
                     ax.yaxis.set_ticks([-np.pi, 0, np.pi])
                     ax.yaxis.set_ticklabels(['-π', 0, 'π'])
                 ax.xaxis.set_ticklabels([])
+                ax.xaxis.set_major_locator(MaxNLocator(**xtick_loc_params))
             # Plot cell weights
             elif row % nsubrows == nsubrows-1:
                 im = ax.imshow(cells_toplot[mode_i, :], cmap='RdBu_r',
                                vmin=asc.absmin(cells), vmax=asc.absmax(cells),
                                aspect='auto',
-                             interpolation='nearest')
-                ax.set_xticks([])
+                               interpolation='nearest',
+                               extent=[t_response[0], t_response[-1], 0, cells_toplot.shape[1]])
+                ax.xaxis.set_major_locator(MaxNLocator(**xtick_loc_params))
                 if row == axes.shape[0]-1:
-                    ax.set_xlabel('Time [s]')
-                    ax.set_xticks(np.array([0, .25, .5, .75, 1]) * cells_toplot.shape[-1])
-                    ax.xaxis.set_ticklabels(np.round((ax.get_xticks()*st.frame_duration), 1))
+                    ax.set_xlabel('Time before spike [ms]')
+                    # ax.set_xticks(np.array([0, .25, .5, .75, 1]) * cells_toplot.shape[-1])
+                    # ax.xaxis.set_ticklabels(-np.round((ax.get_xticks()*st.frame_duration), 2)[::-1])
+                else:
+                    ax.xaxis.set_ticklabels([])
+
+                plf.integerticks(ax, 5, which='y')
                 if col==0:
                     ax.set_ylabel(f'Cells\n{"(sorted nsp)"*sort_by_nspikes}\n{("(first " + str(plot_first_ncells)+ " cells)")*(type(plot_first_ncells) is int) }',
                                   rotation=0, ha='right', va='center')
-                    plf.integerticks(ax, 5, which='y')
+                else:
+                    ax.yaxis.set_ticklabels([])
                 if mode_i == n_components-1:
                     plf.colorbar(im)
             # Add ticks on the right side of the plots
@@ -184,7 +217,7 @@ def cca_omb_components(exp: str, stim_nr: int,
 
     fig.suptitle(f'CCA components of {st.exp_foldername}\n{shufflespikes=} {n_components=}\n{sort_by_nspikes=}\n'
             + f'{select_cells=} {regularization=} {filter_length=}')
-    fig.subplots_adjust(wspace=0.1)
+    fig.subplots_adjust(wspace=0.1, hspace=0.3)
     if savefig:
         fig.savefig(savedir / f'{figsavename}_cellsandcomponents.pdf')
     # plt.show()
