@@ -1,6 +1,5 @@
-
-import os
 import numpy as np
+from pathlib import Path
 
 import analysis_scripts as asc
 import iofuncs as iof
@@ -14,9 +13,9 @@ class Stimulus:
         self.maxframes = maxframes
         self.clusters, self.metadata = asc.read_spikesheet(self.exp)
         self.nclusters = self.clusters.shape[0]
-        self.exp_dir = iof.exp_dir_fixer(exp)
-        self.exp_foldername = os.path.split(self.exp_dir)[-1]
-        self.stimname = iof.getstimname(exp, stimnr)
+        self.exp_dir = Path(iof.exp_dir_fixer(exp))
+        self.exp_foldername = self.exp_dir.stem
+        self.stimname = iof.getstimname(self.exp_dir, self.stimnr)
         self.clids = plf.clusters_to_ids(self.clusters)
         self.refresh_rate = self.metadata['refresh_rate']
         self.sampling_rate = self.metadata['sampling_freq']
@@ -24,8 +23,7 @@ class Stimulus:
         self.get_frametimings()
         self._getstimtype()
 
-        self.stim_dir = os.path.join(self.exp_dir, 'data_analysis',
-                                     self.stimname)
+        self.stim_dir = self.exp_dir / 'data_analysis' / self.stimname
 
     def _getstimtype(self):
         sortedstim = asc.stimulisorter(self.exp)
