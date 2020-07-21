@@ -22,6 +22,7 @@ from stripesurround import stripesurround
 from checkerflickerplusanalyzer import checkerflickerplusanalyzer
 from OMSpatchesanalyzer import OMSpatchesanalyzer
 from OMBanalyzer import OMBanalyzer
+from ombtexturestas import ombtexturesta
 from saccadegratingsanalyzer import saccadegratingsanalyzer
 
 # Attempt to read from stdin
@@ -61,6 +62,7 @@ stripesurround(exp_name, stripeflicker)
 OMSpatchesanalyzer(exp_name, OMSpatches)
 for stim in OMB:
     OMBanalyzer(exp_name, stim)
+    ombtexturesta(exp_name, stim)
 for stim in saccadegrating:
     saccadegratingsanalyzer(exp_name, stim)
 
