@@ -13,6 +13,50 @@ import plotfuncs as plf
 from omb import OMB
 
 
+def whiten_data(data: np.array):
+    """
+    Whiten any given data and return the matrix that will transform
+    the data into original coordinates.
+
+    Rows of the input data matrix correspond to the individual dimensions,
+    columns are the features.
+
+    Original source:
+    https://theclevermachine.wordpress.com/2013/03/30/the-statistical-whitening-transform/
+
+    Example
+    ----
+    whitened, rotation = whiten_data(data)
+
+    [do your anaylsis on whitened data here]
+    result = get_components(whitened)
+
+    results_unrotated = result @ rotation
+    """
+    if not np.isclose(np.mean(data), 0, atol=1e-2):
+        raise ValueError('Data should be mean-subtracted before whitening.')
+
+    # Decorrelate the data by calculating the
+    # eigenvectors of its covariance matrix
+    # and multiplying the matrix by it
+    #
+    # Technically, we multiply by transpose of this matrix
+    # but they are equal (as well as the inverse of this matrix)
+    eigvals, eigvecs = np.linalg.eigh(np.cov(data))
+    rotation = eigvecs
+    data_decor = rotation @ data
+
+    # We scale the matrix by multiplying it by D^(-1/2)
+    D = np.diag(eigvals ** (-0.5))
+    data_decor_scaled = D @ data_decor
+
+    # The resulting whitened matrix is in rotated coordinates
+    # The rotation can be reversed by multiplying by the inverse
+    # of the rotation matrix, which is equal to the rotation
+    # matrix itself.
+    return data_decor_scaled, rotation
+
+
 def cca_omb_components(exp: str, stim_nr: int,
                        n_components: int = 6,
                        regularization=None,
@@ -72,7 +116,7 @@ def cca_omb_components(exp: str, stim_nr: int,
 
     spikes = st.allspikes()
     # Set the mean to zero for spikes
-    spikes -= spikes.mean(axis=1)
+    spikes -= spikes.mean(axis=1)[:, None]
 
     bgsteps = st.bgsteps
 
@@ -97,6 +141,8 @@ def cca_omb_components(exp: str, stim_nr: int,
 
     stimulus = mft.packdims(st.bgsteps, filter_length[0])
     spikes = mft.packdims(spikes, filter_length[1])
+
+    spikes, spikes_rotation = whiten_data(spikes)
 
     cca.train([spikes, stimulus])
 
