@@ -71,6 +71,9 @@ def cca_omb_components(exp: str, stim_nr: int,
         savedir.mkdir(exist_ok=True)
 
     spikes = st.allspikes()
+    # Set the mean to zero for spikes
+    spikes -= spikes.mean(axis=1)
+
     bgsteps = st.bgsteps
 
     if select_cells is not None:
