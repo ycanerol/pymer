@@ -42,13 +42,20 @@ def whiten_data(data: np.array):
     #
     # Technically, we multiply by transpose of this matrix
     # but they are equal (as well as the inverse of this matrix)
+    print(f'Starting eigendecomposition with {data.shape=}')
     eigvals, eigvecs = np.linalg.eigh(np.cov(data))
     rotation = eigvecs
+    print(f'Eigenvector calculation complete {eigvals.shape=} {eigvecs.shape=}')
+    print(f'Rotating the data matrix')
     data_decor = rotation @ data
+    print(f'Data matrix rotated')
 
     # We scale the matrix by multiplying it by D^(-1/2)
+    print(f'Calculating D^(-1/2)')
     D = np.diag(eigvals ** (-0.5))
+    print(f'D calculated. Scaling the data.')
     data_decor_scaled = D @ data_decor
+    print(f'Whitening completed.')
 
     # The resulting whitened matrix is in rotated coordinates
     # The rotation can be reversed by multiplying by the inverse
