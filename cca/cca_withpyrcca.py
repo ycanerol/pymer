@@ -77,6 +77,7 @@ def cca_omb_components(exp: str, stim_nr: int,
                        n_components: int = 6,
                        regularization=None,
                        filter_length=None,
+                       maxframes=None,
                        shufflespikes: bool = False, savedir: str = None,
                        savefig: bool = True, sort_by_nspikes: bool = True,
                        select_cells: list = None,
@@ -97,6 +98,9 @@ def cca_omb_components(exp: str, stim_nr: int,
     filter_length:
         The length of the time window to be considered in the past for the stimulus and the responses.
         Can be different for stimulus and response, if a tuple is given.
+    maxframes: int
+        Number of frames to load in the the experiment object. Used to avoid memory and performance
+        issues.
     shufflespikes: bool
         Whether to randomize the spikes, to validate the results
     savedir: str
@@ -116,7 +120,8 @@ def cca_omb_components(exp: str, stim_nr: int,
 
     cca = rcca.CCA(kernelcca=False, reg=regularization, numCC=n_components)
 
-    st = OMB(exp, stim_nr)
+    st = OMB(exp, stim_nr, maxframes=maxframes)
+
     if filter_length is None:
         filter_length = st.filter_length
 
