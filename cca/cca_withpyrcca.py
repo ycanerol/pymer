@@ -58,7 +58,10 @@ def whiten_data(data: np.array):
 
     # We scale the matrix by multiplying it by D^(-1/2)
     print(f'{timediff(start)}  Calculating D^(-1/2)')
+    # Make sure the eigenvalues are not zero
+    eigvals += 1e-10
     D = np.diag(eigvals ** (-0.5))
+
     print(f'{timediff(start)}  D calculated. Scaling the data.')
     data_decor_scaled = D @ data_decor
     print(f'{timediff(start)}  Whitening completed.')
