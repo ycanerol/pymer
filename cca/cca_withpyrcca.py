@@ -46,8 +46,10 @@ def whiten_data(data: np.array):
     from miscfuncs import timediff
 
     start = datetime.now()
-    print(f'{timediff(start)}  Starting eigendecomposition with {data.shape=}')
-    eigvals, eigvecs = np.linalg.eigh(np.cov(data))
+    print(f'{timediff(start)}  Calculating covariance matrix with {data.shape=}')
+    covx = np.cov(data)
+    print(f'{timediff(start)}  Covariance calculated, starting eigendecomposition ')
+    eigvals, eigvecs = np.linalg.eigh(covx)
     rotation = eigvecs
     print(f'{timediff(start)}  Eigenvector calculation complete {eigvals.shape=} {eigvecs.shape=}')
     print(f'{timediff(start)}  Rotating the data matrix')
