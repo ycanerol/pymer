@@ -12,6 +12,7 @@ import spikeshuffler
 import plotfuncs as plf
 from omb import OMB
 
+whiten = False
 
 def whiten_data(data: np.array):
     """
@@ -156,14 +157,15 @@ def cca_omb_components(exp: str, stim_nr: int,
     if shufflespikes:
         spikes = spikeshuffler.shufflebyrow(spikes)
 
-    figsavename = f'{n_components=}_{shufflespikes=}_{select_cells=}_{regularization=}_{filter_length=}'
+    figsavename = f'{n_components=}_{shufflespikes=}_{select_cells=}_{regularization=}_{filter_length=}_{whiten=}'
 
     #sp_train, sp_test, stim_train, stim_test = train_test_split(spikes, bgsteps)
 
     stimulus = mft.packdims(st.bgsteps, filter_length[0])
     spikes = mft.packdims(spikes, filter_length[1])
 
-    spikes, spikes_rotation = whiten_data(spikes)
+    if whiten:
+        spikes, spikes_rotation = whiten_data(spikes)
 
     cca.train([spikes, stimulus])
 
