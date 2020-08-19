@@ -9,6 +9,7 @@ from matplotlib.ticker import MaxNLocator
 import analysis_scripts as asc
 import model_fitting_tools as mft
 import spikeshuffler
+import nonlinearity as nlt
 import plotfuncs as plf
 from omb import OMB
 
@@ -307,3 +308,22 @@ def cca_omb_components(exp: str, stim_nr: int,
     # plt.show()
     plt.close(fig_corrs)
 
+
+    fig_nlt, axes_nlt = plt.subplots(nrows, ncols, figsize=(10, 10))
+    for i, ax in enumerate(axes_nlt.flatten()):
+        # Reshape to perform the convolution as a matrix multiplication
+
+        generator_motion = stimulus @ cca.ws[1][..., i]
+        generator_cells = spikes @ cca.ws[0][..., i]
+
+        nonlinearity, bins = nlt.calc_nonlin(generator_cells, generator_motion)
+        ax.scatter(generator_motion, generator_cells, s=1, alpha=0.5, facecolor='grey')
+        ax.plot(bins, nonlinearity, 'k')
+        ax.set_xlabel('Generator motion')
+        ax.set_ylabel('Generator cells')
+
+    fig_nlt.suptitle(f'Nonlinearities\n{figsavename}')
+    if savefig:
+        fig_nlt.savefig(savedir / f'{figsavename}_nonlinearity.png')
+    fig.close()
+    plt.show()
