@@ -13,7 +13,7 @@ import nonlinearity as nlt
 import plotfuncs as plf
 from omb import OMB
 
-whiten = False
+whiten = True
 
 def whiten_data(data: np.array):
     """
@@ -46,6 +46,9 @@ def whiten_data(data: np.array):
     # but they are equal (as well as the inverse of this matrix)
     from datetime import datetime
     from miscfuncs import timediff
+
+    # We want the to apply the whitening between different cells, not across time
+    data = data.T
 
     start = datetime.now()
     print(f'{timediff(start)}  Calculating covariance matrix with {data.shape=}')
