@@ -328,5 +328,4 @@ def cca_omb_components(exp: str, stim_nr: int,
     fig_nlt.suptitle(f'Nonlinearities\n{figsavename}')
     if savefig:
         fig_nlt.savefig(savedir / f'{figsavename}_nonlinearity.png')
-    fig.close()
-    plt.show()
+    plt.close(fig_nlt)
