@@ -70,7 +70,7 @@ def nestedupdate(d, u):
         Update dictionary with altered values
     """
     for k, v in u.items():
-        if isinstance(v, collections.Mapping):
+        if isinstance(v, collections.abc.Mapping):
             d[k] = nestedupdate(d.get(k, {}), v)
         else:
             d[k] = v
