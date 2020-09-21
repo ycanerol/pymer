@@ -21,3 +21,4 @@ dependencies:
 - pip:
   - pyglmnet
   - pycorrelate
+  - pyrcca
