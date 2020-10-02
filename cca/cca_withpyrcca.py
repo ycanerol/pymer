@@ -163,6 +163,9 @@ def cca_omb_components(exp: str, stim_nr: int,
         spikes = spikeshuffler.shufflebyrow(spikes)
 
     figsavename = f'{n_components=}_{shufflespikes=}_{select_cells=}_{regularization=}_{filter_length=}_{whiten=}'
+    # If the file length gets too long due to the list of selected cells, summarize it.
+    if len(figsavename) > 200:
+        figsavename = f'{n_components=}_{shufflespikes=}_select_cells={len(select_cells)}cells-index{select_cells[0]}to{select_cells[-1]}_{regularization=}_{filter_length=}_{whiten=}'
 
     #sp_train, sp_test, stim_train, stim_test = train_test_split(spikes, bgsteps)
 
