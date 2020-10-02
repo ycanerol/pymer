@@ -71,11 +71,12 @@ def whiten_data(data: np.array):
     data_decor_scaled = D @ data_decor
     print(f'{timediff(start)}  Whitening completed.')
 
+    data_decor_scaled_transposed = data_decor_scaled.T
     # The resulting whitened matrix is in rotated coordinates
     # The rotation can be reversed by multiplying by the inverse
     # of the rotation matrix, which is equal to the rotation
     # matrix itself.
-    return data_decor_scaled, rotation
+    return data_decor_scaled_transposed, rotation
 
 
 def cca_omb_components(exp: str, stim_nr: int,
