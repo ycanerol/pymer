@@ -13,7 +13,7 @@ import nonlinearity as nlt
 import plotfuncs as plf
 from omb import OMB
 
-whiten = True
+whiten = False
 
 def whiten_data(data: np.array):
     """
@@ -324,10 +324,34 @@ def cca_omb_components(exp: str, stim_nr: int,
         generator_cells = spikes @ cca.ws[0][..., i]
 
         nonlinearity, bins = nlt.calc_nonlin(generator_cells, generator_motion)
-        ax.scatter(generator_motion, generator_cells, s=1, alpha=0.5, facecolor='grey')
+        # ax.scatter(generator_motion, generator_cells, s=1, alpha=0.5, facecolor='grey')
         ax.plot(bins, nonlinearity, 'k')
-        ax.set_xlabel('Generator motion')
-        ax.set_ylabel('Generator cells')
+
+    nlt_xlims = []
+    nlt_ylims = []
+    for i, ax in enumerate(axes_nlt.flatten()):
+        xlim = ax.get_xlim()
+        ylim = ax.get_ylim()
+
+        nlt_xlims.extend(xlim)
+        nlt_ylims.extend(ylim)
+    nlt_maxx, nlt_minx = max(nlt_xlims), min(nlt_xlims)
+    nlt_maxy, nlt_miny = max(nlt_ylims), min(nlt_ylims)
+
+    for i, ax in enumerate(axes_nlt.flatten()):
+        ax.set_xlim([nlt_minx, nlt_maxx])
+        ax.set_ylim([nlt_miny, nlt_maxy])
+
+    for i, axes_row in enumerate(axes_nlt):
+        for j, ax in enumerate(axes_row):
+            if i == nrows-1:
+                ax.set_xlabel('Generator (motion)')
+            if j == 0:
+                ax.set_ylabel('Generator (cells)')
+            else:
+                ax.yaxis.set_ticklabels([])
+            ax.set_xlim([nlt_minx, nlt_maxx])
+            ax.set_ylim([nlt_miny, nlt_maxy])
 
     fig_nlt.suptitle(f'Nonlinearities\n{figsavename}')
     if savefig:
