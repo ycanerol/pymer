@@ -177,7 +177,13 @@ def cca_omb_components(exp: str, stim_nr: int,
 
     cca.train([spikes, stimulus])
 
-    cells = np.swapaxes(cca.ws[0], 1, 0)
+    # import IPython.core.debugger as ipdb; ipdb.set_trace()
+    spikes_res = cca.ws[0]
+    # Derotate the data to be able to interpret the responses
+    if whiten:
+        spikes_res = spikes_rotation @ spikes_res
+
+    cells = np.swapaxes(spikes_res, 1, 0)
     cells = cells.reshape((n_components, st.nclusters, filter_length[1]))
 
     nsp_argsorted = np.argsort(nspikes_percell)
