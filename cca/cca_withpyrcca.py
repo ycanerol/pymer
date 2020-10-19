@@ -321,7 +321,6 @@ def cca_omb_components(exp: str, stim_nr: int,
     # plt.show()
     plt.close(fig_corrs)
 
-
     fig_nlt, axes_nlt = plt.subplots(nrows, ncols, figsize=(10, 10))
     for i, ax in enumerate(axes_nlt.flatten()):
         # Reshape to perform the convolution as a matrix multiplication
@@ -332,6 +331,11 @@ def cca_omb_components(exp: str, stim_nr: int,
         nonlinearity, bins = nlt.calc_nonlin(generator_cells, generator_motion)
         # ax.scatter(generator_motion, generator_cells, s=1, alpha=0.5, facecolor='grey')
         ax.plot(bins, nonlinearity, 'k')
+        if i == 0:
+            all_nonlinearities = np.empty((n_components, *nonlinearity.shape))
+            all_bins = np.empty((n_components, *bins.shape))
+        all_nonlinearities[i, ...] = nonlinearity
+        all_bins[i, ...] = bins
 
     nlt_xlims = []
     nlt_ylims = []
@@ -363,3 +367,10 @@ def cca_omb_components(exp: str, stim_nr: int,
     if savefig:
         fig_nlt.savefig(savedir / f'{figsavename}_nonlinearity.png')
     plt.close(fig_nlt)
+    keystosave = [ 'n_components', 'cells', 'motionfilt_x', 'motionfilt_y',
+                    'motionfilt_r', 'motionfilt_theta', 'cells_sorted_nsp',
+                    'select_cells', 'regularization', 'filter_length', ]
+    datadict = dict()
+    for key in keystosave:
+        datadict[key] = locals()[key]
+    np.savez(savedir / figsavename, **datadict)
