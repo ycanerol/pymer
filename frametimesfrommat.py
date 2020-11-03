@@ -40,15 +40,31 @@ def frametimesfrommat(exp_name):
         try:
             f = scipy.io.matlab.loadmat(matfile)
             ftimes = f['ftimes'][0, :]
+            if 'ftimesoff' in f.keys():
+                ftimes_off = f['ftimesoff'][0, :]
+            else:
+                ftimes_off = None
         except NotImplementedError:
             import h5py
             with h5py.File(matfile, mode='r') as f:
                 ftimes = f['ftimes'][:]
+
+                if 'ftimesoff' in f.keys():
+                    ftimes_off = f['ftimesoff'][:]
+                else:
+                    ftimes_off = None
+
                 if len(ftimes.shape) != 1:
                     ftimes = ftimes.flatten()
+                    if ftimes_off is not None:
+                        ftimes_off = ftimes_off.flatten()
 
         ftimes = (ftimes/1000)+monitor_delay
+        savedict = {'f_on' : ftimes}
+        if ftimes_off is not None:
+            ftimes_off = (ftimes_off/1000)+monitor_delay
+            savedict.update({'f_off' : ftimes_off})
 
         np.savez(os.path.join(exp_dir, 'frametimes', name + '_frametimes'),
-                 f_on=ftimes)
+                 **savedict)
         print(f'Converted and saved frametimes for {name}')
