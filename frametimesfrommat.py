@@ -34,7 +34,9 @@ def frametimesfrommat(exp_name):
                 raise
 
         matfile = os.path.join(exp_dir, 'frametimes', name + '_frametimings.mat')
-
+        if not os.path.isfile(matfile):
+            name = '0' + name
+            matfile = os.path.join(exp_dir, 'frametimes', name + '_frametimings.mat')
         try:
             f = scipy.io.matlab.loadmat(matfile)
             ftimes = f['ftimes'][0, :]
