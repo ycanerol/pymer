@@ -59,10 +59,10 @@ def frametimesfrommat(exp_name):
                     if ftimes_off is not None:
                         ftimes_off = ftimes_off.flatten()
 
-        ftimes = (ftimes/1000)+monitor_delay
+        ftimes = ftimes+monitor_delay
         savedict = {'f_on' : ftimes}
         if ftimes_off is not None:
-            ftimes_off = (ftimes_off/1000)+monitor_delay
+            ftimes_off = ftimes_off+monitor_delay
             savedict.update({'f_off' : ftimes_off})
 
         np.savez(os.path.join(exp_dir, 'frametimes', name + '_frametimes'),
