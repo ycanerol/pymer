@@ -175,7 +175,8 @@ def read_infofile(folder):
     """
     infofile = pd.read_csv(os.path.join(folder, 'cluster_info.tsv'),
                        sep='\t', header=0)
-    # Change from index zero to index one
+    # Kilosort channel ID's start from zero, to make them backwards
+    # compatible, change them to start from one
     infofile.loc[:, 'ch'] +=1
     return infofile
 

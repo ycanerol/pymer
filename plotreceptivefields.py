@@ -17,7 +17,7 @@ import iofuncs as iof
 import analysis_scripts as asc
 import miscfuncs as msc
 
-exp = '20171122'
+exp = '20180710_kilosorted'
 sorted_stimuli = asc.stimulisorter(exp)
 #checker = sorted_stimuli['frozennoise'][0]
 checker = sorted_stimuli['checkerflicker'][0]
@@ -63,6 +63,7 @@ def mahalonobis_convert(Z, pars):
 def drawellipse(pars, bound, ax=None):
     if ax is None:
         ax = plt.gca()
+    # Flip it for correct x-y axis
     center = pars[2:4][::-1]
     width_x = pars[5]*2 # HINT: magic number, possibly due to diameter vs radius
     width_y = pars[4]*2 # difference in the arguments accepted by Ellipse and gaussfit
@@ -75,6 +76,14 @@ def drawellipse(pars, bound, ax=None):
                  fill=False, edgecolor='green', lw=1)
     ax.add_artist(rf)
     return rf
+
+
+def label_ellipse(pars, text, ax=None):
+    if ax is None:
+        ax = plt.gca()
+    center = pars[2:4][::-1]
+    ax.text(*center, text, va='center', ha='center')
+
 
 #%%
 stixelw, stixelh = parameters['stixelwidth'],parameters['stixelheight']
@@ -102,7 +111,7 @@ for i, _ in enumerate(data['clusters']):
     Zm = mahalonobis_convert(Z, pars)
 
     drawellipse(pars, bound, ax)
-
+    label_ellipse(pars, i, ax)
     with warnings.catch_warnings():
         warnings.filterwarnings('ignore', category=UserWarning)
 #        ax.contour(X, Y, Zm, [bound])

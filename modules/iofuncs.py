@@ -97,7 +97,7 @@ def exp_dir_fixer(exp_name):
                 files = glob.glob(exp_dir+'*')
 
                 if len(files) > 1:
-                    raise ValueError('Multiple folders'
+                    raise ValueError('Multiple folders '
                                      'found matching'
                                      ' pattern: {}\n {}'.format(exp_name,
                                                                 files))

@@ -37,34 +37,36 @@ def frametimesfrommat(exp_name):
         matfile = os.path.join(exp_dir, 'frametimes', name + '_frametimings.mat')
         # Check for zero padded name
         if not os.path.isfile(matfile):
-            matfile = os.path.join(exp_dir, 'frametimes', '0' + name + '_frametimings.mat')
-
+            name = '0' + name
+            matfile = os.path.join(exp_dir, 'frametimes', name + '_frametimings.mat')
         try:
             f = scipy.io.matlab.loadmat(matfile)
             ftimes = f['ftimes'][0, :]
-            try:
+            if 'ftimesoff' in f.keys():
                 ftimes_off = f['ftimesoff'][0, :]
-            except KeyError:
-                print(f'Frame times offset not found for stimulus {i}')
+            else:
                 ftimes_off = None
         except NotImplementedError:
             import h5py
             with h5py.File(matfile, mode='r') as f:
                 ftimes = f['ftimes'][:]
-                try:
+
+                if 'ftimesoff' in f.keys():
                     ftimes_off = f['ftimesoff'][:]
-                except KeyError:
-                    print(f'Frame times offset not found for stimulus {i}')
+                else:
                     ftimes_off = None
+
                 if len(ftimes.shape) != 1:
                     ftimes = ftimes.flatten()
                     if ftimes_off is not None:
                         ftimes_off = ftimes_off.flatten()
 
-        ftimes += monitor_delay
+        ftimes = ftimes+monitor_delay
+        savedict = {'f_on' : ftimes}
         if ftimes_off is not None:
-            ftimes_off += monitor_delay
+            ftimes_off = ftimes_off+monitor_delay
+            savedict.update({'f_off' : ftimes_off})
 
         np.savez(os.path.join(exp_dir, 'frametimes', name + '_frametimes'),
-                 f_on=ftimes, f_off=ftimes_off)
+                 **savedict)
         print(f'Converted and saved frametimes for {name}')

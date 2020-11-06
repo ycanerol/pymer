@@ -20,7 +20,7 @@ import nonlinearity as nlt
 from omb import OMB
 
 
-exp_name, stim_nr = '20180710', 8
+exp_name, stim_nr = '20180710_kilosorted', 8
 #exp_name, stim_nr = 'Kuehn', 13
 
 val_split_size = 0.1
