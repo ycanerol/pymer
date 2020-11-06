@@ -139,7 +139,7 @@ def cca_omb_components(exp: str, stim_nr: int,
 
     if savedir is None:
         savedir = st.stim_dir / 'CCA'
-        savedir.mkdir(exist_ok=True)
+        savedir.mkdir(exist_ok=True, parents=True)
 
     spikes = st.allspikes()
     # Set the mean to zero for spikes
