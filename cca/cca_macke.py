@@ -26,6 +26,10 @@ bgsteps = st.bgsteps
 
 stimulus = mft.packdims(st.bgsteps, filter_length[0])
 spikes = mft.packdims(spikes, filter_length[1])
+
+stimavg = stimulus.mean(axis=0)[np.newaxis, :]
+spikesavg = spikes.mean(axis=0)[np.newaxis, :]
+
 #%%
 stimcov = np.cov(stimulus.T)
 spkcov = np.cov(spikes.T)
@@ -35,10 +39,10 @@ stspcov = np.zeros((stimcov.shape[0], spkcov.shape[0]))
 for i in range(stspcov.shape[0]):
     for j in range(stspcov.shape[1]):
         stspcov[i, j] = np.mean(
-                (stimulus[i, :] - np.mean(stimulus[i, :]))*
-                (spikes[j, :] - np.mean(spikes[j, :]))
+                (stimulus[:, i] - np.mean(stimulus[:, i]))*
+                (spikes[:, j] - np.mean(spikes[:, j]))
                                 )
-
+#%%
 whitened_cov = stimcov**(-0.5) @ stspcov @ spkcov**(-0.5)
 
 u, s, vh = np.linalg.svd(whitened_cov, full_matrices=True)
