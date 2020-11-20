@@ -3,6 +3,7 @@ from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import rcca
+from scipy.linalg import fractional_matrix_power
 
 from matplotlib.ticker import MaxNLocator
 
@@ -43,7 +44,10 @@ for i in range(stspcov.shape[0]):
                 (spikes[:, j] - np.mean(spikes[:, j]))
                                 )
 #%%
-whitened_cov = stimcov**(-0.5) @ stspcov @ spkcov**(-0.5)
+
+stimcov_exp = fractional_matrix_power(stimcov, -0.5)
+spkcov_exp = fractional_matrix_power(spkcov, -0.5)
+whitened_cov =  stimcov_exp @ stspcov @ spkcov_exp
 
 u, s, vh = np.linalg.svd(whitened_cov, full_matrices=True)
 
