@@ -66,6 +66,9 @@ def exp_dir_fixer(exp_name):
     Convert short experiment name into full path. If input is already
     a full path it will be returned as is.
 
+    In order to avoid retyping common prefixes for experiment names, "experiment_prefixes"
+    key in the .pymer_config file are used.
+
     Following are some valid inputs:
         <valid_prefix>_20171122_fe_re_fp
         20171122_fe_re_fp

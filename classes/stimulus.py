@@ -7,6 +7,36 @@ import plotfuncs as plf
 
 
 class Stimulus:
+    """
+    Generic class for loading all data regarding a single stimulus. Classes for other stimuli are
+    derived from this.
+
+    Attribues:
+        exp:
+            Name of the experiment to be analyzed. Accepts short versions of the foldername.
+        stimnr:
+            Stimulus number in the experiment.
+        maxframes:
+            Maximum number of frames to load for the stimulus. Since the whole stimulus is loaded in the
+            memory by the class, large stimuli that exceed the size of memory cause problems.
+        clusters:
+            List of the units in the experiments in the form of channel, cluster nr, rating
+        nclusters:
+            Number of units
+        exp_dir:
+            Full path of the main experiment folder
+        exp_foldername:
+            Actual folder name of the experiment
+        stimname:
+            Stimulus name
+        clids:
+            Cluster id's, padded strings with channel and cluster number, useful for plotting e.g. 02801
+        frametimings:
+            Pulses marking the stimulus presentation/change times in seconds.
+        allspikes:
+            Binned spike times for all clusters.
+
+    """
     def __init__(self, exp, stimnr, maxframes=None):
         self.exp = exp
         self.stimnr = stimnr
@@ -83,7 +113,7 @@ class Stimulus:
 
 class Parameters:
     """
-    Dummy class to hold parameters.
+    Dummy class to hold stimulus parameters.
     """
     def __init__(self):
         pass
