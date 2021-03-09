@@ -578,7 +578,7 @@ def check_interactive_backend():
     backend = mpl.get_backend()
     if not backend[:2] in interactive_backends:
         raise ValueError('Switch to an interactive backend (e.g. Qt) to see'
-                         ' the animation.')
+                         ' the animation. %matplotlib qt can be used in IPython')
 
 
 def integerticks(axes, *args, which='xyz', **kwargs):
