@@ -65,7 +65,10 @@ def read_spikesheet(exp_name, cutoff=4, defaultpath=True, onlymetadata=False):
         filenames = iof.config('spike_sorting_filenames')
         for filename in filenames:
             filepath = os.path.join(exp_dir, filename)
-            if os.path.isfile(filepath + '.ods'):
+            if iskilosorted(exp_name) and not onlymetadata:
+                import readks
+                return readks.read_spikesheet_ks(exp_name)
+            elif os.path.isfile(filepath + '.ods'):
                 filepath += '.ods'
                 meta_keys = [0, 0, 1, 25]
                 meta_vals = [1, 0, 2, 25]
@@ -81,9 +84,6 @@ def read_spikesheet(exp_name, cutoff=4, defaultpath=True, onlymetadata=False):
                 cluster_cltr = [51, 5, 2000, 6]
                 cluster_rtng = [51, 6, 2000, 7]
                 break
-            elif iskilosorted(exp_name) and not onlymetadata:
-                import readks
-                return readks.read_spikesheet_ks(exp_name)
 
         else:
             raise FileNotFoundError('Spike sorting file (ods/xlsx) not found.')
