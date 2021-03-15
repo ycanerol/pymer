@@ -28,7 +28,11 @@ def calc_covar(stim_small):
 
 def OMBanalyzer(exp_name, stimnr, plotall=False, nr_bins=20):
     """
-    Analyze responses to object moving background stimulus.
+    Analyze responses to object moving background stimulus. STA and STC
+    are calculated.
+
+    Note that there are additional functions that make use of the
+    OMB class. This function was written before the OMB class existed
     """
     # TODO
     # Add iteration over multiple stimuli
