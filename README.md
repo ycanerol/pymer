@@ -4,6 +4,8 @@ array recordings from the **r**etina in the Gollisch lab, Göttingen.
 
 # Installing
 
+Install the latest version of [Anaconda](https://www.anaconda.com/products/individual#Downloads) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html).
+
 ## Creating conda environment
 
 Open the terminal and navigate to the directory where you downloaded the repository.
@@ -11,43 +13,63 @@ Open the terminal and navigate to the directory where you downloaded the reposit
 conda env create --file environment.yml
 ```
 
-This will create a new conda environment named pymer with the required packages. You
-need to activate it.
+This will create a new conda environment named pymer with the required packages. 
 
-The environment name can be overriden by `-n <your_fav_name>` flag.
-
-## Adding path variables
-Folder paths to `modules/` and `external_libs/` should be added
-to your python path variable, so that the imports can work.
-
-One way would be adding a link to them in the site-packages:
+Each time you want to use this environment, you need to activate it:
 ```bash
-echo "<path_to_main_dir>/modules" >> "<python_install_loc>/lib/python<your_version>/site-packages/modules.pth"
-echo "<path_to_main_dir>/external_libs" >> "<python_install_loc>/lib/python<your_version>/site-packages/external_libs.pth"
+conda activate pymer
 ```
 
-OR
-Add the following to the ~/.pythonrc
+## Adding path variables
+
+A few folder paths need to be made available to python so that the scripts in those
+folders are reachable. This can be done by a single import when the directory is set
+to the pymer folder.
+
 ```python
-import sys
-sys.path.append('<path_to_main_dir>/modules')
-sys.path.append('<path_to_main_dir>/external_libs')
+import pathadder
+```
+
+You should edit the `pymer_path` variable in this script to match the location of the
+folder where pymer is located.
+
+
+The import needs to be done each time you launch the python interpreter.
+
+If you'd like to make this more permanent, the following lines can be added to your `~/.bashrc` file
+
+```bash
+PYMERPATH='/home/user/repositories/pymer'
+export PYTHONPATH="${PYTHONPATH}:$PYMERPATH"
+export PYTHONPATH="${PYTHONPATH}:$PYMERPATH/modules"
+export PYTHONPATH="${PYTHONPATH}:$PYMERPATH/external_libs"
+export PYTHONPATH="${PYTHONPATH}:$PYMERPATH/classes"
+export PYTHONPATH="${PYTHONPATH}:$PYMERPATH/generalizedmodels"
 ```
 
 ## Random Number Generator
-The random number generator should be setup by running the setup.py file in
-external_libs/randpy as described in the readme file there.
+To set up the random number generator, run the following in the terminal with the pymer environment activated:
+
+```bash
+sudo apt install gcc g++
+
+cd external_libs/randpy
+
+python setup.py build_ext --inplace
+```
+
 
 ## User Configuration
-The file `pymer_config_default.json` is meant to be read-only. Local configurations
-may be set with a file `.pymer_config` in your home directory. These will
-override the default configuration.
 
 A local setting *root_experiment_dir* is necessary for most functions.
 
+This is a shortcut for all experiments, so that they are accessible from anywhere regardless of
+your current working directory. Once you set the root_experiment_directory, you can access experiments
+simply by their folder name instead of the full path.
+
 To set your local configuration, create an empty file named ".pymer_config" at
-your home directory (`/home/<username>` for Linux and Mac and
-`C:\Users\<username>` for Windows)
+your home directory (`/home/<username>/` for Linux and Mac and
+`C:\Users\<username>\` for Windows)
 and add the desired options. See the default configuration file for all options.
 
 A minimum working example to get you started would be:
