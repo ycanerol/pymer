@@ -13,7 +13,7 @@ Open the terminal and navigate to the directory where you downloaded the reposit
 conda env create --file environment.yml
 ```
 
-This will create a new conda environment named pymer with the required packages. 
+This will create a new conda environment named pymer with the required packages.
 
 Each time you want to use this environment, you need to activate it:
 ```bash
@@ -34,9 +34,10 @@ You should edit the `pymer_path` variable in this script to match the location o
 folder where pymer is located.
 
 
-The import needs to be done each time you launch the python interpreter.
+The import needs to be done each time you launch the python interpreter or in the beginning of each script/notebook.
 
-If you'd like to make this more permanent, the following lines can be added to your `~/.bashrc` file
+If you'd like to make this more permanent, the following lines can be added to your `~/.bashrc` file, changing the
+`PYMERPATH` variable to tha appropriate path.
 
 ```bash
 PYMERPATH='/home/user/repositories/pymer'

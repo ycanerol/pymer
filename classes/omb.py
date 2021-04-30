@@ -380,6 +380,14 @@ class OMB(Stimulus):
         """
         Returns an overview of all texture STAs with the detected receptive
         field centers marked.
+
+        In case the returned plot is interactive, make sure to assign the
+        returned fig and st variables to a value to prevent them from
+        garbage collected from memory.
+
+        Example
+        --------
+        fig, sl = st.show_texture_stas()
         """
         texturedata = self.read_texture_analysis()
         fig, sl = plf.multistabrowser(texturedata['texturestas'], self.frame_duration,
